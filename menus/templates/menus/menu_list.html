@@ -1,0 +1,11 @@
+<h1>Menu List</h1>
+<a href="{% url 'menu_create' %}">Add New Menu</a>
+<ul>
+    {% for menu in menus %}
+        <li>
+            {{ menu.menu_name }} — {{ menu.menu_url }}
+            <a href="{% url 'menu_update' menu.pk %}">Edit</a>
+            <a href="{% url 'menu_delete' menu.pk %}">Delete</a>
+        </li>
+    {% endfor %}
+</ul>
