@@ -1,0 +1,8 @@
+<h1>Delete Role</h1>
+<p>Are you sure you want to delete role: <strong>{{ role.role_name }}</strong>?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Yes, delete</button>
+    <a href="{% url 'role_list' %}">Cancel</a>
+</form>

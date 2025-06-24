@@ -1,0 +1,27 @@
+<h1>Role: {{ role.role_name }}</h1>
+<p>Description: {{ role.description }}</p>
+
+<h2>Assigned Menus:</h2>
+<ul>
+    {% for menu in assigned_menus %}
+        <li>
+            {{ menu.menu_name }} ({{ menu.menu_url }})
+            <a href="{% url 'remove_menu_from_role' role.pk menu.pk %}">Remove</a>
+        </li>
+    {% empty %}
+        <li>No menus assigned.</li>
+    {% endfor %}
+</ul>
+
+<h3>Add Menu to this Role:</h3>
+<form method="post">
+    {% csrf_token %}
+    <select name="menu_id">
+        {% for menu in unassigned_menus %}
+            <option value="{{ menu.pk }}">{{ menu.menu_name }} - {{ menu.menu_url }}</option>
+        {% endfor %}
+    </select>
+    <button type="submit">Add</button>
+</form>
+
+<a href="{% url 'role_list' %}">Back to Role List</a>
