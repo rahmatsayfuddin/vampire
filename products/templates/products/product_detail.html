@@ -1,0 +1,19 @@
+<h1>Product: {{ product.product_name }}</h1>
+
+{% if product.product_logo %}
+    <img src="{{ product.product_logo.url }}" width="150">
+{% endif %}
+
+<p>{{ product.description }}</p>
+
+<h2>Projects under {{ product.product_name }}</h2>
+<ul>
+    {% for project in projects %}
+        <li>
+            {{ project.project_name }} - {{ project.status }}
+            <a href="{% url 'project_update' project.pk %}">Edit</a>
+        </li>
+    {% empty %}
+        <li>No projects yet.</li>
+    {% endfor %}
+</ul>

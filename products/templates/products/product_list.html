@@ -1,0 +1,18 @@
+<h1>Product List</h1>
+<a href="{% url 'product_create' %}">Add New Product</a>
+<ul>
+{% for product in products %}
+    <li>
+        <strong>{{ product.product_name }}</strong><br>
+        {% if product.product_logo %}
+            <img src="{{ product.product_logo.url }}" width="100">
+        {% endif %}
+        <br>
+        {{ product.description }}
+        <br>
+        <a href="{% url 'product_detail' product.pk %}">Detail</a>|
+        <a href="{% url 'product_update' product.pk %}">Edit</a>|
+        <a href="{% url 'product_delete' product.pk %}">Delete</a>
+    </li>
+{% endfor %}
+</ul>
