@@ -4,6 +4,7 @@
 {% for project in projects %}
     <li>
         {{ project.project_name }} - {{ project.product.product_name }} - {{ project.status }}
+        <a href="{% url 'project_detail' project.pk %}">View</a>
         <a href="{% url 'project_update' project.pk %}">Edit</a>
         <a href="{% url 'project_delete' project.pk %}">Delete</a>
     </li>

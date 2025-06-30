@@ -1,0 +1,48 @@
+<h1>Project Detail</h1>
+
+<h2>{{ project.project_name }}</h2>
+<p><strong>Status:</strong> {{ project.status }}</p>
+<p><strong>Start Date:</strong> {{ project.start_date }}</p>
+<p><strong>End Date:</strong> {{ project.end_date|default:"-" }}</p>
+<p><strong>Description:</strong> {{ project.description|linebreaks }}</p>
+
+<hr>
+
+<h3>🧑‍💻 Assignments (Project Team)</h3>
+<ul>
+    {% for a in assignments %}
+        <li>{{ a.user }} — {{ a.title }}</li>
+    {% empty %}
+        <li>No team members assigned.</li>
+    {% endfor %}
+</ul>
+
+<h3>📞 PIC (External Contacts)</h3>
+<ul>
+    {% for p in pics %}
+        <li>{{ p.name }} — {{ p.email }}</li>
+    {% empty %}
+        <li>No external PICs.</li>
+    {% endfor %}
+</ul>
+
+<h3>🧪 Scanning Reports</h3>
+<ul>
+    {% for scan in scans %}
+        <li>{{ scan.scan_tool }} — {{ scan.report_file.name }}</li>
+    {% empty %}
+        <li>No scans uploaded.</li>
+    {% endfor %}
+</ul>
+
+<h3>🐞 Findings</h3>
+<ul>
+    {% for finding in findings %}
+        <li>{{ finding.severity }} — {{ finding.summary }}</li>
+    {% empty %}
+        <li>No findings reported.</li>
+    {% endfor %}
+</ul>
+
+<br>
+<a href="{% url 'project_list' %}">⬅ Back to Project List</a>

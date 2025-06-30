@@ -46,3 +46,14 @@ def product_detail(request, product_id):
         'product': product,
         'projects': projects
     })
+
+def project_detail(request, pk):
+    project = get_object_or_404(Project, pk=pk)
+    return render(request, 'projects/project_detail.html', {
+        'project': project,
+        # Placeholder untuk modul lainnya
+        'assignments': [],  # nanti diisi
+        'pics': [],
+        'scans': [],
+        'findings': [],
+    })
