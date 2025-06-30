@@ -21,14 +21,20 @@
 </ul>
 
 
-<h3>📞 PIC (External Contacts)</h3>
+<h3>📞 Stakeholders</h3>
+<a href="{% url 'add_stakeholder' project.pk %}">+ Add Stakeholder</a>
 <ul>
-    {% for p in pics %}
-        <li>{{ p.name }} — {{ p.email }}</li>
+    {% for s in project.stakeholder_set.all %}
+        <li>
+            {{ s.name }} — {{ s.organization }}<br>
+            {{ s.email }} {{ s.phone }}
+            <a href="{% url 'remove_stakeholder' s.pk %}">Remove</a>
+        </li>
     {% empty %}
-        <li>No external PICs.</li>
+        <li>No stakeholders added.</li>
     {% endfor %}
 </ul>
+
 
 <h3>🧪 Scanning Reports</h3>
 <ul>

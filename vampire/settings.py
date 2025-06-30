@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'users',
     'products',
     'projects',
-    'assignments'
+    'assignments',
+    'stakeholders'
 ]
 
 MIDDLEWARE = [
