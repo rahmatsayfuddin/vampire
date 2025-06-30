@@ -1,0 +1,7 @@
+<h1>Assign User to Project: {{ project.project_name }}</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Assign</button>
+</form>
+<a href="{% url 'project_detail' project.pk %}">Cancel</a>

@@ -9,13 +9,17 @@
 <hr>
 
 <h3>🧑‍💻 Assignments (Project Team)</h3>
+<a href="{% url 'add_assignment' project.pk %}">+ Assign New User</a>
 <ul>
-    {% for a in assignments %}
-        <li>{{ a.user }} — {{ a.title }}</li>
+    {% for a in project.assignment_set.all %}
+        <li>{{ a.user.full_name }} — {{ a.title }}
+            <a href="{% url 'remove_assignment' a.pk %}">Remove</a>
+        </li>
     {% empty %}
         <li>No team members assigned.</li>
     {% endfor %}
 </ul>
+
 
 <h3>📞 PIC (External Contacts)</h3>
 <ul>
