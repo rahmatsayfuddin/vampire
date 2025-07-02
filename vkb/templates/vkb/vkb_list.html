@@ -1,0 +1,13 @@
+<h1>Vulnerability Knowledge Base</h1>
+<a href="{% url 'vkb_create' %}">+ Add New</a>
+<ul>
+{% for item in items %}
+    <li>
+        <strong>{{ item.title }}</strong><br>
+        <a href="{% url 'vkb_update' item.pk %}">Edit</a> |
+        <a href="{% url 'vkb_delete' item.pk %}">Delete</a>
+    </li>
+{% empty %}
+    <li>No VKB items available.</li>
+{% endfor %}
+</ul>

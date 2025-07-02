@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     'products',
     'projects',
     'assignments',
-    'stakeholders'
+    'stakeholders',
+    'vkb',
+    'findings'
 ]
 
 MIDDLEWARE = [
