@@ -45,14 +45,40 @@
     {% endfor %}
 </ul>
 
-<h3>🐞 Findings</h3>
-<ul>
-    {% for finding in findings %}
-        <li>{{ finding.severity }} — {{ finding.summary }}</li>
+<h3>🛠 Findings</h3>
+<a href="{% url 'create_finding' project.pk %}">+ Add Finding</a>
+
+<table border="1">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Severity</th>
+      <th>Status</th>
+      <th>Is Late?</th>
+      <th>SLA Delay</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for f in project.finding_set.all %}
+      <tr {% if f.is_late %} style="background-color: #ffe5e5;" {% endif %}>
+        <td>{{ f.title }}</td>
+        <td>{{ f.severity }}</td>
+        <td>{{ f.status }}</td>
+        <td>{% if f.is_late %} ✅ {% else %} ❌ {% endif %}</td>
+        <td>{{ f.sla_delay_days }} days</td>
+        <td>
+          <a href="{% url 'finding_detail' f.id %}">View</a> |
+          <a href="{% url 'finding_edit' f.id %}">Edit</a> |
+          <a href="{% url 'finding_delete' f.id %}">Delete</a>
+        </td>
+      </tr>
     {% empty %}
-        <li>No findings reported.</li>
+      <tr><td colspan="6">No findings yet.</td></tr>
     {% endfor %}
-</ul>
+  </tbody>
+</table>
+
 
 <br>
 <a href="{% url 'project_list' %}">⬅ Back to Project List</a>

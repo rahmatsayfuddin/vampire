@@ -1,4 +1,5 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, render, redirect
+from django.http import JsonResponse
 from .models import VulnerabilityKnowledgeBase
 from .forms import VKBForm
 
@@ -33,3 +34,13 @@ def vkb_delete(request, pk):
         item.delete()
         return redirect('vkb_list')
     return render(request, 'vkb/vkb_confirm_delete.html', {'item': item})
+
+def get_vkb_json(request, pk):
+    vkb = get_object_or_404(VulnerabilityKnowledgeBase, pk=pk)
+    return JsonResponse({
+        'title': vkb.title,
+        'description': vkb.description,
+        'impact': vkb.impact,
+        'recommendation': vkb.recommendation,
+        'category': vkb.category,
+    })

@@ -29,5 +29,6 @@ urlpatterns = [
     path('assignments/', include('assignments.urls')),
     path('stakeholders/', include('stakeholders.urls')),
     path('vkb/', include('vkb.urls')),
+    path('findings/', include('findings.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
