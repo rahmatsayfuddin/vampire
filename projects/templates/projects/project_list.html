@@ -4,6 +4,19 @@
 {% for project in projects %}
     <li>
         {{ project.project_name }} - {{ project.product.product_name }} - {{ project.status }}
+      {% if project.status == 'Completed' %}
+        {% if project.spi >= 1 %}
+            <p><strong>SPI:</strong> {{ project.spi }} 🟢 – On time or faster</p>
+        {% else %}
+            <p><strong>SPI:</strong> {{ project.spi }} 🔴 – Delayed</p>
+        {% endif %}
+        {% else %}
+        {% if project.spi >= 1 %}
+            <p><strong>SPI (est.):</strong> {{ project.spi }} 🟢 – Estimated, project not yet completed</p>
+        {% else %}
+            <p><strong>SPI (est.):</strong> {{ project.spi }} 🔴 – Estimated, project not yet completed</p>
+        {% endif %}
+        {% endif %}
         <a href="{% url 'project_detail' project.pk %}">View</a>
         <a href="{% url 'project_update' project.pk %}">Edit</a>
         <a href="{% url 'project_delete' project.pk %}">Delete</a>

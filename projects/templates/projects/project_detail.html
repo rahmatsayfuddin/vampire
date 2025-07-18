@@ -5,7 +5,20 @@
 <p><strong>Start Date:</strong> {{ project.start_date }}</p>
 <p><strong>End Date:</strong> {{ project.end_date|default:"-" }}</p>
 <p><strong>Description:</strong> {{ project.description|linebreaks }}</p>
-
+<h3>📈 SPI (Scheduled Performance Index)</h3>
+{% if project.status == 'Completed' %}
+  {% if project.spi >= 1 %}
+    <p><strong>SPI:</strong> {{ project.spi }} 🟢 – On time or faster</p>
+  {% else %}
+    <p><strong>SPI:</strong> {{ project.spi }} 🔴 – Delayed</p>
+  {% endif %}
+{% else %}
+  {% if project.spi >= 1 %}
+    <p><strong>SPI (est.):</strong> {{ project.spi }} 🟢 – Estimated, project not yet completed</p>
+  {% else %}
+    <p><strong>SPI (est.):</strong> {{ project.spi }} 🔴 – Estimated, project not yet completed</p>
+  {% endif %}
+{% endif %}
 <hr>
 
 <h3>🧑‍💻 Assignments (Project Team)</h3>
@@ -72,6 +85,7 @@
           <a href="{% url 'finding_edit' f.id %}">Edit</a> |
           <a href="{% url 'finding_delete' f.id %}">Delete</a>
         </td>
+        <td>
       </tr>
     {% empty %}
       <tr><td colspan="6">No findings yet.</td></tr>
