@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'assignments',
     'stakeholders',
     'vkb',
-    'findings'
+    'findings',
+    'reports', 
 ]
 
 MIDDLEWARE = [

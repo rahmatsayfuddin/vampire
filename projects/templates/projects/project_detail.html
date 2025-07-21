@@ -96,3 +96,33 @@
 
 <br>
 <a href="{% url 'project_list' %}">⬅ Back to Project List</a>
+
+<h4>📚 Report History</h4>
+<a href="{% url 'generate_report' project.id 'pdf' %}">📄 Generate PDF</a> |
+<a href="{% url 'generate_report' project.id 'docx' %}">📝 Generate Word</a>
+
+<table>
+  <tr>
+    <th>File</th>
+    <th>Status</th>
+    <th>Format</th>
+    <th>Created</th>
+    <th>Actions</th>
+  </tr>
+  {% for r in project.reports.all %}
+  <tr>
+    <td>{{ r.file_name }}</td>
+    <td>{{ r.status }}</td>
+    <td>{{ r.format }}</td>
+    <td>{{ r.created_at }}</td>
+    <td>
+      {% if r.status == 'done' %}
+        <a href="{% url 'download_report' r.id %}">⬇️ Download</a>
+      {% else %}
+        ⏳
+      {% endif %}
+      | <a href="{% url 'delete_report' r.id %}">🗑️ Delete</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
