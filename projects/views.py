@@ -3,6 +3,8 @@ from .models import Project
 from .forms import ProjectForm
 from products.models import Product
 from django.utils import timezone
+from reports.models import ReportHistory
+
 
 def project_list(request):
     projects = Project.objects.select_related('product').all()
@@ -32,7 +34,13 @@ def project_update(request, pk):
     if request.method == 'POST':
         form = ProjectForm(request.POST, instance=project)
         if form.is_valid():
-            form.save()
+            project = form.save(commit=False)
+            
+            if project.status == 'Completed' and not project.completed_date:
+                project.completed_date = timezone.now().date()
+            elif project.status != 'Completed':
+                project.completed_date = None
+            project.save()
             return redirect('project_list')
     else:
         form = ProjectForm(instance=project)
@@ -55,11 +63,12 @@ def product_detail(request, product_id):
 
 def project_detail(request, pk):
     project = get_object_or_404(Project, pk=pk)
+    reports = project.reports.all().order_by('-created_at')
     return render(request, 'projects/project_detail.html', {
-        'project': project,
-        # Placeholder untuk modul lainnya
-        'assignments': [],  # nanti diisi
-        'pics': [],
-        'scans': [],
-        'findings': [],
-    })
+            'project': project,
+            'reports': reports,
+            'assignments': [],
+            'pics': [],
+            'scans': [],
+            'findings': [],
+        })

@@ -1,13 +1,21 @@
-<h1>Vulnerability Knowledge Base</h1>
-<a href="{% url 'vkb_create' %}">+ Add New</a>
-<ul>
+{% extends "base_adminlte.html" %}
+{% block title %}VKB{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3">Vulnerability Knowledge Base</h1>
+  <a href="{% url 'vkb_create' %}" class="btn btn-primary">+ Add New</a>
+</div>
+<ul class="list-group">
 {% for item in items %}
-    <li>
-        <strong>{{ item.title }}</strong><br>
-        <a href="{% url 'vkb_update' item.pk %}">Edit</a> |
-        <a href="{% url 'vkb_delete' item.pk %}">Delete</a>
-    </li>
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <strong>{{ item.title }}</strong>
+    <span>
+      <a href="{% url 'vkb_update' item.pk %}" class="btn btn-sm btn-warning">Edit</a>
+      <a href="{% url 'vkb_delete' item.pk %}" class="btn btn-sm btn-danger">Delete</a>
+    </span>
+  </li>
 {% empty %}
-    <li>No VKB items available.</li>
+  <li class="list-group-item">No VKB items available.</li>
 {% endfor %}
 </ul>
+{% endblock %}

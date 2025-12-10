@@ -77,12 +77,6 @@ VAMPIRE is designed for security teams and penetration testers who need to:
 - Download and delete functionality
 - Timestamped filenames
 
-### 🔐 User & Role Management
-- User management with role-based access
-- Menu-based permission system
-- Role-menu access control
-- Secure password hashing
-
 ## 🛠️ Technologies Used
 
 - **Framework**: Django 5.2.3
@@ -154,14 +148,11 @@ The application will be available at `http://127.0.0.1:8000/`
 vampire/
 ├── assignments/          # Team assignment management
 ├── findings/            # Vulnerability findings
-├── menus/               # Menu management
 ├── products/            # Product management
 ├── projects/            # Project management
 ├── reports/             # Report generation
 │   └── sections/        # Report section modules
-├── roles/               # Role-based access control
 ├── stakeholders/        # Stakeholder management
-├── users/               # User management
 ├── vkb/                 # Vulnerability Knowledge Base
 ├── vampire/             # Main project settings
 │   ├── settings.py
@@ -267,9 +258,6 @@ Findings are automatically monitored for SLA compliance:
 - **VulnerabilityKnowledgeBase**: Reusable vulnerability templates
 - **Assignment**: Team member assignments
 - **Stakeholder**: Client contacts
-- **User**: System users
-- **Role**: User roles
-- **Menu**: Menu items
 - **ReportHistory**: Generated report tracking
 
 ## 🔒 Security Considerations
@@ -305,21 +293,6 @@ python manage.py migrate
 ```bash
 python manage.py collectstatic
 ```
-
-## 📝 API Endpoints
-
-The application uses Django's URL routing. Main endpoints:
-
-- `/products/` - Product management
-- `/projects/` - Project management
-- `/findings/` - Finding management
-- `/reports/` - Report generation
-- `/vkb/` - Vulnerability Knowledge Base
-- `/users/` - User management
-- `/roles/` - Role management
-- `/menus/` - Menu management
-- `/assignments/` - Team assignments
-- `/stakeholders/` - Stakeholder management
 
 ## 🤝 Contributing
 

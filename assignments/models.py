@@ -1,10 +1,10 @@
 from django.db import models
+from django.conf import settings
 from projects.models import Project
-from users.models import User 
 
 class Assignment(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
 
     class Meta:
@@ -12,4 +12,5 @@ class Assignment(models.Model):
         ordering = ['user__username']
 
     def __str__(self):
-        return f"{self.user.full_name} - {self.title}"
+        name = getattr(self.user, "get_full_name", lambda: "")()
+        return f"{name or self.user.username} - {self.title}"

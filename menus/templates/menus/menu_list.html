@@ -1,11 +1,19 @@
-<h1>Menu List</h1>
-<a href="{% url 'menu_create' %}">Add New Menu</a>
-<ul>
-    {% for menu in menus %}
-        <li>
-            {{ menu.menu_name }} — {{ menu.menu_url }}
-            <a href="{% url 'menu_update' menu.pk %}">Edit</a>
-            <a href="{% url 'menu_delete' menu.pk %}">Delete</a>
-        </li>
-    {% endfor %}
+{% extends "base_adminlte.html" %}
+{% block title %}Menu List{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3">Menu List</h1>
+  <a href="{% url 'menu_create' %}" class="btn btn-primary">Add New Menu</a>
+</div>
+<ul class="list-group">
+  {% for menu in menus %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <span>{{ menu.menu_name }} — {{ menu.menu_url }}</span>
+      <span>
+        <a href="{% url 'menu_update' menu.pk %}" class="btn btn-sm btn-warning">Edit</a>
+        <a href="{% url 'menu_delete' menu.pk %}" class="btn btn-sm btn-danger">Delete</a>
+      </span>
+    </li>
+  {% endfor %}
 </ul>
+{% endblock %}

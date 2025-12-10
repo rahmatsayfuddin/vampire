@@ -1,7 +1,17 @@
-<h1>Remove Assignment</h1>
-<p>Are you sure you want to remove <strong>{{ assignment.user.full_name }}</strong> from this project?</p>
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">Yes, remove</button>
-</form>
-<a href="{% url 'project_detail' assignment.project.pk %}">Cancel</a>
+{% extends "base_adminlte.html" %}
+{% block title %}Remove Assignment{% endblock %}
+{% block content %}
+<div class="card card-danger card-outline">
+  <div class="card-header">
+    <h3 class="card-title">Remove Assignment</h3>
+  </div>
+  <div class="card-body">
+    <p>Are you sure you want to remove <strong>{{ assignment.user.get_full_name|default:assignment.user.username }}</strong> from this project?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Yes, remove</button>
+      <a href="{% url 'project_detail' assignment.project.pk %}" class="btn btn-secondary ml-2">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

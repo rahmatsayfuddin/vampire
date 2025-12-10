@@ -1,13 +1,28 @@
-<h2>Finding: {{ finding.title }}</h2>
-<ul>
-  <li><strong>Severity:</strong> {{ finding.severity }}</li>
-  <li><strong>Status:</strong> {{ finding.status }}</li>
-  <li><strong>Project:</strong> {{ finding.project }}</li>
-  <li><strong>SLA Due:</strong> {{ finding.sla_due_date }}</li>
-  <li><strong>Late:</strong> {{ finding.is_late }}</li>
-  <li><strong>Delay Days:</strong> {{ finding.sla_delay_days }}</li>
-  <li><strong>Description:</strong> {{ finding.description }}</li>
-  <li><strong>Impact:</strong> {{ finding.impact }}</li>
-  <li><strong>Recommendation:</strong> {{ finding.recommendation }}</li>
-  <li><strong>POC:</strong> {{ finding.poc }}</li>
-</ul>
+{% extends "base_adminlte.html" %}
+{% block title %}Finding Detail{% endblock %}
+{% block content %}
+<div class="card card-info card-outline">
+  <div class="card-header">
+    <h3 class="card-title">Finding: {{ finding.title }}</h3>
+  </div>
+  <div class="card-body">
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item"><strong>Severity:</strong> {{ finding.severity }}</li>
+      <li class="list-group-item"><strong>Status:</strong> {{ finding.status }}</li>
+      <li class="list-group-item"><strong>Project:</strong> {{ finding.project }}</li>
+      <li class="list-group-item"><strong>SLA Due:</strong> {{ finding.sla_due_date }}</li>
+      <li class="list-group-item"><strong>Late:</strong> {{ finding.is_late }}</li>
+      <li class="list-group-item"><strong>Delay Days:</strong> {{ finding.sla_delay_days }}</li>
+      <li class="list-group-item"><strong>Description:</strong> {{ finding.description }}</li>
+      <li class="list-group-item"><strong>Impact:</strong> {{ finding.impact }}</li>
+      <li class="list-group-item"><strong>Recommendation:</strong> {{ finding.recommendation }}</li>
+      <li class="list-group-item"><strong>POC:</strong> {{ finding.poc }}</li>
+    </ul>
+    <div class="mt-3">
+      <a href="{% url 'finding_edit' finding.pk %}" class="btn btn-primary">Edit</a>
+      <a href="{% url 'finding_delete' finding.pk %}" class="btn btn-danger ml-2">Delete</a>
+      <a href="{% url 'project_detail' finding.project.pk %}" class="btn btn-secondary ml-2">Back</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

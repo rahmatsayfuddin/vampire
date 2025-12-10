@@ -1,128 +1,167 @@
-<h1>Project Detail</h1>
-
-<h2>{{ project.project_name }}</h2>
-<p><strong>Status:</strong> {{ project.status }}</p>
-<p><strong>Start Date:</strong> {{ project.start_date }}</p>
-<p><strong>End Date:</strong> {{ project.end_date|default:"-" }}</p>
-<p><strong>Description:</strong> {{ project.description|linebreaks }}</p>
-<h3>📈 SPI (Scheduled Performance Index)</h3>
-{% if project.status == 'Completed' %}
-  {% if project.spi >= 1 %}
-    <p><strong>SPI:</strong> {{ project.spi }} 🟢 – On time or faster</p>
-  {% else %}
-    <p><strong>SPI:</strong> {{ project.spi }} 🔴 – Delayed</p>
-  {% endif %}
-{% else %}
-  {% if project.spi >= 1 %}
-    <p><strong>SPI (est.):</strong> {{ project.spi }} 🟢 – Estimated, project not yet completed</p>
-  {% else %}
-    <p><strong>SPI (est.):</strong> {{ project.spi }} 🔴 – Estimated, project not yet completed</p>
-  {% endif %}
-{% endif %}
-<hr>
-
-<h3>🧑‍💻 Assignments (Project Team)</h3>
-<a href="{% url 'add_assignment' project.pk %}">+ Assign New User</a>
-<ul>
-    {% for a in project.assignment_set.all %}
-        <li>{{ a.user.full_name }} — {{ a.title }}
-            <a href="{% url 'remove_assignment' a.pk %}">Remove</a>
-        </li>
-    {% empty %}
-        <li>No team members assigned.</li>
-    {% endfor %}
-</ul>
-
-
-<h3>📞 Stakeholders</h3>
-<a href="{% url 'add_stakeholder' project.pk %}">+ Add Stakeholder</a>
-<ul>
-    {% for s in project.stakeholder_set.all %}
-        <li>
-            {{ s.name }} — {{ s.organization }}<br>
-            {{ s.email }} {{ s.phone }}
-            <a href="{% url 'remove_stakeholder' s.pk %}">Remove</a>
-        </li>
-    {% empty %}
-        <li>No stakeholders added.</li>
-    {% endfor %}
-</ul>
-
-
-<h3>🧪 Scanning Reports</h3>
-<ul>
-    {% for scan in scans %}
-        <li>{{ scan.scan_tool }} — {{ scan.report_file.name }}</li>
-    {% empty %}
-        <li>No scans uploaded.</li>
-    {% endfor %}
-</ul>
-
-<h3>🛠 Findings</h3>
-<a href="{% url 'create_finding' project.pk %}">+ Add Finding</a>
-
-<table border="1">
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Severity</th>
-      <th>Status</th>
-      <th>Is Late?</th>
-      <th>SLA Delay</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for f in project.finding_set.all %}
-      <tr {% if f.is_late %} style="background-color: #ffe5e5;" {% endif %}>
-        <td>{{ f.title }}</td>
-        <td>{{ f.severity }}</td>
-        <td>{{ f.status }}</td>
-        <td>{% if f.is_late %} ✅ {% else %} ❌ {% endif %}</td>
-        <td>{{ f.sla_delay_days }} days</td>
-        <td>
-          <a href="{% url 'finding_detail' f.id %}">View</a> |
-          <a href="{% url 'finding_edit' f.id %}">Edit</a> |
-          <a href="{% url 'finding_delete' f.id %}">Delete</a>
-        </td>
-        <td>
-      </tr>
-    {% empty %}
-      <tr><td colspan="6">No findings yet.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
-
-
-<br>
-<a href="{% url 'project_list' %}">⬅ Back to Project List</a>
-
-<h4>📚 Report History</h4>
-<a href="{% url 'generate_report' project.id 'pdf' %}">📄 Generate PDF</a> |
-<a href="{% url 'generate_report' project.id 'docx' %}">📝 Generate Word</a>
-
-<table>
-  <tr>
-    <th>File</th>
-    <th>Status</th>
-    <th>Format</th>
-    <th>Created</th>
-    <th>Actions</th>
-  </tr>
-  {% for r in project.reports.all %}
-  <tr>
-    <td>{{ r.file_name }}</td>
-    <td>{{ r.status }}</td>
-    <td>{{ r.format }}</td>
-    <td>{{ r.created_at }}</td>
-    <td>
-      {% if r.status == 'done' %}
-        <a href="{% url 'download_report' r.id %}">⬇️ Download</a>
+{% extends "base_adminlte.html" %}
+{% block title %}Project Detail{% endblock %}
+{% block content %}
+<div class="card card-info card-outline">
+  <div class="card-header">
+    <h3 class="card-title">Project Detail</h3>
+  </div>
+  <div class="card-body">
+    <h2>{{ project.project_name }}</h2>
+    <p><strong>Status:</strong> {{ project.status }}</p>
+    <p><strong>Start Date:</strong> {{ project.start_date }}</p>
+    <p><strong>End Date:</strong> {{ project.end_date|default:"-" }}</p>
+    <p><strong>Description:</strong> {{ project.description|linebreaks }}</p>
+    <h4>📈 SPI (Scheduled Performance Index)</h4>
+    {% if project.status == 'Completed' %}
+      {% if project.spi >= 1 %}
+        <p><strong>SPI:</strong> {{ project.spi }} 🟢 – On time or faster</p>
       {% else %}
-        ⏳
+        <p><strong>SPI:</strong> {{ project.spi }} 🔴 – Delayed</p>
       {% endif %}
-      | <a href="{% url 'delete_report' r.id %}">🗑️ Delete</a>
-    </td>
-  </tr>
-  {% endfor %}
-</table>
+    {% else %}
+      {% if project.spi >= 1 %}
+        <p><strong>SPI (est.):</strong> {{ project.spi }} 🟢 – Estimated, project not yet completed</p>
+      {% else %}
+        <p><strong>SPI (est.):</strong> {{ project.spi }} 🔴 – Estimated, project not yet completed</p>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+<div class="card card-outline card-primary mt-3">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h3 class="card-title">🧑‍💻 Assignments (Project Team)</h3>
+    <a href="{% url 'add_assignment' project.pk %}" class="btn btn-sm btn-primary">+ Assign New User</a>
+  </div>
+  <div class="card-body">
+    <ul class="list-group">
+      {% for a in project.assignment_set.all %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>{{ a.user.get_full_name|default:a.user.username }} — {{ a.title }}</span>
+          <a href="{% url 'remove_assignment' a.pk %}" class="btn btn-sm btn-danger">Remove</a>
+        </li>
+      {% empty %}
+        <li class="list-group-item">No team members assigned.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<div class="card card-outline card-primary mt-3">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h3 class="card-title">📞 Stakeholders</h3>
+    <a href="{% url 'add_stakeholder' project.pk %}" class="btn btn-sm btn-primary">+ Add Stakeholder</a>
+  </div>
+  <div class="card-body">
+    <ul class="list-group">
+      {% for s in project.stakeholder_set.all %}
+        <li class="list-group-item">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <strong>{{ s.name }}</strong> — {{ s.organization }}<br>
+              {{ s.email }} {{ s.phone }}
+            </div>
+            <a href="{% url 'remove_stakeholder' s.pk %}" class="btn btn-sm btn-danger">Remove</a>
+          </div>
+        </li>
+      {% empty %}
+        <li class="list-group-item">No stakeholders added.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<div class="card card-outline card-secondary mt-3">
+  <div class="card-header">
+    <h3 class="card-title">🧪 Scanning Reports</h3>
+  </div>
+  <div class="card-body">
+    <ul class="list-group">
+      {% for scan in scans %}
+        <li class="list-group-item">{{ scan.scan_tool }} — {{ scan.report_file.name }}</li>
+      {% empty %}
+        <li class="list-group-item">No scans uploaded.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<div class="card card-outline card-warning mt-3">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <h3 class="card-title">🛠 Findings</h3>
+    <a href="{% url 'create_finding' project.pk %}" class="btn btn-sm btn-primary">+ Add Finding</a>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-striped mb-0">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Severity</th>
+          <th>Status</th>
+          <th>Is Late?</th>
+          <th>SLA Delay</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in project.finding_set.all %}
+          <tr class="{% if f.is_late %}table-danger{% endif %}">
+            <td>{{ f.title }}</td>
+            <td>{{ f.severity }}</td>
+            <td>{{ f.status }}</td>
+            <td>{% if f.is_late %} ✅ {% else %} ❌ {% endif %}</td>
+            <td>{{ f.sla_delay_days }} days</td>
+            <td>
+              <a href="{% url 'finding_detail' f.id %}" class="btn btn-sm btn-info">View</a>
+              <a href="{% url 'finding_edit' f.id %}" class="btn btn-sm btn-warning">Edit</a>
+              <a href="{% url 'finding_delete' f.id %}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" class="text-center">No findings yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card card-outline card-success mt-3">
+  <div class="card-header">
+    <h3 class="card-title">Report History</h3>
+  </div>
+  <div class="card-body">
+    <ul class="list-group mb-3">
+      {% for report in project.reports.all %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span>{{ report.file_name }} ({{ report.format }}) - {{ report.status }}</span>
+          <span>
+            {% if report.status == "done" %}
+              <a href="{% url 'download_report' report.id %}" class="btn btn-sm btn-info">Download</a>
+            {% endif %}
+            <form action="{% url 'delete_report' report.id %}" method="post" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+            </form>
+          </span>
+        </li>
+      {% empty %}
+        <li class="list-group-item">No report history.</li>
+      {% endfor %}
+    </ul>
+
+    <form action="{% url 'generate_report' project.id 'pdf' %}" method="post" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-primary">Generate PDF</button>
+    </form>
+
+    <form action="{% url 'generate_report' project.id 'docx' %}" method="post" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-secondary ml-2">Generate Word</button>
+    </form>
+  </div>
+</div>
+
+<div class="mt-3">
+  <a href="{% url 'project_list' %}" class="btn btn-outline-secondary">⬅ Back to Project List</a>
+</div>
+{% endblock %}

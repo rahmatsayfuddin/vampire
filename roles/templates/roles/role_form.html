@@ -1,22 +1,30 @@
-<h1>Role Form</h1>
-<form method="post">
-    {% csrf_token %}
-    <p>
+{% extends "base_adminlte.html" %}
+{% block title %}Role Form{% endblock %}
+{% block content %}
+<div class="card card-primary card-outline">
+  <div class="card-header">
+    <h3 class="card-title">Role Form</h3>
+  </div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-group">
         {{ form.role_name.label }}<br>
         {{ form.role_name }}
-    </p>
-    <p>
+      </div>
+      <div class="form-group">
         {{ form.description.label }}<br>
         {{ form.description }}
-    </p>
-    <p>
+      </div>
+      <div class="form-group">
         <strong>Menus:</strong><br>
         {% for menu in form.menus %}
-            <label>
-                {{ menu.tag }} {{ menu.choice_label }}
-            </label><br>
+          <label>{{ menu.tag }} {{ menu.choice_label }}</label><br>
         {% endfor %}
-    </p>
-    <button type="submit">Save</button>
-</form>
-<a href="{% url 'role_list' %}">Back</a>
+      </div>
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a href="{% url 'role_list' %}" class="btn btn-secondary ml-2">Back</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

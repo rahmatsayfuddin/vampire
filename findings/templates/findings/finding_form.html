@@ -1,48 +1,80 @@
-<h2>Add Finding to Project: {{ project.project_name }}</h2>
+{% extends "base_adminlte.html" %}
+{% block title %}Add Finding{% endblock %}
+{% block content %}
+<div class="card card-primary card-outline">
+  <div class="card-header">
+    <h3 class="card-title">Add Finding to Project: {{ project.project_name }}</h3>
+  </div>
+  <div class="card-body">
+    <form method="post" id="finding-form">
+      {% csrf_token %}
 
-<form method="post" id="finding-form">
-    {% csrf_token %}
+      <div class="form-group">
+        {{ form.vkb.label_tag }} {{ form.vkb }}
+      </div>
+      <div class="form-group">
+        {{ form.vkb_category.label_tag }} {{ form.vkb_category }}
+      </div>
+      <div class="form-group">
+        {{ form.title.label_tag }} {{ form.title }}
+      </div>
+      <div class="form-group">
+        {{ form.description.label_tag }} {{ form.description }}
+      </div>
+      <div class="form-group">
+        {{ form.impact.label_tag }} {{ form.impact }}
+      </div>
+      <div class="form-group">
+        {{ form.recommendation.label_tag }} {{ form.recommendation }}
+      </div>
+      <div class="form-group">
+        {{ form.affected.label_tag }} {{ form.affected }}
+      </div>
+      <div class="form-group">
+        {{ form.severity.label_tag }} {{ form.severity }}
+      </div>
+      <div class="form-group">
+        {{ form.score.label_tag }} {{ form.score }}
+      </div>
+      <div class="form-group">
+        {{ form.poc.label_tag }} {{ form.poc }}
+      </div>
+      <div class="form-group">
+        {{ form.status.label_tag }} {{ form.status }}
+      </div>
+      <div class="form-group form-check">
+        {{ form.save_to_vkb }} {{ form.save_to_vkb.label }}
+      </div>
 
-    <p>{{ form.vkb.label_tag }} {{ form.vkb }}</p>
-    <p>{{ form.vkb_category.label_tag }} {{ form.vkb_category }}</p>
-    <p>{{ form.title.label_tag }} {{ form.title }}</p>
-    <p>{{ form.description.label_tag }} {{ form.description }}</p>
-    <p>{{ form.impact.label_tag }} {{ form.impact }}</p>
-    <p>{{ form.recommendation.label_tag }} {{ form.recommendation }}</p>
-    <p>{{ form.affected.label_tag }} {{ form.affected }}</p>
-    <p>{{ form.severity.label_tag }} {{ form.severity }}</p>
-    <p>{{ form.score.label_tag }} {{ form.score }}</p>
-    <p>{{ form.poc.label_tag }} {{ form.poc }}</p>
-    <p>{{ form.status.label_tag }} {{ form.status }}</p>
-    <p>{{ form.save_to_vkb }} {{ form.save_to_vkb.label }}</p>
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a href="{% url 'project_detail' project.pk %}" class="btn btn-secondary ml-2">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
 
-    <button type="submit">Save</button>
-</form>
-
+{% block scripts %}
 <script>
 document.getElementById('id_vkb').addEventListener('change', function () {
-    const vkbId = this.value;
-    if (!vkbId) {
-        // kosong berarti pilih "Custom" → kosongkan field (opsional)
-        return;
-    }
-
-    fetch(`/vkb/api/${vkbId}/`)
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById('id_title').value = data.title;
-            document.getElementById('id_description').value = data.description;
-            document.getElementById('id_impact').value = data.impact;
-            document.getElementById('id_recommendation').value = data.recommendation;
-            const categorySelect = document.getElementById('id_vkb_category');
-            if (categorySelect) {
-                for (let option of categorySelect.options) {
-                    if (option.value === data.category) {
-                        option.selected = true;
-                        break;
-                    }
-                }
-            }
-        });
+  const vkbId = this.value;
+  if (!vkbId) return;
+  fetch(`/vkb/api/${vkbId}/`)
+    .then(res => res.json())
+    .then(data => {
+      document.getElementById('id_title').value = data.title;
+      document.getElementById('id_description').value = data.description;
+      document.getElementById('id_impact').value = data.impact;
+      document.getElementById('id_recommendation').value = data.recommendation;
+      const categorySelect = document.getElementById('id_vkb_category');
+      if (categorySelect) {
+        for (let option of categorySelect.options) {
+          if (option.value === data.category) {
+            option.selected = true;
+            break;
+          }
+        }
+      }
+    });
 });
 </script>
+{% endblock %}

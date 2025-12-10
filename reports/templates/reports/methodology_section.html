@@ -1,0 +1,66 @@
+<h2 style="border-bottom: 1px solid #000;">Methodology</h2>
+
+<p>
+  The penetration test was conducted using a structured and industry-recognized methodology, primarily based on the <strong>OWASP Testing Guide v4</strong>. This approach ensures a comprehensive evaluation of the target system's security posture across multiple layers.
+</p>
+
+<h3>1. Information Gathering</h3>
+<ul>
+  <li>DNS enumeration</li>
+  <li>WHOIS lookups</li>
+  <li>Port and service scanning</li>
+  <li>Banner grabbing</li>
+  <li>Publicly available information (OSINT)</li>
+</ul>
+<p><em>Purpose:</em> Identify the attack surface and map all reachable assets.</p>
+
+<h3>2. Threat Modeling</h3>
+<p>
+  Based on the data collected, we identify:
+</p>
+<ul>
+  <li>Potential assets of value</li>
+  <li>Trust boundaries</li>
+  <li>Entry points for attackers</li>
+  <li>Threat agents and motivation</li>
+</ul>
+<p>This stage helps prioritize targets and predict attacker behavior.</p>
+<h3>3. Vulnerability Analysis</h3>
+<p>
+  In this phase, the target systems are analyzed for weaknesses. This involves:
+</p>
+<ul>
+  <li>Manual inspection of input fields and logic flaws</li>
+  <li>Use of automated tools (e.g., SQLi, XSS detection)</li>
+  <li>Authentication and authorization tests</li>
+  <li>Configuration and deployment reviews</li>
+</ul>
+<p>All vulnerabilities are validated to minimize false positives.</p>
+
+<h3>4. Exploitation</h3>
+<p>
+  Once vulnerabilities are identified, we attempt to exploit them to assess real-world impact:
+</p>
+<ul>
+  <li>Without causing harm to the system</li>
+  <li>Simulating attacker behavior</li>
+  <li>Extracting evidence (e.g., session tokens, user data)</li>
+</ul>
+<p><em>No denial-of-service (DoS) attacks were conducted unless authorized.</em></p>
+
+<h3>5. Post-Exploitation & Reporting</h3>
+<p>
+  After exploitation:
+</p>
+<ul>
+  <li>We analyze access gained and lateral movement possibilities</li>
+  <li>Identify ways to remediate or mitigate</li>
+</ul>
+<p>All findings are documented with severity, risk, PoC, and recommendations.</p>
+
+<h3>Tools and Standards Used</h3>
+<ul>
+  <li><strong>Standards:</strong> OWASP WSTG v4, PTES</li>
+  <li><strong>Tools:</strong> Nmap, Burp Suite, Nikto, SQLMap, custom scripts</li>
+  <li><strong>Approach:</strong> Black-box / Gray-box / White-box</li>
+</ul>

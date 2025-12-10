@@ -12,17 +12,14 @@ class Project(models.Model):
 
     project_name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True)
+    scope = models.TextField(blank=True)
     product = models.ForeignKey(Product, on_delete=models.RESTRICT)
     start_date = models.DateField()
-    end_date = models.DateField(blank=True, null=True)
-    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Planned')
+    end_date = models.DateField()  # deadline
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='In Progress')
+    completed_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='In Progress')
-    start_date = models.DateField()
-    end_date = models.DateField()  # deadline
-    completed_date = models.DateField(null=True, blank=True)
 
     def spi(self):
         if not self.end_date or not self.start_date:

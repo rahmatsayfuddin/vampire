@@ -4,7 +4,7 @@ from .models import Project
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['project_name', 'description', 'product', 'start_date', 'end_date', 'status']
+        fields = ['project_name', 'description','scope', 'product', 'start_date', 'end_date', 'status']
 
     def __init__(self, *args, **kwargs):
         product_id = kwargs.pop('product_id', None)

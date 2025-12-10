@@ -1,7 +1,17 @@
-<h1>Assign User to Project: {{ project.project_name }}</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Assign</button>
-</form>
-<a href="{% url 'project_detail' project.pk %}">Cancel</a>
+{% extends "base_adminlte.html" %}
+{% block title %}Assign User{% endblock %}
+{% block content %}
+<div class="card card-primary card-outline">
+  <div class="card-header">
+    <h3 class="card-title">Assign User to Project: {{ project.project_name }}</h3>
+  </div>
+  <div class="card-body">
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary">Assign</button>
+      <a href="{% url 'project_detail' project.pk %}" class="btn btn-secondary ml-2">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
