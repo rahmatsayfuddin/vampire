@@ -11,19 +11,20 @@
     <p><strong>Start Date:</strong> {{ project.start_date }}</p>
     <p><strong>End Date:</strong> {{ project.end_date|default:"-" }}</p>
     <p><strong>Description:</strong> {{ project.description|linebreaks }}</p>
+    <p><strong>Scope:</strong> {{ project.scope|linebreaks }}</p>
     <h4>📈 SPI (Scheduled Performance Index)</h4>
     {% if project.status == 'Completed' %}
-      {% if project.spi >= 1 %}
-        <p><strong>SPI:</strong> {{ project.spi }} 🟢 – On time or faster</p>
-      {% else %}
-        <p><strong>SPI:</strong> {{ project.spi }} 🔴 – Delayed</p>
-      {% endif %}
+    {% if project.spi >= 1 %}
+    <p><strong>SPI:</strong> {{ project.spi }} 🟢 – On time or faster</p>
     {% else %}
-      {% if project.spi >= 1 %}
-        <p><strong>SPI (est.):</strong> {{ project.spi }} 🟢 – Estimated, project not yet completed</p>
-      {% else %}
-        <p><strong>SPI (est.):</strong> {{ project.spi }} 🔴 – Estimated, project not yet completed</p>
-      {% endif %}
+    <p><strong>SPI:</strong> {{ project.spi }} 🔴 – Delayed</p>
+    {% endif %}
+    {% else %}
+    {% if project.spi >= 1 %}
+    <p><strong>SPI (est.):</strong> {{ project.spi }} 🟢 – Estimated, project not yet completed</p>
+    {% else %}
+    <p><strong>SPI (est.):</strong> {{ project.spi }} 🔴 – Estimated, project not yet completed</p>
+    {% endif %}
     {% endif %}
   </div>
 </div>
@@ -31,17 +32,21 @@
 <div class="card card-outline card-primary mt-3">
   <div class="card-header d-flex justify-content-between align-items-center">
     <h3 class="card-title">🧑‍💻 Assignments (Project Team)</h3>
+    {% if perms.projects.change_project %}
     <a href="{% url 'add_assignment' project.pk %}" class="btn btn-sm btn-primary">+ Assign New User</a>
+    {% endif %}
   </div>
   <div class="card-body">
     <ul class="list-group">
       {% for a in project.assignment_set.all %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span>{{ a.user.get_full_name|default:a.user.username }} — {{ a.title }}</span>
-          <a href="{% url 'remove_assignment' a.pk %}" class="btn btn-sm btn-danger">Remove</a>
-        </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ a.user.get_full_name|default:a.user.username }} — {{ a.title }}</span>
+        {% if perms.projects.change_project %}
+        <a href="{% url 'remove_assignment' a.pk %}" class="btn btn-sm btn-danger">Remove</a>
+        {% endif %}
+      </li>
       {% empty %}
-        <li class="list-group-item">No team members assigned.</li>
+      <li class="list-group-item">No team members assigned.</li>
       {% endfor %}
     </ul>
   </div>
@@ -55,17 +60,17 @@
   <div class="card-body">
     <ul class="list-group">
       {% for s in project.stakeholder_set.all %}
-        <li class="list-group-item">
-          <div class="d-flex justify-content-between align-items-start">
-            <div>
-              <strong>{{ s.name }}</strong> — {{ s.organization }}<br>
-              {{ s.email }} {{ s.phone }}
-            </div>
-            <a href="{% url 'remove_stakeholder' s.pk %}" class="btn btn-sm btn-danger">Remove</a>
+      <li class="list-group-item">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <strong>{{ s.name }}</strong> — {{ s.organization }}<br>
+            {{ s.email }} {{ s.phone }}
           </div>
-        </li>
+          <a href="{% url 'remove_stakeholder' s.pk %}" class="btn btn-sm btn-danger">Remove</a>
+        </div>
+      </li>
       {% empty %}
-        <li class="list-group-item">No stakeholders added.</li>
+      <li class="list-group-item">No stakeholders added.</li>
       {% endfor %}
     </ul>
   </div>
@@ -78,9 +83,9 @@
   <div class="card-body">
     <ul class="list-group">
       {% for scan in scans %}
-        <li class="list-group-item">{{ scan.scan_tool }} — {{ scan.report_file.name }}</li>
+      <li class="list-group-item">{{ scan.scan_tool }} — {{ scan.report_file.name }}</li>
       {% empty %}
-        <li class="list-group-item">No scans uploaded.</li>
+      <li class="list-group-item">No scans uploaded.</li>
       {% endfor %}
     </ul>
   </div>
@@ -105,20 +110,22 @@
       </thead>
       <tbody>
         {% for f in project.finding_set.all %}
-          <tr class="{% if f.is_late %}table-danger{% endif %}">
-            <td>{{ f.title }}</td>
-            <td>{{ f.severity }}</td>
-            <td>{{ f.status }}</td>
-            <td>{% if f.is_late %} ✅ {% else %} ❌ {% endif %}</td>
-            <td>{{ f.sla_delay_days }} days</td>
-            <td>
-              <a href="{% url 'finding_detail' f.id %}" class="btn btn-sm btn-info">View</a>
-              <a href="{% url 'finding_edit' f.id %}" class="btn btn-sm btn-warning">Edit</a>
-              <a href="{% url 'finding_delete' f.id %}" class="btn btn-sm btn-danger">Delete</a>
-            </td>
-          </tr>
+        <tr class="{% if f.is_late %}table-danger{% endif %}">
+          <td>{{ f.title }}</td>
+          <td>{{ f.severity }}</td>
+          <td>{{ f.status }}</td>
+          <td>{% if f.is_late %} ✅ {% else %} ❌ {% endif %}</td>
+          <td>{{ f.sla_delay_days }} days</td>
+          <td>
+            <a href="{% url 'finding_detail' f.id %}" class="btn btn-sm btn-info">View</a>
+            <a href="{% url 'finding_edit' f.id %}" class="btn btn-sm btn-warning">Edit</a>
+            <a href="{% url 'finding_delete' f.id %}" class="btn btn-sm btn-danger">Delete</a>
+          </td>
+        </tr>
         {% empty %}
-          <tr><td colspan="6" class="text-center">No findings yet.</td></tr>
+        <tr>
+          <td colspan="6" class="text-center">No findings yet.</td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>
@@ -132,20 +139,24 @@
   <div class="card-body">
     <ul class="list-group mb-3">
       {% for report in project.reports.all %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span>{{ report.file_name }} ({{ report.format }}) - {{ report.status }}</span>
-          <span>
-            {% if report.status == "done" %}
-              <a href="{% url 'download_report' report.id %}" class="btn btn-sm btn-info">Download</a>
-            {% endif %}
-            <form action="{% url 'delete_report' report.id %}" method="post" class="d-inline">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-            </form>
-          </span>
-        </li>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ report.file_name }} ({{ report.format }}) - {{ report.status }}</span>
+        <span>
+          {% if report.status == "done" %}
+          {% if report.format == 'pdf' %}
+          <a href="{% url 'download_report' report.id %}?preview=true" target="_blank"
+            class="btn btn-sm btn-secondary">Preview</a>
+          {% endif %}
+          <a href="{% url 'download_report' report.id %}" class="btn btn-sm btn-info">Download</a>
+          {% endif %}
+          <form action="{% url 'delete_report' report.id %}" method="post" class="d-inline">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </span>
+      </li>
       {% empty %}
-        <li class="list-group-item">No report history.</li>
+      <li class="list-group-item">No report history.</li>
       {% endfor %}
     </ul>
 

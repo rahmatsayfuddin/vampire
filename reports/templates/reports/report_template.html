@@ -1,118 +1,14 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>{{ project.project_name }} Report</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        h1, h2, h3 { color: #2c3e50; }
-        .section { page-break-after: always; }
-        .section:last-child { page-break-after: auto; }
-        .table { width: 100%; border-collapse: collapse; }
-        .table th, .table td { border: 1px solid #ccc; padding: 8px; }
-    </style>
-</head>
-<body>
+{% extends 'reports/base_report.html' %}
 
-    <!-- 1. Cover Page -->
-    <div class="section">
-        <h1>{{ project.project_name|upper }}<br>Penetration Testing Report</h1>
-        <p><strong>Product:</strong> {{ project.product.name }}</p>
-        <p><strong>Date:</strong> {{ today }}</p>
-        <p><strong>Classification:</strong> Confidential</p>
-    </div>
+{% block content %}
+{% include 'reports/cover_page.html' %}
+{% include 'reports/document_control.html' %}
+{% include 'reports/executive_summary.html' %}
 
-    <!-- 2. Document Detail -->
-    <div class="section">
-        <h2>Document Detail</h2>
-        <p><strong>Start Date:</strong> {{ project.start_date }}</p>
-        <p><strong>End Date:</strong> {{ project.end_date }}</p>
-        <p><strong>Description:</strong><br>{{ project.description }}</p>
-    </div>
+<div class="section">
+    {% include 'reports/methodology_section.html' %}
+</div>
 
-    <!-- 3. Scope -->
-    <div class="section">
-        <h2>Scope</h2>
-        <p>{{ project.scope|linebreaks }}</p>
-    </div>
-
-    <!-- 4. Project Member -->
-    <div class="section">
-        <h2>Project Member</h2>
-        <table class="table">
-            <thead><tr><th>Name</th><th>Email</th><th>Title</th><th>Signature</th></tr></thead>
-            <tbody>
-                {% for pic in project.pic_set.all %}
-                    <tr>
-                        <td>{{ pic.name }}</td>
-                        <td>{{ pic.email }}</td>
-                        <td>{{ pic.title }}</td>
-                        <td>________________</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- 5. Stake Holder -->
-    <div class="section">
-        <h2>Stake Holder</h2>
-        <table class="table">
-            <thead><tr><th>Name</th><th>Email</th><th>Position</th><th>Signature</th></tr></thead>
-            <tbody>
-                {% for stakeholder in project.stakeholder_set.all %}
-                    <tr>
-                        <td>{{ stakeholder.name }}</td>
-                        <td>{{ stakeholder.email }}</td>
-                        <td>{{ stakeholder.position }}</td>
-                        <td>________________</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- 6. Methodology -->
-    <div class="section">
-    {% include 'reports/methodology_section.html' %}  
-    </div>
-
-    <!-- 7. Executive Summary -->
-    <div class="section">
-        <h2>Executive Summary</h2>
-        <p>General summary of findings goes here. Graphic or statistics could be added later.</p>
-    </div>
-
-    <!-- 8. Finding Summary -->
-    <div class="section">
-        <h2>Finding Summary</h2>
-        <table class="table">
-            <thead><tr><th>Title</th><th>Severity</th><th>Status</th></tr></thead>
-            <tbody>
-                {% for finding in findings %}
-                    <tr>
-                        <td>{{ finding.title }}</td>
-                        <td>{{ finding.severity }}</td>
-                        <td>{{ finding.status }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- 9. Detail Finding -->
-    <div class="section">
-        <h2>Detail Finding</h2>
-        {% for finding in findings %}
-            <h3>{{ finding.title }} ({{ finding.severity }})</h3>
-            <p><strong>Description:</strong><br>{{ finding.description }}</p>
-            <p><strong>Impact:</strong><br>{{ finding.impact }}</p>
-            <p><strong>Recommendation:</strong><br>{{ finding.recommendation }}</p>
-            <p><strong>Affected:</strong> {{ finding.affected }}</p>
-            <p><strong>Status:</strong> {{ finding.status }}</p>
-            <hr>
-        {% endfor %}
-    </div>
-
-</body>
-</html>
+{% include 'reports/finding_list.html' %}
+{% include 'reports/finding_detail.html' %}
+{% endblock %}

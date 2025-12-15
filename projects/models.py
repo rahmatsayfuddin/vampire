@@ -1,5 +1,5 @@
 from django.db import models
-from products.models import Product
+from organizations.models import Organization
 from django.utils import timezone
 
 class Project(models.Model):
@@ -13,7 +13,7 @@ class Project(models.Model):
     project_name = models.CharField(max_length=255, unique=True)
     description = models.TextField(blank=True)
     scope = models.TextField(blank=True)
-    product = models.ForeignKey(Product, on_delete=models.RESTRICT)
+    organization = models.ForeignKey(Organization, on_delete=models.RESTRICT)
     start_date = models.DateField()
     end_date = models.DateField()  # deadline
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='In Progress')

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ project.project_name }} Report</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+
+            @frame footer_frame {
+                -pdf-frame-content: footerContent;
+                bottom: 1cm;
+                margin-left: 2cm;
+                margin-right: 2cm;
+                height: 1cm;
+            }
+        }
+
+        body {
+            font-family: 'Helvetica', sans-serif;
+            font-size: 10pt;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        h1 {
+            color: #1a237e;
+            /* Dark Blue */
+            font-size: 24pt;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #1a237e;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #283593;
+            /* Slightly lighter blue */
+            font-size: 18pt;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            color: #303f9f;
+            font-size: 14pt;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+
+        .section {
+            page-break-after: always;
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th {
+            background-color: #1a237e;
+            color: white;
+            font-weight: bold;
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #1a237e;
+        }
+
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+
+        /* Severity Colors */
+        .severity-Critical {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        .severity-High {
+            color: #c62828;
+            font-weight: bold;
+        }
+
+        .severity-Medium {
+            color: #f57c00;
+            font-weight: bold;
+        }
+
+        .severity-Low {
+            color: #fbc02d;
+            font-weight: bold;
+        }
+
+        .severity-Info {
+            color: #1976d2;
+            font-weight: bold;
+        }
+
+        /* Cover Page Specifics */
+        .cover-page {
+            text-align: center;
+            padding-top: 20px;
+            /* Reduced from 50px */
+        }
+
+        .cover-title {
+            font-size: 36pt;
+            color: #1a237e;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .cover-subtitle {
+            font-size: 24pt;
+            color: #555;
+            margin-bottom: 10px;
+            /* Reduced from 20px */
+        }
+
+        .cover-info {
+            font-size: 14pt;
+            margin-top: 30px;
+            /* Reduced from 50px */
+            color: #777;
+        }
+
+        /* Footer */
+        #footerContent {
+            text-align: right;
+            color: #777;
+            font-size: 8pt;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="footerContent">
+        Page <pdf:pagenumber> of <pdf:pagecount>
+    </div>
+
+    {% block content %}{% endblock %}
+</body>
+
+</html>

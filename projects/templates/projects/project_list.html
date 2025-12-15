@@ -7,26 +7,26 @@
 </div>
 
 <div class="row">
-{% for project in projects %}
+  {% for project in projects %}
   <div class="col-md-6">
     <div class="card card-outline card-primary mb-3">
       <div class="card-header">
-        <h3 class="card-title">{{ project.project_name }} — {{ project.product.product_name }}</h3>
+        <h3 class="card-title">{{ project.project_name }} — {{ project.organization.name }}</h3>
       </div>
       <div class="card-body">
         <p>Status: {{ project.status }}</p>
         {% if project.status == 'Completed' %}
-          {% if project.spi >= 1 %}
-            <p><strong>SPI:</strong> {{ project.spi }} 🟢 – On time or faster</p>
-          {% else %}
-            <p><strong>SPI:</strong> {{ project.spi }} 🔴 – Delayed</p>
-          {% endif %}
+        {% if project.spi >= 1 %}
+        <p><strong>SPI:</strong> {{ project.spi }} 🟢 – On time or faster</p>
         {% else %}
-          {% if project.spi >= 1 %}
-            <p><strong>SPI (est.):</strong> {{ project.spi }} 🟢 – Estimated, project not yet completed</p>
-          {% else %}
-            <p><strong>SPI (est.):</strong> {{ project.spi }} 🔴 – Estimated, project not yet completed</p>
-          {% endif %}
+        <p><strong>SPI:</strong> {{ project.spi }} 🔴 – Delayed</p>
+        {% endif %}
+        {% else %}
+        {% if project.spi >= 1 %}
+        <p><strong>SPI (est.):</strong> {{ project.spi }} 🟢 – Estimated, project not yet completed</p>
+        {% else %}
+        <p><strong>SPI (est.):</strong> {{ project.spi }} 🔴 – Estimated, project not yet completed</p>
+        {% endif %}
         {% endif %}
       </div>
       <div class="card-footer">
@@ -36,10 +36,10 @@
       </div>
     </div>
   </div>
-{% empty %}
+  {% empty %}
   <div class="col-12">
     <div class="alert alert-secondary">No projects found.</div>
   </div>
-{% endfor %}
+  {% endfor %}
 </div>
 {% endblock %}

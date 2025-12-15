@@ -8,10 +8,58 @@
   <div class="card-body">
     <form method="post">
       {% csrf_token %}
-      {{ form.as_p }}
+      {% for field in form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {% if 'date' in field.name %}
+        <div class="input-group date" id="{{ field.id_for_label }}_wrapper" data-target-input="nearest">
+          {{ field }}
+          <div class="input-group-append" data-target="#{{ field.id_for_label }}_wrapper" data-toggle="datetimepicker">
+            <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+          </div>
+        </div>
+        {% else %}
+        {{ field }}
+        {% endif %}
+
+        {% if field.help_text %}
+        <small class="form-text text-muted">{{ field.help_text }}</small>
+        {% endif %}
+        {% for error in field.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+      {% endfor %}
       <button type="submit" class="btn btn-primary">Save</button>
       <a href="{% url 'project_list' %}" class="btn btn-secondary ml-2">Back to Project List</a>
     </form>
   </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $(function () {
+    // Initialize Select2
+    $('select').select2({
+      theme: 'bootstrap4'
+    })
+
+    // Add form-control class to inputs
+    $('input:not([type="checkbox"]):not([type="radio"]), select, textarea').addClass('form-control');
+
+    // Date picker initialization
+    // Specifically targeting inputs with 'date' in name which we wrapped above
+    // We assume the rendered widget is a standard text input.
+    // We need to add 'datetimepicker-input' class to the input itself.
+    $('.input-group.date input').addClass('datetimepicker-input');
+
+    // Initialize TempusDominus
+    $('.input-group.date').each(function () {
+      $(this).datetimepicker({
+        format: 'YYYY-MM-DD'
+      });
+    });
+  });
+</script>
 {% endblock %}

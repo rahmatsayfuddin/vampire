@@ -1,10 +1,28 @@
 from django import forms
-from .models import User
+from django.contrib.auth.models import User, Group
 
 class UserForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput(), required=False, help_text="Leave empty to keep current password")
+    groups = forms.ModelMultipleChoiceField(queryset=Group.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
+
     class Meta:
         model = User
-        fields = ['username', 'password_hash', 'email', 'full_name', 'role']
+        fields = ['username', 'email', 'first_name', 'last_name', 'is_active', 'groups']
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        password = self.cleaned_data.get('password')
+        if password:
+            user.set_password(password)
+        if commit:
+            user.save()
+            self.save_m2m()
+        return user
+
+class GroupForm(forms.ModelForm):
+    class Meta:
+        model = Group
+        fields = ['name', 'permissions']
         widgets = {
-            'password_hash': forms.PasswordInput(),
+            'permissions': forms.CheckboxSelectMultiple()
         }

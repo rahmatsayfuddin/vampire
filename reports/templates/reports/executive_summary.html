@@ -1,0 +1,28 @@
+<div class="section">
+    <h1>Executive Summary</h1>
+    <p>
+        This report details the findings of the penetration testing conducted on <strong>{{ project.organization.name }}</strong>.
+        The assessment was performed from {{ project.start_date }} to {{ project.end_date }}.
+    </p>
+
+    <h2>Summary of Findings</h2>
+    <p>
+        A total of <strong>{{ findings.count }}</strong> vulnerabilities were identified during this assessment.
+        The following table summarizes the findings by severity.
+    </p>
+
+    <!-- Simple Severity Count Table (Logic could be moved to view/utils later for better performance) -->
+    <!-- For now, we just show the count -->
+
+    <div style="margin-top: 20px; padding: 15px; background-color: #e3f2fd; border-left: 5px solid #1a237e;">
+        <p><strong>Assessment Result:</strong></p>
+        <p>
+            {% if findings %}
+            Vulnerabilities were found that require attention. Please refer to the detailed findings section for
+            remediation steps.
+            {% else %}
+            No significant vulnerabilities were identified during this assessment.
+            {% endif %}
+        </p>
+    </div>
+</div>

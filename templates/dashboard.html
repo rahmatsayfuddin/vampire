@@ -1,0 +1,51 @@
+{% extends 'base_adminlte.html' %}
+
+{% block title %}Dashboard - VAMPIRE{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-info">
+            <div class="inner">
+                <h3>{{ project_count }}</h3>
+                <p>My Projects</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-project-diagram"></i>
+            </div>
+            <a href="{% url 'project_list' %}" class="small-box-footer">More info <i
+                    class="fas fa-arrow-circle-right"></i></a>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-lg-3 col-6">
+        <!-- small box -->
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>{{ finding_count }}</h3>
+                <p>My Findings</p>
+            </div>
+            <div class="icon">
+                <i class="fas fa-bug"></i>
+            </div>
+            <!-- <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a> -->
+        </div>
+    </div>
+    <!-- ./col -->
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Welcome to VAMPIRE</h3>
+            </div>
+            <div class="card-body">
+                <p>Welcome back, <strong>{{ user.get_full_name|default:user.username }}</strong>!</p>
+                <p>Use the sidebar to navigate to your projects and findings.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

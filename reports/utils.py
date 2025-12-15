@@ -7,6 +7,29 @@ from datetime import datetime
 from reports.sections.methodology import add_methodology_section
 
 
+def link_callback(uri, rel):
+    """
+    Convert HTML URIs to absolute system paths so xhtml2pdf can access those resources
+    """
+    sUrl = settings.STATIC_URL      # Typically /static/
+    sRoot = settings.STATIC_ROOT    # Typically /home/userX/project_static/
+    mUrl = settings.MEDIA_URL       # Typically /media/
+    mRoot = settings.MEDIA_ROOT     # Typically /home/userX/project_media/
+
+    if uri.startswith(mUrl):
+        path = os.path.join(mRoot, uri.replace(mUrl, ""))
+    elif uri.startswith(sUrl):
+        path = os.path.join(sRoot, uri.replace(sUrl, ""))
+    else:
+        return uri
+
+    # make sure that file exists
+    if not os.path.isfile(path):
+            raise Exception(
+                'media URI must start with %s or %s' % (sUrl, mUrl)
+            )
+    return path
+
 def generate_report_file(project, findings, format='pdf'):
     context = {
         'project': project,
@@ -22,7 +45,7 @@ def generate_report_file(project, findings, format='pdf'):
         try:
             html = render_to_string('reports/report_template.html', context)
             with open(output_path, "wb") as out:
-                pisa_status = pisa.CreatePDF(html, dest=out)
+                pisa_status = pisa.CreatePDF(html, dest=out, link_callback=link_callback)
                 if pisa_status.err:
                     print("Failed to generate PDF:", pisa_status.err)
         except Exception as e:
@@ -34,7 +57,7 @@ def generate_report_file(project, findings, format='pdf'):
 
             # Cover Page
             doc.add_heading(f'{project.project_name} - Penetration Testing Report', 0)
-            doc.add_paragraph(f"Product: {project.product.product_name}")
+            doc.add_paragraph(f"Organization: {project.organization.name}")
             doc.add_paragraph(f"Date: {datetime.now().strftime('%B %d, %Y')}")
             doc.add_paragraph("Classification: Confidential")
             doc.add_page_break()

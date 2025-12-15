@@ -4,12 +4,12 @@ from .models import Project
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['project_name', 'description','scope', 'product', 'start_date', 'end_date', 'status']
+        fields = ['project_name', 'description','scope', 'organization', 'start_date', 'end_date', 'status']
 
     def __init__(self, *args, **kwargs):
-        product_id = kwargs.pop('product_id', None)
+        organization_id = kwargs.pop('organization_id', None)
         super().__init__(*args, **kwargs)
 
-        if product_id:
-            self.fields['product'].initial = product_id
-            self.fields['product'].widget = forms.HiddenInput()
+        if organization_id:
+            self.fields['organization'].initial = organization_id
+            self.fields['organization'].widget = forms.HiddenInput()

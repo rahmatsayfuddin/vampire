@@ -54,7 +54,11 @@ def download_report(request, report_id):
                 else 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
             )
             response = HttpResponse(f.read(), content_type=mime_type)
-            response['Content-Disposition'] = f'attachment; filename="{report.file_name}"'
+            # Check for 'preview' query param
+            if request.GET.get('preview') == 'true' and report.format == 'pdf':
+                response['Content-Disposition'] = f'inline; filename="{report.file_name}"'
+            else:
+                response['Content-Disposition'] = f'attachment; filename="{report.file_name}"'
             return response
     else:
         return HttpResponseNotFound("File not found.")

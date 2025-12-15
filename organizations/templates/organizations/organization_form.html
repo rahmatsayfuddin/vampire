@@ -1,0 +1,59 @@
+{% extends "base_adminlte.html" %}
+{% block title %}Organization Form{% endblock %}
+{% block content %}
+<div class="card card-primary card-outline">
+  <div class="card-header">
+    <h3 class="card-title">Organization Form</h3>
+  </div>
+  <div class="card-body">
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% for field in form %}
+      <div class="form-group">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}
+        <small class="form-text text-muted">{{ field.help_text }}</small>
+        {% endif %}
+        {% for error in field.errors %}
+        <div class="text-danger">{{ error }}</div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+      <button type="submit" class="btn btn-primary">Save</button>
+      <a href="{% url 'organization_list' %}" class="btn btn-secondary ml-2">Back</a>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  $(function () {
+    // Initialize Select2
+    $('.select2').select2({
+      theme: 'bootstrap4'
+    })
+
+    // Initialize custom file input
+    bsCustomFileInput.init();
+
+    // Add form-control class to inputs
+    $('input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea').addClass('form-control');
+    $('input[type="file"]').addClass('custom-file-input');
+
+    // Wrap file inputs in custom-file structure if needed, or just leave as is if bs-custom-file-input handles it.
+    // bs-custom-file-input expects a specific structure: .custom-file > .custom-file-input + .custom-file-label
+    // Since Django renders just <input type="file">, we might need to wrap it if we want the full BS custom file/input look.
+    // For now, adding form-control-file or similar might be enough, but let's try to wrap it for "Advanced" look.
+
+    $('input[type="file"]').each(function () {
+      if (!$(this).parent().hasClass('custom-file')) {
+        $(this).wrap('<div class="custom-file"></div>');
+        $(this).after('<label class="custom-file-label" for="' + $(this).attr('id') + '">Choose file</label>');
+      }
+    });
+    bsCustomFileInput.init();
+  });
+</script>
+{% endblock %}

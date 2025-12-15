@@ -1,0 +1,50 @@
+{% extends 'base_adminlte.html' %}
+
+{% block content %}
+<div class="login-box" style="margin: 0 auto; padding-top: 50px;">
+  <div class="login-logo">
+    <a href="/"><b>VAMPIRE</b></a>
+  </div>
+  <!-- /.login-logo -->
+  <div class="card">
+    <div class="card-body login-card-body">
+      <p class="login-box-msg">Sign in to start your session</p>
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="input-group mb-3">
+          <input type="text" name="username" class="form-control" placeholder="Username" required>
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-user"></span>
+            </div>
+          </div>
+        </div>
+        <div class="input-group mb-3">
+          <input type="password" name="password" class="form-control" placeholder="Password" required>
+          <div class="input-group-append">
+            <div class="input-group-text">
+              <span class="fas fa-lock"></span>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-8">
+          </div>
+          <!-- /.col -->
+          <div class="col-4">
+            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+          </div>
+          <!-- /.col -->
+        </div>
+      </form>
+
+      {% if form.errors %}
+      <p class="text-danger mt-3">Your username and password didn't match. Please try again.</p>
+      {% endif %}
+
+    </div>
+    <!-- /.login-card-body -->
+  </div>
+</div>
+{% endblock %}

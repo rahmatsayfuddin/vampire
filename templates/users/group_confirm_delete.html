@@ -1,0 +1,21 @@
+{% extends 'base_adminlte.html' %}
+
+{% block title %}Delete Role - VAMPIRE{% endblock %}
+
+{% block content %}
+<div class="card card-danger">
+    <div class="card-header">
+        <h3 class="card-title">Confirm Delete</h3>
+    </div>
+    <div class="card-body">
+        <p>Are you sure you want to delete role "<strong>{{ group.name }}</strong>"?</p>
+    </div>
+    <div class="card-footer">
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="{% url 'group_list' %}" class="btn btn-default float-right">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

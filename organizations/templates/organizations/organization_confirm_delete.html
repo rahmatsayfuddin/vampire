@@ -1,0 +1,17 @@
+{% extends "base_adminlte.html" %}
+{% block title %}Delete Organization{% endblock %}
+{% block content %}
+<div class="card card-danger card-outline">
+  <div class="card-header">
+    <h3 class="card-title">Delete Organization</h3>
+  </div>
+  <div class="card-body">
+    <p>Are you sure you want to delete <strong>{{ organization.name }}</strong>?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Yes, Delete</button>
+      <a href="{% url 'organization_list' %}" class="btn btn-secondary ml-2">Cancel</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

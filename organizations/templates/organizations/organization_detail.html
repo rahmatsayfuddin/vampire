@@ -1,0 +1,30 @@
+{% extends "base_adminlte.html" %}
+{% block title %}Organization Detail{% endblock %}
+{% block content %}
+<div class="card card-info card-outline">
+  <div class="card-header">
+    <h3 class="card-title">Organization: {{ organization.name }}</h3>
+  </div>
+  <div class="card-body">
+    {% if organization.logo %}
+    <img src="{{ organization.logo.url }}" class="img-fluid mb-3" style="max-height:150px;">
+    {% endif %}
+    <p>{{ organization.description }}</p>
+
+    <h4 class="mt-4">Projects under {{ organization.name }}</h4>
+    <ul class="list-group">
+      {% for project in projects %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <span>{{ project.project_name }} - {{ project.status }}</span>
+        <span>
+          <a href="{% url 'project_detail' project.pk %}" class="btn btn-sm btn-info">View</a>
+          <a href="{% url 'project_update' project.pk %}" class="btn btn-sm btn-warning">Edit</a>
+        </span>
+      </li>
+      {% empty %}
+      <li class="list-group-item">No projects yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+{% endblock %}
