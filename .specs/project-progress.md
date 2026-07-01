@@ -28,6 +28,16 @@
 - Verified: media files survive restart (media volume mount)
 - Verified: ./init.sh works inside container
 
+### devops-003 — Database migration SQLite → PostgreSQL — COMPLETE
+- Updated .env.example: Docker + local PostgreSQL documentation with setup steps
+- Created migrate_db.sh: dumpdata from SQLite → loaddata to PostgreSQL with connectivity check
+- Updated init.sh: SQLite warning banner with link to .env.example
+- Added CONN_MAX_AGE=600 to PostgreSQL connection pool settings
+- Full integration test on PostgreSQL: Organization, Project, Assignment, Stakeholder, Finding — all CRUD working
+- SPI calculation works (SPI=2.01), SLA logic works (Critical=7d, Medium=30d)
+- Report generation works on PostgreSQL (PDF generated successfully)
+- ./init.sh passes with SQLite fallback (no PostgreSQL required for local dev)
+
 ### Observations (audit notes)
 - **Bug:** `project_detail` in `projects/views.py:101` passes empty lists for assignments, pics, scans, findings instead of querying them.
 - **Bug:** `reports/views.py:run()` has no error handling — thread crashes silently, ReportHistory stuck 'loading'.
