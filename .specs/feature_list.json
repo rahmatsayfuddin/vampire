@@ -290,8 +290,28 @@
       "notes": "Current finding_list view has pagination but no search/filter form. Add GET parameter-based filtering in the view and a filter form in the template."
     },
     {
-      "id": "feat-003",
+      "id": "feat-007",
       "priority": 11,
+      "area": "reports",
+      "title": "Report History list page \u2014 /reports/ with project, org, format, status columns",
+      "user_visible_behavior": "Clicking Reports in the sidebar shows a global list of all generated reports across projects, with filter dropdowns for project, format, and status.",
+      "status": "not_started",
+      "verification": [
+        "Navigate to /reports/ \u2014 verify a table of reports appears.",
+        "Verify columns: Project (link), Organization, File, Format badge, Status badge, Created, Actions (Preview/Download/Delete).",
+        "Verify filter dropdowns: Project, Format (All/PDF/Word), Status (All/Loading/Done/Failed).",
+        "Verify non-admin users only see reports from their assigned projects.",
+        "Verify pagination works and preserves filter params.",
+        "Verify Preview works for PDF reports.",
+        "Verify Download and Delete work.",
+        "./init.sh passes."
+      ],
+      "evidence": [],
+      "notes": "Currently /reports/ 404s \u2014 no root URL in reports/urls.py. Add report_list view scoped to user, FilterParams pattern mirroring findings/views.py."
+    },
+    {
+      "id": "feat-003",
+      "priority": 12,
       "area": "findings",
       "title": "Email notification when finding misses SLA deadline",
       "user_visible_behavior": "When a finding passes its SLA due date, assigned users receive an email notification. A daily digest email summarizes all late findings.",
@@ -308,7 +328,7 @@
     },
     {
       "id": "improve-001",
-      "priority": 12,
+      "priority": 13,
       "area": "findings",
       "title": "SLA days configurable per project instead of hardcoded",
       "user_visible_behavior": "When creating or editing a project, the user can set custom SLA day values per severity level. Findings inherit SLA from their project.",
@@ -325,7 +345,7 @@
     },
     {
       "id": "feat-004",
-      "priority": 13,
+      "priority": 14,
       "area": "api",
       "title": "REST API endpoints for findings and projects",
       "user_visible_behavior": "External tools can query, create, and update findings and projects via JSON REST API with authentication.",
@@ -343,7 +363,7 @@
     },
     {
       "id": "feat-005",
-      "priority": 14,
+      "priority": 15,
       "area": "findings",
       "title": "Export findings to CSV/Excel, import from scanner output",
       "user_visible_behavior": "From the findings list, users can click Export to download all visible findings as CSV or Excel. Users can upload a scanner output file (e.g. Burp/Nessus XML) to bulk-import findings.",
@@ -363,7 +383,7 @@
     },
     {
       "id": "improve-002",
-      "priority": 15,
+      "priority": 16,
       "area": "auth",
       "title": "Authentication enhancements \u2014 password reset, rate-limited login",
       "user_visible_behavior": "Users can reset their password via email link. Failed login attempts are rate-limited to prevent brute force.",
@@ -382,7 +402,7 @@
     },
     {
       "id": "feat-006",
-      "priority": 16,
+      "priority": 17,
       "area": "audit",
       "title": "Audit trail \u2014 log who created/edited/deleted findings and projects",
       "user_visible_behavior": "Each finding and project detail page shows a history of changes (who changed what and when). A global audit log page (admin only) shows all recent activity.",
@@ -410,7 +430,7 @@
     },
     {
       "id": "improve-003",
-      "priority": 17,
+      "priority": 18,
       "area": "reports",
       "title": "Unified report content pipeline between PDF and DOCX",
       "user_visible_behavior": "PDF and DOCX reports contain identical content because both are generated from the same data pipeline. No more content drift between formats.",
@@ -428,7 +448,7 @@
     },
     {
       "id": "improve-004",
-      "priority": 18,
+      "priority": 19,
       "area": "reports",
       "title": "Fill empty report section stubs (cover.py, summary.py, detail_findings.py, etc.)",
       "user_visible_behavior": "DOCX report generation uses modular section builders for each report part, making the codebase easier to extend and maintain.",
@@ -448,7 +468,7 @@
     },
     {
       "id": "improve-006",
-      "priority": 19,
+      "priority": 20,
       "area": "reports",
       "title": "Report generation via Markdown \u2014 MD as primary output, PDF conversion optional",
       "user_visible_behavior": "Report generation produces a clean Markdown document. Users can download the Markdown file directly or optionally convert to PDF. Removes the current dual-path (xhtml2pdf + python-docx) complexity.",
@@ -469,7 +489,7 @@
     },
     {
       "id": "improve-005",
-      "priority": 20,
+      "priority": 21,
       "area": "users",
       "title": "Custom user model replacing django.contrib.auth.models.User",
       "user_visible_behavior": "No visible change to end users. Future user profile fields (phone, department, avatar) can be added without migration pain.",
@@ -486,7 +506,7 @@
     },
     {
       "id": "devops-004",
-      "priority": 21,
+      "priority": 22,
       "area": "devops",
       "title": "Default port 8001 \u2014 8000 occupied by Docker Desktop on macOS",
       "user_visible_behavior": "runserver and docker compose always use port 8001. No more port-conflict errors.",
