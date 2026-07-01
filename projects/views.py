@@ -1,9 +1,7 @@
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, redirect
 from .models import Project
 from .forms import ProjectForm
 from .services import ProjectService
-from organizations.models import Organization
-from reports.models import ReportHistory
 from django.contrib.auth.decorators import login_required, permission_required
 
 @login_required
@@ -55,20 +53,6 @@ def project_delete(request, pk):
     return render(request, 'projects/project_confirm_delete.html', {'project': project})
 
 @login_required
-def organization_detail(request, organization_id):
-    organization = get_object_or_404(Organization, pk=organization_id)
-
-    if request.user.is_superuser:
-        projects = Project.objects.filter(organization=organization)
-    else:
-        projects = Project.objects.filter(organization=organization, assignment__user=request.user)
-
-    return render(request, 'organizations/organization_detail.html', {
-        'organization': organization,
-        'projects': projects
-    })
-
-@login_required
 def project_detail(request, pk):
     project = ProjectService.get_project_for_user(pk, request.user)
 
@@ -76,8 +60,5 @@ def project_detail(request, pk):
     return render(request, 'projects/project_detail.html', {
             'project': project,
             'reports': reports,
-            'assignments': [],
-            'pics': [],
             'scans': [],
-            'findings': [],
         })
