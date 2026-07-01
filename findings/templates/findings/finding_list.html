@@ -8,6 +8,53 @@
         <h3 class="card-title">Findings</h3>
     </div>
     <div class="card-body">
+        <form method="get" class="mb-3">
+            <div class="row">
+                <div class="col-md-3 mb-2">
+                    <input type="text" name="q" class="form-control" placeholder="Search title or description..." value="{{ filters.q }}">
+                </div>
+                <div class="col-md-2 mb-2">
+                    <select name="severity" class="form-control">
+                        <option value="">All Severities</option>
+                        <option value="Critical" {% if filters.severity == "Critical" %}selected{% endif %}>Critical</option>
+                        <option value="High" {% if filters.severity == "High" %}selected{% endif %}>High</option>
+                        <option value="Medium" {% if filters.severity == "Medium" %}selected{% endif %}>Medium</option>
+                        <option value="Low" {% if filters.severity == "Low" %}selected{% endif %}>Low</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2">
+                    <select name="status" class="form-control">
+                        <option value="">All Statuses</option>
+                        <option value="Open" {% if filters.status == "Open" %}selected{% endif %}>Open</option>
+                        <option value="Closed" {% if filters.status == "Closed" %}selected{% endif %}>Closed</option>
+                        <option value="Risk Acceptance" {% if filters.status == "Risk Acceptance" %}selected{% endif %}>Risk Acceptance</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2">
+                    <select name="project" class="form-control">
+                        <option value="">All Projects</option>
+                        {% for p in projects %}
+                        <option value="{{ p.pk }}" {% if filters.project == p.pk|stringformat:"s" %}selected{% endif %}>{{ p.project_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2">
+                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2 mb-2">
+                    <input type="date" name="date_from" class="form-control" placeholder="From" value="{{ filters.date_from }}">
+                </div>
+                <div class="col-md-2 mb-2">
+                    <input type="date" name="date_to" class="form-control" placeholder="To" value="{{ filters.date_to }}">
+                </div>
+                <div class="col-md-2 mb-2">
+                    <a href="{% url 'finding_list' %}" class="btn btn-outline-secondary btn-block">Clear</a>
+                </div>
+            </div>
+        </form>
+
         <table class="table table-bordered table-hover">
             <thead>
                 <tr>
@@ -44,11 +91,9 @@
                     </td>
                     <td>{{ finding.status }}</td>
                     <td>
-                        <a href="{% url 'finding_detail' finding.pk %}" class="btn btn-sm btn-info"><i
-                                class="fas fa-eye"></i> View</a>
+                        <a href="{% url 'finding_detail' finding.pk %}" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</a>
                         {% if perms.findings.change_finding %}
-                        <a href="{% url 'finding_edit' finding.pk %}" class="btn btn-sm btn-warning"><i
-                                class="fas fa-edit"></i> Edit</a>
+                        <a href="{% url 'finding_edit' finding.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</a>
                         {% endif %}
                     </td>
                 </tr>
@@ -63,9 +108,8 @@
     <div class="card-footer clearfix">
         <ul class="pagination pagination-sm m-0 float-right">
             {% if page_obj.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a>
-            </li>
+            <li class="page-item"><a class="page-link" href="?page=1{% if query_string %}&{{ query_string }}{% endif %}">&laquo; First</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query_string %}&{{ query_string }}{% endif %}">Previous</a></li>
             {% endif %}
 
             <li class="page-item disabled">
@@ -73,9 +117,8 @@
             </li>
 
             {% if page_obj.has_next %}
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
-            </li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query_string %}&{{ query_string }}{% endif %}">Next</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query_string %}&{{ query_string }}{% endif %}">Last &raquo;</a></li>
             {% endif %}
         </ul>
     </div>

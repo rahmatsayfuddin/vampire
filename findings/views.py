@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.db.models import Q
 from .models import Finding
 from .forms import FindingForm
 from .services import FindingService
@@ -11,15 +12,57 @@ from django.contrib.auth.decorators import login_required, permission_required
 @login_required
 @permission_required('findings.view_finding', raise_exception=True)
 def finding_list(request):
-    findings_list = FindingService.get_queryset_for_user(request.user).order_by('-created_at')
+    findings_list = FindingService.get_queryset_for_user(request.user)
+
+    q = request.GET.get('q', '')
+    if q:
+        findings_list = findings_list.filter(Q(title__icontains=q) | Q(description__icontains=q))
+
+    severity = request.GET.get('severity', '')
+    if severity:
+        findings_list = findings_list.filter(severity=severity)
+
+    status = request.GET.get('status', '')
+    if status:
+        findings_list = findings_list.filter(status=status)
+
+    project_id = request.GET.get('project', '')
+    if project_id:
+        findings_list = findings_list.filter(project_id=project_id)
+
+    date_from = request.GET.get('date_from', '')
+    if date_from:
+        findings_list = findings_list.filter(created_at__gte=date_from)
+    date_to = request.GET.get('date_to', '')
+    if date_to:
+        findings_list = findings_list.filter(created_at__lte=date_to)
+
+    findings_list = findings_list.order_by('-created_at')
+
+    projects = ProjectService.get_queryset_for_user(request.user)
 
     paginator = Paginator(findings_list, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
 
+    query_params = request.GET.copy()
+    if 'page' in query_params:
+        del query_params['page']
+    query_string = query_params.urlencode()
+
     return render(request, 'findings/finding_list.html', {
         'page_obj': page_obj,
-        'num_pages': paginator.num_pages
+        'num_pages': paginator.num_pages,
+        'projects': projects,
+        'query_string': query_string,
+        'filters': {
+            'q': q,
+            'severity': severity,
+            'status': status,
+            'project': project_id,
+            'date_from': date_from,
+            'date_to': date_to,
+        }
     })
 
 @login_required

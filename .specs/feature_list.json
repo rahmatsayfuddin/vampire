@@ -268,7 +268,7 @@
       "area": "findings",
       "title": "Search bar and advanced filtering on finding list",
       "user_visible_behavior": "The finding list page has a search bar and dropdown filters. Users can search by title/description and filter by severity, status, project, date range.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Navigate to /findings/.",
         "Type a keyword in the search box, submit.",
@@ -278,7 +278,15 @@
         "Combine search + filter and verify results.",
         "Verify pagination still works with filters applied."
       ],
-      "evidence": [],
+      "evidence": [
+        "finding_list view: GET-param filtering (q, severity, status, project, date_from, date_to)",
+        "Search: title__icontains OR description__icontains",
+        "Filters: severity dropdown, status dropdown, project dropdown, date range inputs",
+        "Pagination links preserve all active filter params via query_string",
+        "\"Clear\" button resets to unfiltered list",
+        "Verified: search, single filter, combined filter, empty results \u2014 all correct",
+        "./init.sh passes"
+      ],
       "notes": "Current finding_list view has pagination but no search/filter form. Add GET parameter-based filtering in the view and a filter form in the template."
     },
     {
