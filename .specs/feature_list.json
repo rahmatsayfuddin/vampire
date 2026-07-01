@@ -110,7 +110,7 @@
       "area": "architecture",
       "title": "Assessment \u2014 apakah project sudah layered architecture?",
       "user_visible_behavior": "Tidak ada perubahan yang terlihat. Output berupa dokumentasi gap analysis yang mencatat semua business logic yang bercampur di views, models, dan utils.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Audit seluruh views.py \u2014 catat semua business logic yang ada di dalam view functions.",
         "Audit seluruh models.py \u2014 catat method yang berisi business logic (SLA, SPI, dll).",
@@ -119,7 +119,16 @@
         "Tentukan target structure: services/ per app, repositori pattern jika diperlukan.",
         "Output rekomendasi: apakah perlu refactor penuh atau incremental."
       ],
-      "evidence": [],
+      "evidence": [
+        "Full audit of all 10 models.py files: 5 business logic methods found in 2 models (Finding: 4 SLA methods, Project: 1 SPI method)",
+        "Full audit of all 11 views.py files: ~30 business logic violations across 6 view files (findings, projects, organizations, reports, vkb, roles)",
+        "Full audit of reports/utils.py: generate_report_file() is 60-line monolithic function mixing rendering, I/O, format dispatch",
+        "4 apps are clean (assignments, stakeholders, menus, users) with zero business logic in views",
+        "Documented 11+ authorization branching duplicates, 4 status lifecycle duplicates, cross-model mutations, raw threading in views",
+        "Architecture assessment written to .specs/architecture-assessment.md with gap analysis, target architecture, and 6-phase migration strategy",
+        "Recommendation: refactor to layered architecture IS recommended (arch-002), start with Phase 1 (authorization extraction)",
+        "Deferred to arch-002: repository pattern is NOT recommended \u2014 Django ORM is sufficient data abstraction"
+      ],
       "notes": "Saat ini project adalah flat Django FBV: views langsung panggil ORM, business logic tersebar di models (Finding.sla_days, Project.spi), views (create_finding, edit_finding), dan utils (generate_report_file). Tidak ada service layer. Assessment ini adalah prerequisite untuk arch-002."
     },
     {

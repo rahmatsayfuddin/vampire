@@ -38,6 +38,15 @@
 - Report generation works on PostgreSQL (PDF generated successfully)
 - ./init.sh passes with SQLite fallback (no PostgreSQL required for local dev)
 
+### arch-001 — Layered architecture assessment — COMPLETE
+- Audited all 10 models.py: 5 business logic methods (Finding SLA engine, Project SPI)
+- Audited all 11 views.py: ~30 business logic violations across 6 view files
+- Audited reports/utils.py: monolithic 60-line generate_report_file()
+- Identified: 11+ authorization branching duplicates, 4 status lifecycle duplicates, cross-model mutations, raw threading
+- 4 apps clean (assignments, stakeholders, menus, users)
+- Wrote .specs/architecture-assessment.md with gap analysis, target architecture, 6-phase migration strategy
+- Verdict: NOT layered. Refactor IS recommended (arch-002). Start with Phase 1: authorization extraction.
+
 ### Observations (audit notes)
 - **Bug:** `project_detail` in `projects/views.py:101` passes empty lists for assignments, pics, scans, findings instead of querying them.
 - **Bug:** `reports/views.py:run()` has no error handling — thread crashes silently, ReportHistory stuck 'loading'.
