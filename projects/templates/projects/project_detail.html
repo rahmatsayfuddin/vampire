@@ -140,7 +140,16 @@
     <ul class="list-group mb-3">
       {% for report in project.reports.all %}
       <li class="list-group-item d-flex justify-content-between align-items-center">
-        <span>{{ report.file_name }} ({{ report.format }}) - {{ report.status }}</span>
+        <span>
+          {{ report.file_name }} ({{ report.format }})
+          {% if report.status == "loading" %}
+          <span class="badge badge-warning">Loading...</span>
+          {% elif report.status == "done" %}
+          <span class="badge badge-success">Done</span>
+          {% elif report.status == "failed" %}
+          <span class="badge badge-danger">Failed</span>
+          {% endif %}
+        </span>
         <span>
           {% if report.status == "done" %}
           {% if report.format == 'pdf' %}

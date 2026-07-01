@@ -61,7 +61,7 @@ class ReportGenerationService:
             history.save()
         except Exception:
             history = ReportHistory.objects.get(id=history_id)
-            history.status = 'loading'
+            history.status = 'failed'
             history.save()
             raise
 

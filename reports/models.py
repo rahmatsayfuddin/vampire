@@ -10,6 +10,7 @@ class ReportHistory(models.Model):
     STATUS_CHOICES = [
         ('loading', 'Loading'),
         ('done', 'Done'),
+        ('failed', 'Failed'),
     ]
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='reports')

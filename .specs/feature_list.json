@@ -200,7 +200,7 @@
       "area": "reports",
       "title": "Report generation thread crashes silently, status stuck 'loading'",
       "user_visible_behavior": "When report generation fails, the user sees a clear error message instead of a perpetually 'loading' status.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Trigger a report generation for a project.",
         "If generation succeeds, download the file and verify content.",
@@ -208,7 +208,14 @@
         "Verify the ReportHistory status is updated to a failure state (not stuck 'loading').",
         "Verify the user sees an error indicator on the project detail page."
       ],
-      "evidence": [],
+      "evidence": [
+        "Added \"failed\" to ReportHistory.STATUS_CHOICES \u2014 migration reports/0002",
+        "ReportGenerationService.generate_async(): exception handler sets status=\"failed\" before re-raising",
+        "Exception still propagates to stderr (visible in terminal) \u2014 useful for debugging",
+        "project_detail.html: styled status badges \u2014 Loading (warning), Done (success), Failed (danger)",
+        "Tested: forced exception \u2192 status=\"failed\" verified (was stuck \"loading\" before)",
+        "./init.sh passes"
+      ],
       "notes": "Partially addressed in arch-002 (generate_async now has try/except). ReportHistory.status needs separate \u201cfailed\u201d state and user-visible error indicator on project detail page."
     },
     {
