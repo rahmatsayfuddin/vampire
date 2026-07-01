@@ -6,7 +6,7 @@ from vkb.models import VulnerabilityKnowledgeBase
 
 
 class SlaService:
-    SLA_DAYS = {
+    SLA_DEFAULTS = {
         'Critical': 7,
         'High': 14,
         'Medium': 30,
@@ -15,7 +15,11 @@ class SlaService:
 
     @classmethod
     def sla_days(cls, finding):
-        return cls.SLA_DAYS.get(finding.severity, 30)
+        profile = finding.project.sla_profile
+        if profile:
+            attr = f'sla_{finding.severity.lower()}'
+            return getattr(profile, attr, 30)
+        return cls.SLA_DEFAULTS.get(finding.severity, 30)
 
     @classmethod
     def sla_due_date(cls, finding):

@@ -1,0 +1,48 @@
+{% extends "base_adminlte.html" %}
+
+{% block title %}SLA Profiles{% endblock %}
+
+{% block content %}
+<div class="card card-outline card-primary">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title">SLA Profiles</h3>
+        <a href="{% url 'sla_profile_create' %}" class="btn btn-sm btn-primary">+ Add SLA Profile</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Critical</th>
+                    <th>High</th>
+                    <th>Medium</th>
+                    <th>Low</th>
+                    <th>Default</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in profiles %}
+                <tr>
+                    <td>
+                        <strong>{{ p.name }}</strong>
+                        {% if p.description %}<br><small class="text-muted">{{ p.description }}</small>{% endif %}
+                    </td>
+                    <td>{{ p.sla_critical }}d</td>
+                    <td>{{ p.sla_high }}d</td>
+                    <td>{{ p.sla_medium }}d</td>
+                    <td>{{ p.sla_low }}d</td>
+                    <td>{% if p.is_default %}<span class="badge badge-success">Default</span>{% else %}—{% endif %}</td>
+                    <td>
+                        <a href="{% url 'sla_profile_update' p.pk %}" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="{% url 'sla_profile_delete' p.pk %}" class="btn btn-sm btn-danger">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center">No SLA profiles defined.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

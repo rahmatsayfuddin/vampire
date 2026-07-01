@@ -367,7 +367,7 @@
       "area": "findings",
       "title": "SLA days configurable per project instead of hardcoded",
       "user_visible_behavior": "When creating or editing a project, the user can set custom SLA day values per severity level. Findings inherit SLA from their project.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Create a project with custom SLA: Critical=3, High=7.",
         "Create a Critical finding in that project.",
@@ -375,7 +375,17 @@
         "Create a project without custom SLA.",
         "Verify it uses system defaults (Critical=7, High=14, Medium=30, Low=60)."
       ],
-      "evidence": [],
+      "evidence": [
+        "SlaProfile model: name, description, sla_critical/high/medium/low, is_default (auto-clears other defaults)",
+        "Project model: sla_profile FK (nullable, SET_NULL on delete)",
+        "SLA Profile CRUD: sla_profile_list, create, update, delete views + templates",
+        "SlaProfileForm + ProjectForm with sla_profile dropdown (empty_label = \"Use default SLA\")",
+        "SlaService.sla_days(): checks project.sla_profile first, falls back to SLA_DEFAULTS (7/14/30/60)",
+        "Sidebar: SLA Profiles link under ADMINISTRATION",
+        "Project detail: shows SLA profile name + days (or \"Default SLA\")",
+        "Tested: Critical Infra profile \u2192 Critical=3d; Standard profile \u2192 Critical=5d; no profile \u2192 7d default",
+        "./init.sh passes"
+      ],
       "notes": "Current SLA values are hardcoded dict in Finding.sla_days(). Move to Project model with default fallback. Consider a global Setting model for system-wide defaults."
     },
     {

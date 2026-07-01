@@ -1,0 +1,20 @@
+{% extends "base_adminlte.html" %}
+
+{% block title %}Delete SLA Profile{% endblock %}
+
+{% block content %}
+<div class="card card-outline card-danger">
+    <div class="card-header">
+        <h3 class="card-title">Delete SLA Profile</h3>
+    </div>
+    <div class="card-body">
+        <p>Are you sure you want to delete the SLA profile <strong>{{ profile.name }}</strong>?</p>
+        <p class="text-muted">Projects using this profile will fall back to the default SLA.</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="{% url 'sla_profile_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

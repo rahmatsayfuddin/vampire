@@ -1,7 +1,7 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.contenttypes.models import ContentType
-from .models import Project
-from .forms import ProjectForm
+from .models import Project, SlaProfile
+from .forms import ProjectForm, SlaProfileForm
 from .services import ProjectService
 from audit.models import AuditLog
 from django.contrib.auth.decorators import login_required, permission_required
@@ -70,3 +70,47 @@ def project_detail(request, pk):
             'scans': [],
             'audit_logs': audit_logs,
         })
+
+
+@login_required
+@permission_required('projects.add_project', raise_exception=True)
+def sla_profile_list(request):
+    profiles = SlaProfile.objects.all()
+    return render(request, 'projects/sla_profile_list.html', {'profiles': profiles})
+
+
+@login_required
+@permission_required('projects.add_project', raise_exception=True)
+def sla_profile_create(request):
+    if request.method == 'POST':
+        form = SlaProfileForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('sla_profile_list')
+    else:
+        form = SlaProfileForm()
+    return render(request, 'projects/sla_profile_form.html', {'form': form, 'title': 'Create SLA Profile'})
+
+
+@login_required
+@permission_required('projects.change_project', raise_exception=True)
+def sla_profile_update(request, pk):
+    profile = get_object_or_404(SlaProfile, pk=pk)
+    if request.method == 'POST':
+        form = SlaProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('sla_profile_list')
+    else:
+        form = SlaProfileForm(instance=profile)
+    return render(request, 'projects/sla_profile_form.html', {'form': form, 'title': 'Edit SLA Profile'})
+
+
+@login_required
+@permission_required('projects.delete_project', raise_exception=True)
+def sla_profile_delete(request, pk):
+    profile = get_object_or_404(SlaProfile, pk=pk)
+    if request.method == 'POST':
+        profile.delete()
+        return redirect('sla_profile_list')
+    return render(request, 'projects/sla_profile_confirm_delete.html', {'profile': profile})

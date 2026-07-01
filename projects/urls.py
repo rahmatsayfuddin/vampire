@@ -9,4 +9,8 @@ urlpatterns = [
     path('delete/<int:pk>/', views.project_delete, name='project_delete'),
     path('<int:pk>/', views.project_detail, name='project_detail'),
 
+    path('sla/', views.sla_profile_list, name='sla_profile_list'),
+    path('sla/create/', views.sla_profile_create, name='sla_profile_create'),
+    path('sla/<int:pk>/edit/', views.sla_profile_update, name='sla_profile_update'),
+    path('sla/<int:pk>/delete/', views.sla_profile_delete, name='sla_profile_delete'),
 ]

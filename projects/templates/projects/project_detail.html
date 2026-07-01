@@ -12,6 +12,19 @@
     <p><strong>End Date:</strong> {{ project.end_date|default:"-" }}</p>
     <p><strong>Description:</strong> {{ project.description|linebreaks }}</p>
     <p><strong>Scope:</strong> {{ project.scope|linebreaks }}</p>
+    <p><strong>SLA Profile:</strong>
+        {% if project.sla_profile %}
+        {{ project.sla_profile.name }}
+        <small class="text-muted">
+            (Critical: {{ project.sla_profile.sla_critical }}d,
+            High: {{ project.sla_profile.sla_high }}d,
+            Medium: {{ project.sla_profile.sla_medium }}d,
+            Low: {{ project.sla_profile.sla_low }}d)
+        </small>
+        {% else %}
+        <span class="text-muted">Default SLA</span>
+        {% endif %}
+    </p>
     <h4>📈 SPI (Scheduled Performance Index)</h4>
     {% if project.status == 'Completed' %}
     {% if project.spi >= 1 %}
