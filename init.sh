@@ -27,3 +27,4 @@ if [ -z "$DB_HOST" ]; then
 fi
 
 echo "Startup OK."
+echo "Run: python manage.py runserver 0.0.0.0:8001"

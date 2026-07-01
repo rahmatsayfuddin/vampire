@@ -27,7 +27,7 @@ Before writing code:
 3. Read `.specs/feature_list.json` and choose the highest-priority unfinished feature.
 4. Review recent commits with `git log --oneline -5`.
 5. Run `./init.sh`.
-6. Verify the app starts: `python manage.py runserver` and check `http://127.0.0.1:8000/`
+6. Verify the app starts: `python manage.py runserver` and check `http://127.0.0.1:8001/`
 
 If baseline verification (`./init.sh`) is already failing, fix that first. Do
 not stack new feature work on top of a broken starting state.

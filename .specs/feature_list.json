@@ -199,7 +199,7 @@
         "Verify the user sees an error indicator on the project detail page."
       ],
       "evidence": [],
-      "notes": "reports/views.py:run() runs in a raw threading.Thread with no try/except. If any exception occurs, the thread dies silently and ReportHistory stays 'loading' forever."
+      "notes": "Partially addressed in arch-002 (generate_async now has try/except). ReportHistory.status needs separate \u201cfailed\u201d state and user-visible error indicator on project detail page."
     },
     {
       "id": "tech-001",
@@ -445,14 +445,20 @@
       "area": "devops",
       "title": "Default port 8001 \u2014 8000 occupied by Docker Desktop on macOS",
       "user_visible_behavior": "runserver and docker compose always use port 8001. No more port-conflict errors.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Run `python manage.py runserver` \u2014 starts on 8001 (not 8000).",
         "Run `docker compose up` \u2014 app accessible on http://127.0.0.1:8001/.",
         "Verify init.sh output mentions port 8001.",
         "Verify no port-conflict errors."
       ],
-      "evidence": [],
+      "evidence": [
+        "AGENTS.md: port reference updated to 8001",
+        "init.sh: added runserver hint with port 8001",
+        "docker-compose.yml: already uses 8001:8000 mapping (unchanged)",
+        "entrypoint.sh: container-internal port stays 8000 \u2014 Docker maps host 8001 to container 8000 (unchanged)",
+        "./init.sh passes"
+      ],
       "notes": "Port 8000 is always occupied by Docker Desktop on macOS. docker-compose.yml already uses 8001. Need to update: manage.py or settings.py RUNSERVER_PORT, init.sh banner, and any hardcoded URL references in documentation."
     }
   ]
