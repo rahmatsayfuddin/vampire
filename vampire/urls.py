@@ -19,25 +19,55 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
-from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
+from django.db.models import Count
 from projects.models import Project
+from projects.services import ProjectMetricsService
 from findings.models import Finding
+from findings.services import SlaService
 
 @login_required
 def dashboard(request):
-    # Basic stats for the dashboard
     if request.user.is_superuser:
-        project_count = Project.objects.count()
-        finding_count = Finding.objects.count()
+        findings = Finding.objects.select_related('project', 'project__organization').all()
+        projects = Project.objects.select_related('organization').all()
     else:
-        project_count = Project.objects.filter(assignment__user=request.user).count()
-        finding_count = Finding.objects.filter(project__assignment__user=request.user).count()
-    
+        findings = Finding.objects.filter(project__assignment__user=request.user).select_related('project', 'project__organization')
+        projects = Project.objects.filter(assignment__user=request.user).select_related('organization')
+
+    project_count = projects.count()
+    finding_count = findings.count()
+
+    severity_counts = dict(
+        Finding.objects.filter(pk__in=findings.values('pk'))
+        .values_list('severity')
+        .annotate(count=Count('id'))
+        .order_by('severity')
+    )
+
+    late_count = sum(1 for f in findings if SlaService.is_late(f))
+    on_time_count = finding_count - late_count
+    sla_compliance = round((on_time_count / finding_count * 100) if finding_count > 0 else 100)
+
+    on_track = sum(1 for p in projects if ProjectMetricsService.spi(p) is not None and ProjectMetricsService.spi(p) >= 1)
+    delayed = project_count - on_track
+
+    recent_findings = findings.order_by('-created_at')[:5]
+    recent_projects = projects.order_by('-created_at')[:5]
+
     return render(request, 'dashboard.html', {
         'project_count': project_count,
-        'finding_count': finding_count
+        'finding_count': finding_count,
+        'late_count': late_count,
+        'sla_compliance': sla_compliance,
+        'severity_labels': list(severity_counts.keys()),
+        'severity_data': list(severity_counts.values()),
+        'severity_counts': severity_counts,
+        'on_track': on_track,
+        'delayed': delayed,
+        'recent_findings': recent_findings,
+        'recent_projects': recent_projects,
     })
 
 urlpatterns = [

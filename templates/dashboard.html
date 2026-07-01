@@ -5,47 +5,166 @@
 {% block content %}
 <div class="row">
     <div class="col-lg-3 col-6">
-        <!-- small box -->
         <div class="small-box bg-info">
             <div class="inner">
                 <h3>{{ project_count }}</h3>
                 <p>My Projects</p>
             </div>
-            <div class="icon">
-                <i class="fas fa-project-diagram"></i>
-            </div>
-            <a href="{% url 'project_list' %}" class="small-box-footer">More info <i
-                    class="fas fa-arrow-circle-right"></i></a>
+            <div class="icon"><i class="fas fa-project-diagram"></i></div>
+            <a href="{% url 'project_list' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
         </div>
     </div>
-    <!-- ./col -->
     <div class="col-lg-3 col-6">
-        <!-- small box -->
         <div class="small-box bg-success">
             <div class="inner">
                 <h3>{{ finding_count }}</h3>
                 <p>My Findings</p>
             </div>
-            <div class="icon">
-                <i class="fas fa-bug"></i>
-            </div>
-            <!-- <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a> -->
+            <div class="icon"><i class="fas fa-bug"></i></div>
         </div>
     </div>
-    <!-- ./col -->
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-{% if late_count > 0 %}danger{% else %}success{% endif %}">
+            <div class="inner">
+                <h3>{{ late_count }}</h3>
+                <p>Late Findings</p>
+            </div>
+            <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-6">
+        <div class="small-box bg-{% if sla_compliance >= 80 %}success{% elif sla_compliance >= 50 %}warning{% else %}danger{% endif %}">
+            <div class="inner">
+                <h3>{{ sla_compliance }}%</h3>
+                <p>SLA Compliance</p>
+            </div>
+            <div class="icon"><i class="fas fa-clock"></i></div>
+        </div>
+    </div>
 </div>
 
 <div class="row">
-    <div class="col-md-12">
-        <div class="card">
+    <div class="col-md-6">
+        <div class="card card-outline card-primary">
             <div class="card-header">
-                <h3 class="card-title">Welcome to VAMPIRE</h3>
+                <h3 class="card-title">Findings by Severity</h3>
             </div>
             <div class="card-body">
-                <p>Welcome back, <strong>{{ user.get_full_name|default:user.username }}</strong>!</p>
-                <p>Use the sidebar to navigate to your projects and findings.</p>
+                <canvas id="severityChart" style="min-height: 250px; height: 250px; max-height: 250px;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-outline card-info">
+            <div class="card-header">
+                <h3 class="card-title">Project Schedule (SPI)</h3>
+            </div>
+            <div class="card-body">
+                <canvas id="spiChart" style="min-height: 250px; height: 250px; max-height: 250px;"></canvas>
             </div>
         </div>
     </div>
 </div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-outline card-warning">
+            <div class="card-header">
+                <h3 class="card-title">Recent Findings</h3>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped mb-0">
+                    <thead><tr><th>Title</th><th>Severity</th><th>Project</th></tr></thead>
+                    <tbody>
+                        {% for f in recent_findings %}
+                        <tr>
+                            <td><a href="{% url 'finding_detail' f.pk %}">{{ f.title }}</a></td>
+                            <td><span class="badge badge-{% if f.severity == 'Critical' %}danger{% elif f.severity == 'High' %}warning{% elif f.severity == 'Medium' %}info{% else %}success{% endif %}">{{ f.severity }}</span></td>
+                            <td>{{ f.project.project_name }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-center">No findings yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-outline card-success">
+            <div class="card-header">
+                <h3 class="card-title">Recent Projects</h3>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-striped mb-0">
+                    <thead><tr><th>Project</th><th>Status</th><th>SPI</th></tr></thead>
+                    <tbody>
+                        {% for p in recent_projects %}
+                        <tr>
+                            <td><a href="{% url 'project_detail' p.pk %}">{{ p.project_name }}</a></td>
+                            <td>{{ p.status }}</td>
+                            <td>
+                                {% if p.spi %}
+                                <span class="badge badge-{% if p.spi >= 1 %}success{% else %}danger{% endif %}">{{ p.spi }}</span>
+                                {% else %}
+                                —
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3" class="text-center">No projects yet.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    var severityCtx = document.getElementById('severityChart').getContext('2d');
+    var severityLabels = {{ severity_labels|safe }};
+    var severityData = {{ severity_data|safe }};
+    var severityColors = {
+        'Critical': '#dc3545',
+        'High': '#fd7e14',
+        'Medium': '#17a2b8',
+        'Low': '#28a745'
+    };
+    new Chart(severityCtx, {
+        type: 'doughnut',
+        data: {
+            labels: severityLabels,
+            datasets: [{
+                data: severityData,
+                backgroundColor: severityLabels.map(function(l) { return severityColors[l] || '#6c757d'; }),
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    var spiCtx = document.getElementById('spiChart').getContext('2d');
+    new Chart(spiCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['On Track (SPI ≥ 1)', 'Delayed (SPI < 1)'],
+            datasets: [{
+                data: [{{ on_track }}, {{ delayed }}],
+                backgroundColor: ['#28a745', '#dc3545'],
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+</script>
 {% endblock %}

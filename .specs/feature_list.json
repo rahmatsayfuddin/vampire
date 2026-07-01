@@ -241,7 +241,7 @@
       "area": "dashboard",
       "title": "Dashboard analytics \u2014 severity charts, SPI trends, SLA compliance",
       "user_visible_behavior": "The dashboard shows interactive charts: finding count by severity, project timeline with SPI indicators, and SLA compliance rate (late vs on-time findings).",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Log in and navigate to dashboard.",
         "Verify a chart/graph shows findings grouped by severity (Low/Medium/High/Critical).",
@@ -249,7 +249,17 @@
         "Verify SLA compliance metrics are displayed (e.g. X of Y findings are late).",
         "Verify non-admin users only see data for their assigned projects."
       ],
-      "evidence": [],
+      "evidence": [
+        "Dashboard view: computed severity breakdown, SLA compliance %, SPI on-track/delayed counts, recent findings and projects",
+        "Dashboard template: 4 stat boxes (Projects, Findings, Late Findings, SLA Compliance %) with color-coded severity",
+        "Chart.js doughnut: Findings by Severity (Critical/High/Medium/Low with color mapping)",
+        "Chart.js doughnut: Project Schedule SPI (On Track \u2265 1 vs Delayed < 1)",
+        "Recent Findings table: title, severity badge, project name",
+        "Recent Projects table: project name, status, SPI badge",
+        "Non-admin scoping: dashboard only shows data from assigned projects",
+        "Template renders 200 with all expected elements",
+        "./init.sh passes"
+      ],
       "notes": "Current dashboard only shows 2 numbers (project_count, finding_count). Consider Chart.js (already jQuery is loaded) or server-side rendered charts."
     },
     {
