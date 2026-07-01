@@ -61,6 +61,18 @@
 ### Notes
 - **Reporting strategy change**: improve-006 added — switch to Markdown-based reports (MD as primary output, optional PDF conversion). Supersedes improve-003 (unified PDF/DOCX pipeline) and improve-004 (DOCX section stubs). Remove xhtml2pdf + python-docx dependencies, keep only Markdown rendering.
 
+### arch-002 — Refactor to layered architecture — COMPLETE
+- Created 4 service modules: findings/services.py, projects/services.py, organizations/services.py, reports/services.py
+- findings/services.py: SlaService (4 methods) + FindingService (4 methods) — extracted SLA engine and auth branching
+- projects/services.py: ProjectMetricsService.spi() + ProjectService (3 methods) — extracted SPI formula and auth branching
+- organizations/services.py: OrganizationService.get_queryset_for_user()
+- reports/services.py: ReportService (4 methods) + ReportGenerationService (3 methods) — extracted MIME mapping, file I/O, threading, added error handling
+- Models: Finding SLA methods and Project.spi() delegate to services (backward compatible with templates)
+- Views refactored: all 4 view files now call services instead of inline business logic
+- Removed: 11+ authorization branching duplicates, 4 status lifecycle duplicates, duplicate @login_required, duplicate organization_detail comments, raw threading from views
+- Smoke tested: SLA, SPI, lifecycle (close/reopen), VKB promotion, report generation — all pass
+- ./init.sh passes
+
 ### Active feature
 - None (setup session)
 

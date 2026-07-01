@@ -137,7 +137,7 @@
       "area": "architecture",
       "title": "Refactor ke layered architecture \u2014 services/ per app",
       "user_visible_behavior": "Tidak ada perubahan yang terlihat oleh user. Internal: business logic dipindahkan ke service layer, views jadi thin HTTP handler.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Buat services/ package di setiap app (findings/services.py, projects/services.py, reports/services.py).",
         "Pindahkan SLA logic dari Finding model ke findings/services.py.",
@@ -150,7 +150,21 @@
         "Manual test: create/edit/delete finding, project, generate report \u2014 semua masih berfungsi.",
         "Existing template rendering tidak berubah."
       ],
-      "evidence": [],
+      "evidence": [
+        "Created findings/services.py: SlaService (sla_days, sla_due_date, is_late, sla_delay_days) + FindingService (get_queryset_for_user, get_finding_for_user, set_closed_at_by_status, promote_to_vkb)",
+        "Created projects/services.py: ProjectMetricsService.spi() + ProjectService (get_queryset_for_user, get_project_for_user, set_completed_date_by_status)",
+        "Created organizations/services.py: OrganizationService.get_queryset_for_user()",
+        "Created reports/services.py: ReportService (get_mime_type, get_disposition, delete_report_file, file_exists) + ReportGenerationService (create_history, generate_async with try/except, start_generation)",
+        "Finding model: 4 SLA methods now delegate to SlaService (backward compatible, templates still work)",
+        "Project model: spi() now delegates to ProjectMetricsService (backward compatible)",
+        "findings/views.py: all 5 views use FindingService/ProjectService \u2014 removed 4 authorization branches, 2 lifecycle duplicates, inline VKB creation",
+        "projects/views.py: all 6 views use ProjectService \u2014 removed 4 authorization branches, 2 lifecycle duplicates, duplicate @login_required, cleaned up organization_detail",
+        "organizations/views.py: organization_list uses OrganizationService \u2014 removed authorization branch, cleaned up organization_detail",
+        "reports/views.py: generate/download/delete use ReportService/ReportGenerationService \u2014 removed raw threading, file I/O, MIME mapping from view. Added try/except error handling in generate_async",
+        "Smoke tested: SlaService (7 days Critical, is_late=False), ProjectMetricsService (SPI=2.01), FindingService (close/reopen lifecycle, promote_to_vkb), ProjectService (complete/reopen lifecycle), ReportGenerationService (PDF generation)",
+        "./init.sh passes (system check, migrations)",
+        "Templates unchanged \u2014 backward compatible via model delegate methods"
+      ],
       "notes": "Blocked by arch-001 (harus assessment dulu). Target: services/ di tiap app dengan pure functions. Models hanya field + relasi. Views hanya HTTP glue. Import service functions dari views. Tidak perlu repository pattern untuk tahap ini karena Django ORM sudah cukup."
     },
     {

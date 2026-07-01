@@ -1,5 +1,4 @@
 from django.db import models
-from django.utils import timezone
 from datetime import timedelta
 from projects.models import Project
 from vkb.models import VulnerabilityKnowledgeBase
@@ -35,30 +34,18 @@ class Finding(models.Model):
     def __str__(self):
         return self.title
 
-    # SLA logic (hardcoded)
     def sla_days(self):
-        return {
-            'Critical': 7,
-            'High': 14,
-            'Medium': 30,
-            'Low': 60,
-        }.get(self.severity, 30)
+        from .services import SlaService
+        return SlaService.sla_days(self)
 
     def sla_due_date(self):
-        return self.created_at + timedelta(days=self.sla_days())
+        from .services import SlaService
+        return SlaService.sla_due_date(self)
 
     def is_late(self):
-        if self.status == 'Closed' and self.closed_at:
-            return self.closed_at > self.sla_due_date()
-        if self.status == 'Open':
-            return timezone.now() > self.sla_due_date()
-        return False
+        from .services import SlaService
+        return SlaService.is_late(self)
 
     def sla_delay_days(self):
-        if self.status == 'Closed' and self.closed_at:
-            delta = (self.closed_at - self.sla_due_date()).days
-            return max(0, delta)
-        elif self.status == 'Open':
-            delta = (timezone.now() - self.sla_due_date()).days
-            return max(0, delta)
-        return 0
+        from .services import SlaService
+        return SlaService.sla_delay_days(self)
