@@ -464,46 +464,8 @@
       "notes": "Options: django-simple-history, django-auditlog, or a custom AuditLog model with a signal-based approach. Choose the lightest option (custom model likely sufficient)."
     },
     {
-      "id": "improve-003",
-      "priority": 19,
-      "area": "reports",
-      "title": "Unified report content pipeline between PDF and DOCX",
-      "user_visible_behavior": "PDF and DOCX reports contain identical content because both are generated from the same data pipeline. No more content drift between formats.",
-      "status": "not_started",
-      "verification": [
-        "Generate a PDF report for a project with findings.",
-        "Generate a DOCX report for the same project.",
-        "Compare both: cover page, executive summary, methodology, findings list.",
-        "Verify content matches between both formats.",
-        "Add a new finding, regenerate both formats.",
-        "Verify the new finding appears in both PDF and DOCX."
-      ],
-      "evidence": [],
-      "notes": "SUPERSEDED by improve-006 (Markdown-based reporting). This feature is cancelled \u2014 we are moving away from dual-path PDF/DOCX pipeline in favor of Markdown as primary output."
-    },
-    {
-      "id": "improve-004",
-      "priority": 20,
-      "area": "reports",
-      "title": "Fill empty report section stubs (cover.py, summary.py, detail_findings.py, etc.)",
-      "user_visible_behavior": "DOCX report generation uses modular section builders for each report part, making the codebase easier to extend and maintain.",
-      "status": "not_started",
-      "verification": [
-        "Verify reports/sections/cover.py contains an add_cover_section(doc, project) function.",
-        "Verify reports/sections/summary.py contains an add_summary_section(doc, project, findings) function.",
-        "Verify reports/sections/detail_findings.py contains an add_detail_findings_section(doc, findings) function.",
-        "Verify reports/sections/document_detail.py contains an add_document_detail_section(doc, project) function.",
-        "Verify reports/sections/scope.py contains an add_scope_section(doc, project) function.",
-        "Verify reports/sections/executive_summary.py contains an add_executive_summary_section(doc, project, findings) function.",
-        "Verify reports/sections/members.py contains an add_members_section(doc, project) function.",
-        "Check that utils.py:s generate_report_file() uses these modules for DOCX path."
-      ],
-      "evidence": [],
-      "notes": "SUPERSEDED by improve-006 (Markdown-based reporting). DOCX section stubs are no longer needed since DOCX generation is being replaced by Markdown."
-    },
-    {
       "id": "improve-006",
-      "priority": 21,
+      "priority": 19,
       "area": "reports",
       "title": "Report generation via Markdown \u2014 MD as primary output, PDF conversion optional",
       "user_visible_behavior": "Report generation produces a clean Markdown document. Users can download the Markdown file directly or optionally convert to PDF. Removes the current dual-path (xhtml2pdf + python-docx) complexity.",
@@ -532,7 +494,7 @@
     },
     {
       "id": "improve-005",
-      "priority": 22,
+      "priority": 20,
       "area": "users",
       "title": "Custom user model replacing django.contrib.auth.models.User",
       "user_visible_behavior": "No visible change to end users. Future user profile fields (phone, department, avatar) can be added without migration pain.",
@@ -549,7 +511,7 @@
     },
     {
       "id": "devops-004",
-      "priority": 23,
+      "priority": 21,
       "area": "devops",
       "title": "Default port 8001 \u2014 8000 occupied by Docker Desktop on macOS",
       "user_visible_behavior": "runserver and docker compose always use port 8001. No more port-conflict errors.",
