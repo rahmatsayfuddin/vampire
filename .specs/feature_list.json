@@ -45,7 +45,7 @@
       "area": "devops",
       "title": "Dockerize \u2014 Dockerfile + docker-compose with web and db services",
       "user_visible_behavior": "Developers can run `docker compose up` and get a fully working VAMPIRE instance with Django and database in isolated containers.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Run `docker compose up --build` from project root.",
         "Verify the Django app starts on http://127.0.0.1:8000/.",
@@ -55,7 +55,22 @@
         "Run `./init.sh` inside the container works (check + migrate).",
         "Verify media/ files are mounted as a volume (reports survive restarts)."
       ],
-      "evidence": [],
+      "evidence": [
+        "Dockerfile: python:3.13-slim, apt deps (gcc, libpq-dev), pip deps from requirements.txt, gunicorn",
+        "docker-compose.yml: web + db (postgres:16) services, volumes for postgres_data + media_data",
+        ".env.example with DB config, SECRET_KEY, DEBUG, ALLOWED_HOSTS template",
+        "entrypoint.sh: python manage.py check + migrate + gunicorn startup",
+        ".dockerignore: excludes venv, git, pycache, sqlite, media, IDE files",
+        "settings.py: DATABASES uses PostgreSQL when DB_HOST env var set, falls back to SQLite",
+        "settings.py: SECRET_KEY, DEBUG, ALLOWED_HOSTS read from env vars",
+        "requirements.txt: added gunicorn, psycopg2-binary",
+        "docker compose up --build: image builds and containers start successfully",
+        "docker compose exec web: migration applies all apps, gunicorn starts on 0.0.0.0:8000",
+        "Data persistence: finding survives docker compose down/up cycle (PostgreSQL volume)",
+        "Media persistence: file in /app/media/ survives docker compose down/up cycle (volume mount)",
+        "./init.sh works inside container (check + migrate pass)",
+        "Port 8001 used (8000 occupied by Docker Desktop on this machine; configurable in docker-compose.yml)"
+      ],
       "notes": "Dockerfile: use python:3.13-slim, install deps from requirements.txt, copy source, run gunicorn. docker-compose.yml: web service + db service (postgres:16 or mariadb:11), volumes for media and db data, .env file for config."
     },
     {

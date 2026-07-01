@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${DB_NAME:-vampire}
+      POSTGRES_USER: ${DB_USER:-vampire}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-vampire}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  web:
+    build: .
+    ports:
+      - "8001:8000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME:-vampire}
+      - DB_USER=${DB_USER:-vampire}
+      - DB_PASSWORD=${DB_PASSWORD:-vampire}
+      - SECRET_KEY=${SECRET_KEY:-django-insecure-docker-dev-key-change-in-production}
+      - DEBUG=${DEBUG:-True}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS:-*}
+    volumes:
+      - media_data:/app/media
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  media_data:
