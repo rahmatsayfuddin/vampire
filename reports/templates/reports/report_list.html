@@ -21,8 +21,7 @@
                 <div class="col-md-2 mb-2">
                     <select name="format" class="form-control">
                         <option value="">All Formats</option>
-                        <option value="pdf" {% if filters.format == "pdf" %}selected{% endif %}>PDF</option>
-                        <option value="docx" {% if filters.format == "docx" %}selected{% endif %}>Word</option>
+                        <option value="md" {% if filters.format == "md" %}selected{% endif %}>Markdown</option>
                     </select>
                 </div>
                 <div class="col-md-2 mb-2">
@@ -61,8 +60,8 @@
                     <td>{{ report.project.organization.name }}</td>
                     <td>{{ report.file_name|default:"—" }}</td>
                     <td>
-                        {% if report.format == 'pdf' %}<span class="badge badge-info">PDF</span>
-                        {% elif report.format == 'md' %}<span class="badge badge-primary">MD</span>
+                        {% if report.format == 'md' %}<span class="badge badge-primary">MD</span>
+                        {% elif report.format == 'pdf' %}<span class="badge badge-info">PDF</span>
                         {% else %}<span class="badge badge-secondary">Word</span>
                         {% endif %}
                     </td>
@@ -75,9 +74,6 @@
                     <td>{{ report.created_at|date:"Y-m-d H:i" }}</td>
                     <td>
                         {% if report.status == 'done' %}
-                        {% if report.format == 'pdf' %}
-                        <a href="{% url 'download_report' report.id %}?preview=true" target="_blank" class="btn btn-sm btn-secondary">Preview</a>
-                        {% endif %}
                         <a href="{% url 'download_report' report.id %}" class="btn btn-sm btn-info">Download</a>
                         {% endif %}
                         <form action="{% url 'delete_report' report.id %}" method="post" class="d-inline">

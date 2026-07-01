@@ -169,19 +169,9 @@
       {% endfor %}
     </ul>
 
-    <form action="{% url 'generate_report' project.id 'pdf' %}" method="post" class="d-inline">
+    <form action="{% url 'generate_report' project.id %}" method="post" class="d-inline">
       {% csrf_token %}
-      <button type="submit" class="btn btn-primary">Generate PDF</button>
-    </form>
-
-    <form action="{% url 'generate_report' project.id 'docx' %}" method="post" class="d-inline">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-secondary ml-2">Generate Word</button>
-    </form>
-
-    <form action="{% url 'generate_report' project.id 'md' %}" method="post" class="d-inline">
-      {% csrf_token %}
-      <button type="submit" class="btn btn-outline-info ml-2">Generate Markdown</button>
+      <button type="submit" class="btn btn-primary">Generate Report</button>
     </form>
   </div>
 </div>

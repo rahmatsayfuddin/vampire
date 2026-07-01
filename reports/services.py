@@ -6,8 +6,6 @@ from .models import ReportHistory
 
 
 MIME_MAP = {
-    'pdf': 'application/pdf',
-    'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'md': 'text/markdown',
 }
 
@@ -20,8 +18,6 @@ class ReportService:
 
     @staticmethod
     def get_disposition(report, preview=False):
-        if preview and report.format == 'pdf':
-            return f'inline; filename="{report.file_name}"'
         return f'attachment; filename="{report.file_name}"'
 
     @staticmethod

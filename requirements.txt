@@ -1,6 +1,4 @@
 Django==5.2.3
-xhtml2pdf
-python-docx
 gunicorn
 psycopg2-binary
 django-summernote

@@ -57,10 +57,10 @@ def report_list(request):
 
 
 @require_POST
-def generate_report(request, project_id, format):
+def generate_report(request, project_id):
     project = get_object_or_404(Project, id=project_id)
 
-    history = ReportGenerationService.create_history(project, format)
+    history = ReportGenerationService.create_history(project, 'md')
     ReportGenerationService.start_generation(history.id)
 
     return redirect('project_detail', pk=project.id)
