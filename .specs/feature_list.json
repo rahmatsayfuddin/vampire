@@ -224,7 +224,7 @@
       "area": "tests",
       "title": "Write unit tests for models and key views",
       "user_visible_behavior": "Running `python manage.py test` reports meaningful test results for SLA logic, SPI calculation, and core CRUD views.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Run `python manage.py test`.",
         "Verify tests exist for Finding.sla_days(), Finding.is_late(), Finding.sla_delay_days().",
@@ -232,7 +232,17 @@
         "Verify at least one view test exists (e.g. project_detail returns 200).",
         "All tests pass with zero failures."
       ],
-      "evidence": [],
+      "evidence": [
+        "findings/tests/test_models.py: SlaServiceTest (9 tests) \u2014 sla_days with profile, default fallback, due date, is_late open/closed, sla_delay_days",
+        "findings/tests/test_models.py: ProjectMetricsTest (4 tests) \u2014 spi_on_track, completed_fast, missing_dates, zero_duration",
+        "findings/tests/test_views.py: FindingListViewTest (3 tests) \u2014 pagination, user access, unassigned project isolation",
+        "findings/tests/test_views.py: ProjectDetailViewTest (1 test) \u2014 200 response, contains project name",
+        "projects/tests/test_permissions.py: AccessControlTest (2 tests) \u2014 involved_only_access, dashboard_redirect",
+        "Plus 3 setup_roles tests (8 total from pre-existing)",
+        "Total: 22 tests, all pass",
+        "init.sh: added [3/3] python manage.py test step",
+        "./init.sh passes all 3 steps"
+      ],
       "notes": "All tests.py files are empty. Minimum: test SLA logic in findings, SPI in projects, and smoke test for project_detail. Add `python manage.py test` to init.sh once baseline passes."
     },
     {

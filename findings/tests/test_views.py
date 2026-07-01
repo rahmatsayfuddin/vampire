@@ -1,5 +1,5 @@
-from django.test import TestCase, Client
-from django.contrib.auth.models import User, Group
+from django.test import TestCase
+from django.contrib.auth.models import User, Group, Permission
 from organizations.models import Organization
 from projects.models import Project
 from findings.models import Finding
@@ -7,21 +7,19 @@ from assignments.models import Assignment
 from django.utils import timezone
 import datetime
 
+
 class FindingListViewTest(TestCase):
+
     def setUp(self):
-        # Create users
-        self.superuser = User.objects.create_superuser('admin', '[email protected]', 'password')
-        self.user = User.objects.create_user('user', '[email protected]', 'password')
-        
-        # Setup roles (simulated)
+        self.superuser = User.objects.create_superuser('admin', 'a@t.com', 'password')
+        self.user = User.objects.create_user('user', 'u@t.com', 'password')
+
         group = Group.objects.create(name='Pentester')
-        # Assign permissions to group
-        from django.contrib.auth.models import Permission
-        view_finding = Permission.objects.get(codename='view_finding')
-        group.permissions.add(view_finding)
+        for codename in ['view_finding', 'add_finding', 'change_finding', 'delete_finding']:
+            perm = Permission.objects.get(codename=codename)
+            group.permissions.add(perm)
         self.user.groups.add(group)
 
-        # Create data
         self.org = Organization.objects.create(name='Test Org')
         self.project = Project.objects.create(
             project_name='Test Project',
@@ -30,8 +28,7 @@ class FindingListViewTest(TestCase):
             start_date=timezone.now().date(),
             end_date=timezone.now().date() + datetime.timedelta(days=30)
         )
-        
-        # Create 15 findings
+
         for i in range(15):
             Finding.objects.create(
                 project=self.project,
@@ -41,21 +38,17 @@ class FindingListViewTest(TestCase):
                 severity='High',
                 status='Open'
             )
-            
-        # Assign user to project
+
         Assignment.objects.create(project=self.project, user=self.user, title='Tester')
 
     def test_pagination_superuser(self):
         self.client.force_login(self.superuser)
         response = self.client.get('/findings/')
         self.assertEqual(response.status_code, 200)
-        self.assertTrue('is_paginated' in response.context or 'page_obj' in response.context)
-        # Should show 10 items on first page
         self.assertEqual(len(response.context['page_obj']), 10)
-        
+
         response = self.client.get('/findings/?page=2')
         self.assertEqual(response.status_code, 200)
-        # Should show 5 items on second page
         self.assertEqual(len(response.context['page_obj']), 5)
 
     def test_user_access(self):
@@ -65,13 +58,12 @@ class FindingListViewTest(TestCase):
         self.assertEqual(len(response.context['page_obj']), 10)
 
     def test_unassigned_project_access(self):
-        # Create another project and finding unassigned to user
         project2 = Project.objects.create(
-             project_name='Other Project',
-             organization=self.org,
-             status='Planned',
-             start_date=timezone.now().date(),
-             end_date=timezone.now().date() + datetime.timedelta(days=30)
+            project_name='Other Project',
+            organization=self.org,
+            status='Planned',
+            start_date=timezone.now().date(),
+            end_date=timezone.now().date() + datetime.timedelta(days=30)
         )
         Finding.objects.create(
             project=project2,
@@ -81,14 +73,32 @@ class FindingListViewTest(TestCase):
             severity='Critical',
             status='Open'
         )
-        
+
         self.client.force_login(self.user)
         response = self.client.get('/findings/')
-        # User should NOT see the secret finding (count should still be 10 on page 1, and total count 15)
-        # Check total count in paginator
         self.assertEqual(response.context['page_obj'].paginator.count, 15)
-        
+
         self.client.force_login(self.superuser)
         response = self.client.get('/findings/')
-        # Superuser SHOULD see it (total count 16)
         self.assertEqual(response.context['page_obj'].paginator.count, 16)
+
+
+class ProjectDetailViewTest(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_superuser('admin2', 'a@b.c', 'password')
+        self.org = Organization.objects.create(name='Detail Test Org')
+        self.project = Project.objects.create(
+            project_name='Detail Project',
+            organization=self.org,
+            start_date=timezone.now().date(),
+            end_date=timezone.now().date() + datetime.timedelta(days=30),
+            status='In Progress'
+        )
+
+    def test_project_detail_returns_200(self):
+        self.client.force_login(self.user)
+        response = self.client.get(f'/projects/{self.project.pk}/')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Detail Project')
+        self.assertContains(response, 'Report History')

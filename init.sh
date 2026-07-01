@@ -9,10 +9,12 @@ if [ -f venv/bin/activate ]; then
     source venv/bin/activate
 fi
 
-echo "[1/2] Django system check..."
+echo "[1/3] Django system check..."
 python manage.py check
-echo "[2/2] Running pending migrations..."
+echo "[2/3] Running pending migrations..."
 python manage.py migrate
+echo "[3/3] Running tests..."
+python manage.py test
 
 if [ -f .env ]; then
     export $(grep -v '^#' .env | grep -v '^$' | xargs)
