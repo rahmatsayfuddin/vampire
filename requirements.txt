@@ -3,4 +3,5 @@ gunicorn
 psycopg2-binary
 django-summernote
 whitenoise
+Pillow
 
