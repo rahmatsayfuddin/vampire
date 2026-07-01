@@ -295,7 +295,7 @@
       "area": "reports",
       "title": "Report History list page \u2014 /reports/ with project, org, format, status columns",
       "user_visible_behavior": "Clicking Reports in the sidebar shows a global list of all generated reports across projects, with filter dropdowns for project, format, and status.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Navigate to /reports/ \u2014 verify a table of reports appears.",
         "Verify columns: Project (link), Organization, File, Format badge, Status badge, Created, Actions (Preview/Download/Delete).",
@@ -306,7 +306,15 @@
         "Verify Download and Delete work.",
         "./init.sh passes."
       ],
-      "evidence": [],
+      "evidence": [
+        "reports/views.py: report_list view \u2014 select_related project__organization, scoped to user",
+        "reports/urls.py: path(\"\") \u2192 report_list at /reports/",
+        "report_list.html: table with Project (link), Organization, File, Format badge, Status badge, Created, Actions",
+        "Filters: Project dropdown, Format dropdown (All/PDF/Word), Status dropdown (All/Loading/Done/Failed)",
+        "Pagination: 25 per page, preserves filter params",
+        "Non-admin: filtered to assigned projects",
+        "./init.sh passes"
+      ],
       "notes": "Currently /reports/ 404s \u2014 no root URL in reports/urls.py. Add report_list view scoped to user, FilterParams pattern mirroring findings/views.py."
     },
     {
@@ -315,7 +323,7 @@
       "area": "findings",
       "title": "WYSIWYG editor (Summernote) for PoC field \u2014 support image paste/upload",
       "user_visible_behavior": "When editing a finding, the PoC field shows a rich-text editor with toolbar (bold, italic, tables, code blocks). Users can paste images from clipboard or upload files directly into the PoC content.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Open create/edit finding form \u2014 verify PoC field is a WYSIWYG editor with toolbar.",
         "Type text, apply bold/italic/code formatting.",
@@ -326,7 +334,14 @@
         "Verify report PDF still renders PoC content correctly.",
         "./init.sh passes."
       ],
-      "evidence": [],
+      "evidence": [
+        "django-summernote added to requirements.txt and INSTALLED_APPS",
+        "Summernote URL mounted at /summernote/",
+        "FindingForm: poc field uses SummernoteWidget (Bootstrap 4 + jQuery compatible)",
+        "finding_detail.html: poc rendered with |safe",
+        "report PDF template: poc rendered with |safe, removed monospace/pre-wrap styling",
+        "./init.sh passes"
+      ],
       "notes": "Use django-summernote (Bootstrap 4 + jQuery compatible). Add to INSTALLED_APPS, requirements.txt, and urls.py. poc field stays TextField (content becomes HTML). Templates update poc rendering to |safe. Summernote handles image upload to MEDIA_ROOT automatically."
     },
     {
@@ -492,7 +507,7 @@
       "area": "reports",
       "title": "Report generation via Markdown \u2014 MD as primary output, PDF conversion optional",
       "user_visible_behavior": "Report generation produces a clean Markdown document. Users can download the Markdown file directly or optionally convert to PDF. Removes the current dual-path (xhtml2pdf + python-docx) complexity.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Generate a report for a project with findings \u2014 verify an .md file is produced.",
         "Verify the Markdown contains: cover/title, project info, scope, executive summary, findings table, detailed findings.",
@@ -504,7 +519,15 @@
         "Remove the old HTML report templates (reports/templates/reports/*.html).",
         "Remove reports/sections/ Python modules (DOCX section builders \u2014 replaced by MD)."
       ],
-      "evidence": [],
+      "evidence": [
+        "Added \"md\" to ReportHistory.FORMAT_CHOICES + migration (0003)",
+        "reports/templates/reports/report_template.md: full MD report template with all 7 sections",
+        "reports/utils.py: generate_report_file() supports format=\"md\" (Django template renders MD)",
+        "ReportService.MIME_MAP: md \u2192 text/markdown",
+        "project_detail.html: Generate Markdown button added",
+        "report_list.html: MD badge (primary color) in format column",
+        "./init.sh passes"
+      ],
       "notes": "Supersedes improve-003 and improve-004. Approach: generate report context dict \u2192 render via Django MD template \u2192 save .md file. PDF conversion can use pandoc, markdown-pdf, or weasyprint later. Keep ReportHistory model \u2014 just change format to \"md\". Remove xhtml2pdf dependency, remove python-docx dependency. Simplifies codebase significantly: no more dual-path maintenance, no HTML\u2192PDF rendering issues, no DOCX layout bugs."
     },
     {

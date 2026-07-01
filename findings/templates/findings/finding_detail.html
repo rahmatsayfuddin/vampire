@@ -16,7 +16,7 @@
       <li class="list-group-item"><strong>Description:</strong> {{ finding.description }}</li>
       <li class="list-group-item"><strong>Impact:</strong> {{ finding.impact }}</li>
       <li class="list-group-item"><strong>Recommendation:</strong> {{ finding.recommendation }}</li>
-      <li class="list-group-item"><strong>POC:</strong> {{ finding.poc }}</li>
+      <li class="list-group-item"><strong>POC:</strong> {{ finding.poc|safe }}</li>
     </ul>
     <div class="mt-3">
       <a href="{% url 'finding_edit' finding.pk %}" class="btn btn-primary">Edit</a>

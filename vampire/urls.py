@@ -83,4 +83,5 @@ urlpatterns = [
     path('findings/', include('findings.urls')),
     path('reports/', include('reports.urls')),
     path('audit/', include('audit.urls')),
+    path('summernote/', include('django_summernote.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

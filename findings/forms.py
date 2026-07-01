@@ -1,4 +1,5 @@
 from django import forms
+from django_summernote.widgets import SummernoteWidget
 from .models import Finding
 from vkb.models import VulnerabilityKnowledgeBase
 
@@ -18,15 +19,15 @@ class FindingForm(forms.ModelForm):
         queryset=VulnerabilityKnowledgeBase.objects.all(),
         required=False,
         label="Use VKB (optional)",
-        empty_label="Custom" 
+        empty_label="Custom"
     )
-    
+
     save_to_vkb = forms.BooleanField(required=False, label="Save to VKB if custom")
     vkb_category = forms.ChoiceField(
-    choices=CATEGORY_CHOICES,
-    required=False,
-    initial='Other Notable Vulnerabilities',
-    label="Category"
+        choices=CATEGORY_CHOICES,
+        required=False,
+        initial='Other Notable Vulnerabilities',
+        label="Category"
     )
 
     class Meta:
@@ -35,3 +36,6 @@ class FindingForm(forms.ModelForm):
             'title', 'description', 'impact', 'recommendation',
             'affected', 'severity', 'score', 'poc', 'status'
         ]
+        widgets = {
+            'poc': SummernoteWidget(),
+        }

@@ -6,6 +6,7 @@ class ReportHistory(models.Model):
     FORMAT_CHOICES = [
         ('pdf', 'PDF'),
         ('docx', 'Word'),
+        ('md', 'Markdown'),
     ]
     STATUS_CHOICES = [
         ('loading', 'Loading'),

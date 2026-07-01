@@ -87,8 +87,16 @@ def generate_report_file(project, findings, format='pdf'):
         except Exception as e:
             print("Error generating DOCX:", e)
 
+    elif format == 'md':
+        try:
+            md_content = render_to_string('reports/report_template.md', context)
+            with open(output_path, 'w') as out:
+                out.write(md_content)
+        except Exception as e:
+            print("Error generating Markdown:", e)
+
     else:
-        raise ValueError("Unsupported format. Only 'pdf' and 'docx' are allowed.")
+        raise ValueError("Unsupported format. Only 'pdf', 'docx', and 'md' are allowed.")
 
     print("Report generated at:", output_path)
     return filename

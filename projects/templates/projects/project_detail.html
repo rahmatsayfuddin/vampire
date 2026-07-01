@@ -178,6 +178,11 @@
       {% csrf_token %}
       <button type="submit" class="btn btn-secondary ml-2">Generate Word</button>
     </form>
+
+    <form action="{% url 'generate_report' project.id 'md' %}" method="post" class="d-inline">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-outline-info ml-2">Generate Markdown</button>
+    </form>
   </div>
 </div>
 

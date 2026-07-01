@@ -1,0 +1,109 @@
+{% extends "base_adminlte.html" %}
+
+{% block title %}Report History{% endblock %}
+
+{% block content %}
+<div class="card card-outline card-primary">
+    <div class="card-header">
+        <h3 class="card-title">Report History</h3>
+    </div>
+    <div class="card-body">
+        <form method="get" class="mb-3">
+            <div class="row">
+                <div class="col-md-3 mb-2">
+                    <select name="project" class="form-control">
+                        <option value="">All Projects</option>
+                        {% for p in projects %}
+                        <option value="{{ p.pk }}" {% if filters.project == p.pk|stringformat:"s" %}selected{% endif %}>{{ p.project_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2">
+                    <select name="format" class="form-control">
+                        <option value="">All Formats</option>
+                        <option value="pdf" {% if filters.format == "pdf" %}selected{% endif %}>PDF</option>
+                        <option value="docx" {% if filters.format == "docx" %}selected{% endif %}>Word</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2">
+                    <select name="status" class="form-control">
+                        <option value="">All Statuses</option>
+                        <option value="loading" {% if filters.status == "loading" %}selected{% endif %}>Loading</option>
+                        <option value="done" {% if filters.status == "done" %}selected{% endif %}>Done</option>
+                        <option value="failed" {% if filters.status == "failed" %}selected{% endif %}>Failed</option>
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2">
+                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                </div>
+                <div class="col-md-2 mb-2">
+                    <a href="{% url 'report_list' %}" class="btn btn-outline-secondary btn-block">Clear</a>
+                </div>
+            </div>
+        </form>
+
+        <table class="table table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Organization</th>
+                    <th>File</th>
+                    <th>Format</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in page_obj %}
+                <tr>
+                    <td><a href="{% url 'project_detail' report.project.pk %}">{{ report.project.project_name }}</a></td>
+                    <td>{{ report.project.organization.name }}</td>
+                    <td>{{ report.file_name|default:"—" }}</td>
+                    <td>
+                        {% if report.format == 'pdf' %}<span class="badge badge-info">PDF</span>
+                        {% elif report.format == 'md' %}<span class="badge badge-primary">MD</span>
+                        {% else %}<span class="badge badge-secondary">Word</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if report.status == 'loading' %}<span class="badge badge-warning">Loading</span>
+                        {% elif report.status == 'done' %}<span class="badge badge-success">Done</span>
+                        {% elif report.status == 'failed' %}<span class="badge badge-danger">Failed</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ report.created_at|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        {% if report.status == 'done' %}
+                        {% if report.format == 'pdf' %}
+                        <a href="{% url 'download_report' report.id %}?preview=true" target="_blank" class="btn btn-sm btn-secondary">Preview</a>
+                        {% endif %}
+                        <a href="{% url 'download_report' report.id %}" class="btn btn-sm btn-info">Download</a>
+                        {% endif %}
+                        <form action="{% url 'delete_report' report.id %}" method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center">No reports found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer clearfix">
+        <ul class="pagination pagination-sm m-0 float-right">
+            {% if page_obj.has_previous %}
+            <li class="page-item"><a class="page-link" href="?page=1{% if query_string %}&{{ query_string }}{% endif %}">&laquo;</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query_string %}&{{ query_string }}{% endif %}">Prev</a></li>
+            {% endif %}
+            <li class="page-item disabled"><a class="page-link" href="#">Page {{ page_obj.number }} of {{ num_pages }}</a></li>
+            {% if page_obj.has_next %}
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query_string %}&{{ query_string }}{% endif %}">Next</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query_string %}&{{ query_string }}{% endif %}">&raquo;</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
