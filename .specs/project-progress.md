@@ -58,8 +58,8 @@
 - **No tests:** All tests.py files are empty placeholders.
 - **Reports:** PDF and DOCX paths share zero code. `reports/sections/` has 7 empty stubs, only methodology.py is implemented.
 
-### Next step
-- bug-001 (priority 1): Fix project_detail to query actual assignments, findings, and reports.
+### Notes
+- **Reporting strategy change**: improve-006 added — switch to Markdown-based reports (MD as primary output, optional PDF conversion). Supersedes improve-003 (unified PDF/DOCX pipeline) and improve-004 (DOCX section stubs). Remove xhtml2pdf + python-docx dependencies, keep only Markdown rendering.
 
 ### Active feature
 - None (setup session)

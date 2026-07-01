@@ -365,7 +365,7 @@
         "Verify the new finding appears in both PDF and DOCX."
       ],
       "evidence": [],
-      "notes": "Currently PDF uses Django templates + xhtml2pdf, DOCX uses python-docx programmatically. No shared code. Refactor: build a context dict once, pass to both renderers. Move DOCX section logic into reports/sections/ modules."
+      "notes": "SUPERSEDED by improve-006 (Markdown-based reporting). This feature is cancelled \u2014 we are moving away from dual-path PDF/DOCX pipeline in favor of Markdown as primary output."
     },
     {
       "id": "improve-004",
@@ -385,11 +385,32 @@
         "Check that utils.py:s generate_report_file() uses these modules for DOCX path."
       ],
       "evidence": [],
-      "notes": "Currently only methodology.py is implemented. The other 7 section stubs are empty. Extract Docx generation logic from utils.py into these modules, mirroring how PDF uses separate template partials."
+      "notes": "SUPERSEDED by improve-006 (Markdown-based reporting). DOCX section stubs are no longer needed since DOCX generation is being replaced by Markdown."
+    },
+    {
+      "id": "improve-006",
+      "priority": 19,
+      "area": "reports",
+      "title": "Report generation via Markdown \u2014 MD as primary output, PDF conversion optional",
+      "user_visible_behavior": "Report generation produces a clean Markdown document. Users can download the Markdown file directly or optionally convert to PDF. Removes the current dual-path (xhtml2pdf + python-docx) complexity.",
+      "status": "not_started",
+      "verification": [
+        "Generate a report for a project with findings \u2014 verify an .md file is produced.",
+        "Verify the Markdown contains: cover/title, project info, scope, executive summary, findings table, detailed findings.",
+        "Verify the Markdown renders correctly in a viewer (VS Code, GitHub, Typora).",
+        "Download the .md file from the project detail page.",
+        "Optional: convert the .md to PDF and verify the result.",
+        "Verify ./init.sh passes.",
+        "Remove xhtml2pdf and python-docx from requirements.txt after transition.",
+        "Remove the old HTML report templates (reports/templates/reports/*.html).",
+        "Remove reports/sections/ Python modules (DOCX section builders \u2014 replaced by MD)."
+      ],
+      "evidence": [],
+      "notes": "Supersedes improve-003 and improve-004. Approach: generate report context dict \u2192 render via Django MD template \u2192 save .md file. PDF conversion can use pandoc, markdown-pdf, or weasyprint later. Keep ReportHistory model \u2014 just change format to \"md\". Remove xhtml2pdf dependency, remove python-docx dependency. Simplifies codebase significantly: no more dual-path maintenance, no HTML\u2192PDF rendering issues, no DOCX layout bugs."
     },
     {
       "id": "improve-005",
-      "priority": 19,
+      "priority": 20,
       "area": "users",
       "title": "Custom user model replacing django.contrib.auth.models.User",
       "user_visible_behavior": "No visible change to end users. Future user profile fields (phone, department, avatar) can be added without migration pain.",
