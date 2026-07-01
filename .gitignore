@@ -3,6 +3,51 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
 # Django stuff:
 *.log
 local_settings.py
@@ -12,10 +57,14 @@ db.sqlite3-journal
 # Media files
 media/
 
-# Virtual environment
-venv/
+# Environment
+.env
+.venv
 env/
+venv/
 ENV/
+env.bak/
+venv.bak/
 
 # IDE
 .vscode/
@@ -26,10 +75,9 @@ ENV/
 
 # OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
-assignments/__pycache__/forms.cpython-313.pyc
-assignments/__pycache__/models.cpython-313.pyc
-assignments/__pycache__/views.cpython-313.pyc
-assignments/__pycache__/forms.cpython-313.pyc
-assignments/__pycache__/models.cpython-313.pyc
-assignments/__pycache__/views.cpython-313.pyc

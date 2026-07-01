@@ -1,0 +1,372 @@
+{
+  "project": "vampire",
+  "last_updated": "2026-07-01",
+  "rules": {
+    "single_active_feature": true,
+    "passing_requires_evidence": true,
+    "do_not_skip_verification": true
+  },
+  "status_legend": {
+    "not_started": "Work has not begun.",
+    "in_progress": "The feature is the current active task.",
+    "blocked": "Work cannot continue until a documented blocker is resolved.",
+    "passing": "Required verification has passed and evidence is recorded."
+  },
+  "features": [
+    {
+      "id": "devops-001",
+      "priority": 1,
+      "area": "devops",
+      "title": "Redefine .gitignore \u2014 exclude venv, media, db, IDE files, OS cruft",
+      "user_visible_behavior": "No accidental commits of virtualenv, uploaded media, SQLite database, IDE configs, or macOS artifacts.",
+      "status": "passing",
+      "verification": [
+        "Run `git status` in a clean state \u2014 only tracked source files appear.",
+        "Verify `venv/` is ignored.",
+        "Verify `media/` is ignored.",
+        "Verify `db.sqlite3` is ignored.",
+        "Verify `.DS_Store` is ignored.",
+        "Verify IDE dirs (`.vscode/`, `.idea/`) are ignored.",
+        "Verify `__pycache__/` and `*.pyc` are ignored.",
+        "Verify `.env` is ignored."
+      ],
+      "evidence": [
+        "git check-ignore confirms: db.sqlite3, .env, media/reports, venv, .DS_Store all ignored",
+        "0 tracked __pycache__ files (removed 150 files from git tracking)",
+        "db.sqlite3 removed from tracking (git rm --cached)",
+        "./init.sh passes with no errors",
+        "Untracked files: only intentional new files (.specs/, AGENTS.md, init.sh)"
+      ],
+      "notes": "Current .gitignore is minimal. Add standard Python/Django/macOS/IDE entries. Include .env for future env-var support."
+    },
+    {
+      "id": "devops-002",
+      "priority": 2,
+      "area": "devops",
+      "title": "Dockerize \u2014 Dockerfile + docker-compose with web and db services",
+      "user_visible_behavior": "Developers can run `docker compose up` and get a fully working VAMPIRE instance with Django and database in isolated containers.",
+      "status": "not_started",
+      "verification": [
+        "Run `docker compose up --build` from project root.",
+        "Verify the Django app starts on http://127.0.0.1:8000/.",
+        "Verify the database service starts (PostgreSQL/MariaDB).",
+        "Log in and verify data persists across container restarts.",
+        "Run `docker compose down` and verify containers are removed.",
+        "Run `./init.sh` inside the container works (check + migrate).",
+        "Verify media/ files are mounted as a volume (reports survive restarts)."
+      ],
+      "evidence": [],
+      "notes": "Dockerfile: use python:3.13-slim, install deps from requirements.txt, copy source, run gunicorn. docker-compose.yml: web service + db service (postgres:16 or mariadb:11), volumes for media and db data, .env file for config."
+    },
+    {
+      "id": "devops-003",
+      "priority": 3,
+      "area": "devops",
+      "title": "Database migration \u2014 SQLite to PostgreSQL (or MariaDB)",
+      "user_visible_behavior": "No visible change to end users. The application runs on a production-grade database instead of SQLite.",
+      "status": "not_started",
+      "verification": [
+        "Update settings.py DATABASES to use PostgreSQL.",
+        "Run `python manage.py migrate` \u2014 all tables created in PostgreSQL.",
+        "Verify Django admin works.",
+        "Create a project, finding, assignment \u2014 verify data is stored.",
+        "Generate a report \u2014 verify it works.",
+        "Run `./init.sh` \u2014 passes with PostgreSQL.",
+        "Run `python manage.py test` (once tests exist) \u2014 passes with PostgreSQL."
+      ],
+      "evidence": [],
+      "notes": "Recommended: PostgreSQL 16 (most Django-community standard). MariaDB 11 is acceptable alternative. Implementation: install psycopg2-binary (PostgreSQL) or mysqlclient (MariaDB), update settings.py DATABASES to read from environment variables (DB_HOST, DB_NAME, DB_USER, DB_PASSWORD, DB_PORT). Keep SQLite as fallback for dev/testing. Add .env.example with DB config template."
+    },
+    {
+      "id": "arch-001",
+      "priority": 4,
+      "area": "architecture",
+      "title": "Assessment \u2014 apakah project sudah layered architecture?",
+      "user_visible_behavior": "Tidak ada perubahan yang terlihat. Output berupa dokumentasi gap analysis yang mencatat semua business logic yang bercampur di views, models, dan utils.",
+      "status": "not_started",
+      "verification": [
+        "Audit seluruh views.py \u2014 catat semua business logic yang ada di dalam view functions.",
+        "Audit seluruh models.py \u2014 catat method yang berisi business logic (SLA, SPI, dll).",
+        "Audit reports/utils.py dan reports/sections/ \u2014 catat logika report generation.",
+        "Buat dokumen gap report di .specs/architecture-assessment.md berisi temuan.",
+        "Tentukan target structure: services/ per app, repositori pattern jika diperlukan.",
+        "Output rekomendasi: apakah perlu refactor penuh atau incremental."
+      ],
+      "evidence": [],
+      "notes": "Saat ini project adalah flat Django FBV: views langsung panggil ORM, business logic tersebar di models (Finding.sla_days, Project.spi), views (create_finding, edit_finding), dan utils (generate_report_file). Tidak ada service layer. Assessment ini adalah prerequisite untuk arch-002."
+    },
+    {
+      "id": "arch-002",
+      "priority": 5,
+      "area": "architecture",
+      "title": "Refactor ke layered architecture \u2014 services/ per app",
+      "user_visible_behavior": "Tidak ada perubahan yang terlihat oleh user. Internal: business logic dipindahkan ke service layer, views jadi thin HTTP handler.",
+      "status": "not_started",
+      "verification": [
+        "Buat services/ package di setiap app (findings/services.py, projects/services.py, reports/services.py).",
+        "Pindahkan SLA logic dari Finding model ke findings/services.py.",
+        "Pindahkan SPI logic dari Project model ke projects/services.py.",
+        "Pindahkan report generation logic dari utils.py ke reports/services.py.",
+        "Pindahkan finding create/edit lifecycle logic dari views ke services.",
+        "Pindahkan project create/update/complete logic dari views ke services.",
+        "Refactor views: hanya parse request, panggil service, return response.",
+        "Jalankan ./init.sh \u2014 system check dan migrate tetap OK.",
+        "Manual test: create/edit/delete finding, project, generate report \u2014 semua masih berfungsi.",
+        "Existing template rendering tidak berubah."
+      ],
+      "evidence": [],
+      "notes": "Blocked by arch-001 (harus assessment dulu). Target: services/ di tiap app dengan pure functions. Models hanya field + relasi. Views hanya HTTP glue. Import service functions dari views. Tidak perlu repository pattern untuk tahap ini karena Django ORM sudah cukup."
+    },
+    {
+      "id": "bug-001",
+      "priority": 6,
+      "area": "findings",
+      "title": "project_detail returns empty data for assignments, findings, scans",
+      "user_visible_behavior": "When viewing a project detail page, the user sees the list of team members, findings, and scans associated with that project (not empty placeholders).",
+      "status": "not_started",
+      "verification": [
+        "Create a project with at least 1 assignment, 1 finding.",
+        "Navigate to the project detail page.",
+        "Verify the assignments list shows the assigned user.",
+        "Verify the findings list shows the created finding with title, severity, status.",
+        "Verify the reports section shows any generated reports."
+      ],
+      "evidence": [],
+      "notes": "projects/views.py:101 \u2014 project_detail view passes empty lists for assignments, pics, scans, findings. And there is a duplicate organization_detail view at line 75 that shadows the one in organizations/views.py. Duplicate @login_required decorator at lines 75-76."
+    },
+    {
+      "id": "bug-002",
+      "priority": 7,
+      "area": "reports",
+      "title": "Report generation thread crashes silently, status stuck 'loading'",
+      "user_visible_behavior": "When report generation fails, the user sees a clear error message instead of a perpetually 'loading' status.",
+      "status": "not_started",
+      "verification": [
+        "Trigger a report generation for a project.",
+        "If generation succeeds, download the file and verify content.",
+        "Intentionally cause a failure (e.g. bad template data).",
+        "Verify the ReportHistory status is updated to a failure state (not stuck 'loading').",
+        "Verify the user sees an error indicator on the project detail page."
+      ],
+      "evidence": [],
+      "notes": "reports/views.py:run() runs in a raw threading.Thread with no try/except. If any exception occurs, the thread dies silently and ReportHistory stays 'loading' forever."
+    },
+    {
+      "id": "tech-001",
+      "priority": 8,
+      "area": "tests",
+      "title": "Write unit tests for models and key views",
+      "user_visible_behavior": "Running `python manage.py test` reports meaningful test results for SLA logic, SPI calculation, and core CRUD views.",
+      "status": "not_started",
+      "verification": [
+        "Run `python manage.py test`.",
+        "Verify tests exist for Finding.sla_days(), Finding.is_late(), Finding.sla_delay_days().",
+        "Verify tests exist for Project.spi() with various date scenarios.",
+        "Verify at least one view test exists (e.g. project_detail returns 200).",
+        "All tests pass with zero failures."
+      ],
+      "evidence": [],
+      "notes": "All tests.py files are empty. Minimum: test SLA logic in findings, SPI in projects, and smoke test for project_detail. Add `python manage.py test` to init.sh once baseline passes."
+    },
+    {
+      "id": "feat-001",
+      "priority": 9,
+      "area": "dashboard",
+      "title": "Dashboard analytics \u2014 severity charts, SPI trends, SLA compliance",
+      "user_visible_behavior": "The dashboard shows interactive charts: finding count by severity, project timeline with SPI indicators, and SLA compliance rate (late vs on-time findings).",
+      "status": "not_started",
+      "verification": [
+        "Log in and navigate to dashboard.",
+        "Verify a chart/graph shows findings grouped by severity (Low/Medium/High/Critical).",
+        "Verify a section shows projects with their SPI values and on-time/delayed indicators.",
+        "Verify SLA compliance metrics are displayed (e.g. X of Y findings are late).",
+        "Verify non-admin users only see data for their assigned projects."
+      ],
+      "evidence": [],
+      "notes": "Current dashboard only shows 2 numbers (project_count, finding_count). Consider Chart.js (already jQuery is loaded) or server-side rendered charts."
+    },
+    {
+      "id": "feat-002",
+      "priority": 10,
+      "area": "findings",
+      "title": "Search bar and advanced filtering on finding list",
+      "user_visible_behavior": "The finding list page has a search bar and dropdown filters. Users can search by title/description and filter by severity, status, project, date range.",
+      "status": "not_started",
+      "verification": [
+        "Navigate to /findings/.",
+        "Type a keyword in the search box, submit.",
+        "Verify only matching findings are shown.",
+        "Select a severity filter (e.g. Critical), submit.",
+        "Verify only Critical findings are shown.",
+        "Combine search + filter and verify results.",
+        "Verify pagination still works with filters applied."
+      ],
+      "evidence": [],
+      "notes": "Current finding_list view has pagination but no search/filter form. Add GET parameter-based filtering in the view and a filter form in the template."
+    },
+    {
+      "id": "feat-003",
+      "priority": 11,
+      "area": "findings",
+      "title": "Email notification when finding misses SLA deadline",
+      "user_visible_behavior": "When a finding passes its SLA due date, assigned users receive an email notification. A daily digest email summarizes all late findings.",
+      "status": "not_started",
+      "verification": [
+        "Create a finding with Critical severity (7-day SLA).",
+        "Manually set created_at to 8 days ago.",
+        "Trigger the notification check.",
+        "Verify the assigned user receives an email about the late finding.",
+        "Verify the digest includes the finding title, severity, and days overdue."
+      ],
+      "evidence": [],
+      "notes": "Requires email backend configuration. Can start with console backend (`python -m smtpd`) for development. Consider a Django management command run via cron for periodic checking."
+    },
+    {
+      "id": "improve-001",
+      "priority": 12,
+      "area": "findings",
+      "title": "SLA days configurable per project instead of hardcoded",
+      "user_visible_behavior": "When creating or editing a project, the user can set custom SLA day values per severity level. Findings inherit SLA from their project.",
+      "status": "not_started",
+      "verification": [
+        "Create a project with custom SLA: Critical=3, High=7.",
+        "Create a Critical finding in that project.",
+        "Verify the SLA due date is created_at + 3 days (not the default 7).",
+        "Create a project without custom SLA.",
+        "Verify it uses system defaults (Critical=7, High=14, Medium=30, Low=60)."
+      ],
+      "evidence": [],
+      "notes": "Current SLA values are hardcoded dict in Finding.sla_days(). Move to Project model with default fallback. Consider a global Setting model for system-wide defaults."
+    },
+    {
+      "id": "feat-004",
+      "priority": 13,
+      "area": "api",
+      "title": "REST API endpoints for findings and projects",
+      "user_visible_behavior": "External tools can query, create, and update findings and projects via JSON REST API with authentication.",
+      "status": "not_started",
+      "verification": [
+        "Send GET /api/findings/ with auth token.",
+        "Verify JSON response contains findings with all fields.",
+        "Send POST /api/findings/ with valid payload.",
+        "Verify a new finding is created and returned.",
+        "Send GET /api/projects/.",
+        "Verify response includes project with SPI and finding count."
+      ],
+      "evidence": [],
+      "notes": "Use Django REST Framework (DRF). Start with read-only endpoints, then add write. Token or session auth. Prioritize findings CRUD and project read."
+    },
+    {
+      "id": "feat-005",
+      "priority": 14,
+      "area": "findings",
+      "title": "Export findings to CSV/Excel, import from scanner output",
+      "user_visible_behavior": "From the findings list, users can click Export to download all visible findings as CSV or Excel. Users can upload a scanner output file (e.g. Burp/Nessus XML) to bulk-import findings.",
+      "status": "not_started",
+      "verification": [
+        "Navigate to /findings/.",
+        "Click Export > CSV.",
+        "Verify a CSV file downloads with correct columns (title, severity, status, project, created_at).",
+        "Click Export > Excel.",
+        "Verify an XLSX file downloads.",
+        "Navigate to import page.",
+        "Upload a Burp Suite XML file.",
+        "Verify findings are created from the import."
+      ],
+      "evidence": [],
+      "notes": "CSV export: use Django's StreamingHttpResponse with csv module. Excel: use openpyxl or python-docx's excel equivalent. Import: start with a simple JSON/CSV format before tackling scanner-specific parsers."
+    },
+    {
+      "id": "improve-002",
+      "priority": 15,
+      "area": "auth",
+      "title": "Authentication enhancements \u2014 password reset, rate-limited login",
+      "user_visible_behavior": "Users can reset their password via email link. Failed login attempts are rate-limited to prevent brute force.",
+      "status": "not_started",
+      "verification": [
+        "Click 'Forgot password' on login page.",
+        "Enter email, submit.",
+        "Verify a password reset email is sent (console backend).",
+        "Click the reset link, set new password.",
+        "Log in with new password.",
+        "Attempt 5 failed logins in rapid succession.",
+        "Verify the account is temporarily locked."
+      ],
+      "evidence": [],
+      "notes": "Django has built-in password reset views (django.contrib.auth.urls already included). Just need templates and email config. For rate-limiting: django-axes or manual implementation with django-ratelimit."
+    },
+    {
+      "id": "feat-006",
+      "priority": 16,
+      "area": "audit",
+      "title": "Audit trail \u2014 log who created/edited/deleted findings and projects",
+      "user_visible_behavior": "Each finding and project detail page shows a history of changes (who changed what and when). A global audit log page (admin only) shows all recent activity.",
+      "status": "not_started",
+      "verification": [
+        "Create a finding as user A.",
+        "Edit the finding as user B.",
+        "View the finding detail page.",
+        "Verify an activity section shows: User A created, User B changed severity/title.",
+        "Navigate to audit log page as superuser.",
+        "Verify all create/edit/delete events are listed with timestamps."
+      ],
+      "evidence": [],
+      "notes": "Options: django-simple-history, django-auditlog, or a custom AuditLog model with a signal-based approach. Choose the lightest option (custom model likely sufficient)."
+    },
+    {
+      "id": "improve-003",
+      "priority": 17,
+      "area": "reports",
+      "title": "Unified report content pipeline between PDF and DOCX",
+      "user_visible_behavior": "PDF and DOCX reports contain identical content because both are generated from the same data pipeline. No more content drift between formats.",
+      "status": "not_started",
+      "verification": [
+        "Generate a PDF report for a project with findings.",
+        "Generate a DOCX report for the same project.",
+        "Compare both: cover page, executive summary, methodology, findings list.",
+        "Verify content matches between both formats.",
+        "Add a new finding, regenerate both formats.",
+        "Verify the new finding appears in both PDF and DOCX."
+      ],
+      "evidence": [],
+      "notes": "Currently PDF uses Django templates + xhtml2pdf, DOCX uses python-docx programmatically. No shared code. Refactor: build a context dict once, pass to both renderers. Move DOCX section logic into reports/sections/ modules."
+    },
+    {
+      "id": "improve-004",
+      "priority": 18,
+      "area": "reports",
+      "title": "Fill empty report section stubs (cover.py, summary.py, detail_findings.py, etc.)",
+      "user_visible_behavior": "DOCX report generation uses modular section builders for each report part, making the codebase easier to extend and maintain.",
+      "status": "not_started",
+      "verification": [
+        "Verify reports/sections/cover.py contains an add_cover_section(doc, project) function.",
+        "Verify reports/sections/summary.py contains an add_summary_section(doc, project, findings) function.",
+        "Verify reports/sections/detail_findings.py contains an add_detail_findings_section(doc, findings) function.",
+        "Verify reports/sections/document_detail.py contains an add_document_detail_section(doc, project) function.",
+        "Verify reports/sections/scope.py contains an add_scope_section(doc, project) function.",
+        "Verify reports/sections/executive_summary.py contains an add_executive_summary_section(doc, project, findings) function.",
+        "Verify reports/sections/members.py contains an add_members_section(doc, project) function.",
+        "Check that utils.py:s generate_report_file() uses these modules for DOCX path."
+      ],
+      "evidence": [],
+      "notes": "Currently only methodology.py is implemented. The other 7 section stubs are empty. Extract Docx generation logic from utils.py into these modules, mirroring how PDF uses separate template partials."
+    },
+    {
+      "id": "improve-005",
+      "priority": 19,
+      "area": "users",
+      "title": "Custom user model replacing django.contrib.auth.models.User",
+      "user_visible_behavior": "No visible change to end users. Future user profile fields (phone, department, avatar) can be added without migration pain.",
+      "status": "not_started",
+      "verification": [
+        "Run `python manage.py check` \u2014 no errors.",
+        "Create a new user via Django admin.",
+        "Verify user can log in.",
+        "Verify existing assignments still reference the correct user.",
+        "Verify project_detail shows team members correctly."
+      ],
+      "evidence": [],
+      "notes": "This is a foundational refactor. Do it early before data grows. Use AbstractUser, add minimal extra fields (e.g. department, phone). Requires a fresh migration reset since no production data exists."
+    }
+  ]
+}
