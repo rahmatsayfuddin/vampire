@@ -82,4 +82,5 @@ urlpatterns = [
     path('vkb/', include('vkb.urls')),
     path('findings/', include('findings.urls')),
     path('reports/', include('reports.urls')),
+    path('audit/', include('audit.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

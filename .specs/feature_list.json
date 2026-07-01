@@ -386,7 +386,7 @@
       "area": "audit",
       "title": "Audit trail \u2014 log who created/edited/deleted findings and projects",
       "user_visible_behavior": "Each finding and project detail page shows a history of changes (who changed what and when). A global audit log page (admin only) shows all recent activity.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Create a finding as user A.",
         "Edit the finding as user B.",
@@ -395,7 +395,17 @@
         "Navigate to audit log page as superuser.",
         "Verify all create/edit/delete events are listed with timestamps."
       ],
-      "evidence": [],
+      "evidence": [
+        "Created audit app with AuditLog model (content_type + object_id GenericFK, action, user, timestamp, changes)",
+        "pre_save/post_save/post_delete signals auto-log create/update/delete for Finding and Project models",
+        "pre_save captures old state; post_save compares fields and records changes (e.g. severity: Medium \u2192 Critical)",
+        "_audit_user attribute on instance identifies the acting user; set in findings/views and projects/views",
+        "finding_detail.html: Activity table at bottom showing last 10 audit entries",
+        "project_detail.html: Activity table at bottom showing last 10 audit entries",
+        "audit/audit_list.html: global audit log (/audit/) paginated (25/page) \u2014 admin only",
+        "Sidebar: Audit Log link under ADMINISTRATION for superusers",
+        "init.sh passes; change detection verified (severity, status, completed_date)"
+      ],
       "notes": "Options: django-simple-history, django-auditlog, or a custom AuditLog model with a signal-based approach. Choose the lightest option (custom model likely sufficient)."
     },
     {

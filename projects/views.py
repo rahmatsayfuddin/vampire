@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
+from django.contrib.contenttypes.models import ContentType
 from .models import Project
 from .forms import ProjectForm
 from .services import ProjectService
+from audit.models import AuditLog
 from django.contrib.auth.decorators import login_required, permission_required
 
 @login_required
@@ -17,6 +19,7 @@ def project_create(request, organization_id=None):
         if form.is_valid():
             project = form.save(commit=False)
             ProjectService.set_completed_date_by_status(project)
+            project._audit_user = request.user
             project.save()
             return redirect('project_list')
     else:
@@ -36,6 +39,7 @@ def project_update(request, pk):
         if form.is_valid():
             project = form.save(commit=False)
             ProjectService.set_completed_date_by_status(project)
+            project._audit_user = request.user
             project.save()
             return redirect('project_list')
     else:
@@ -48,6 +52,7 @@ def project_delete(request, pk):
     project = ProjectService.get_project_for_user(pk, request.user)
 
     if request.method == 'POST':
+        project._audit_user = request.user
         project.delete()
         return redirect('project_list')
     return render(request, 'projects/project_confirm_delete.html', {'project': project})
@@ -57,8 +62,11 @@ def project_detail(request, pk):
     project = ProjectService.get_project_for_user(pk, request.user)
 
     reports = project.reports.all().order_by('-created_at')
+    content_type = ContentType.objects.get_for_model(Project)
+    audit_logs = AuditLog.objects.filter(content_type=content_type, object_id=project.pk)[:10]
     return render(request, 'projects/project_detail.html', {
             'project': project,
             'reports': reports,
             'scans': [],
+            'audit_logs': audit_logs,
         })

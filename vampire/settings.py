@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'vkb',
     'findings',
     'reports',
+    'audit',
 ]
 
 MIDDLEWARE = [

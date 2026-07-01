@@ -1,10 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
+from django.contrib.contenttypes.models import ContentType
 from .models import Finding
 from .forms import FindingForm
 from .services import FindingService
 from projects.models import Project
 from projects.services import ProjectService
+from audit.models import AuditLog
 from django.core.paginator import Paginator
 
 from django.contrib.auth.decorators import login_required, permission_required
@@ -81,6 +83,7 @@ def create_finding(request, project_id):
                 finding.vkb_reference_id = selected_vkb
 
             FindingService.set_closed_at_by_status(finding)
+            finding._audit_user = request.user
             finding.save()
 
             if form.cleaned_data.get('save_to_vkb'):
@@ -96,7 +99,12 @@ def create_finding(request, project_id):
 @login_required
 def finding_detail(request, pk):
     finding = FindingService.get_finding_for_user(pk, request.user)
-    return render(request, 'findings/finding_detail.html', {'finding': finding})
+    content_type = ContentType.objects.get_for_model(Finding)
+    audit_logs = AuditLog.objects.filter(content_type=content_type, object_id=finding.pk)[:10]
+    return render(request, 'findings/finding_detail.html', {
+        'finding': finding,
+        'audit_logs': audit_logs,
+    })
 
 @login_required
 @permission_required('findings.change_finding', raise_exception=True)
@@ -108,6 +116,7 @@ def edit_finding(request, pk):
         if form.is_valid():
             finding = form.save(commit=False)
             FindingService.set_closed_at_by_status(finding)
+            finding._audit_user = request.user
             finding.save()
             return redirect('finding_detail', pk=finding.pk)
     else:
@@ -121,6 +130,7 @@ def delete_finding(request, pk):
     finding = FindingService.get_finding_for_user(pk, request.user)
     project_id = finding.project.id
     if request.method == 'POST':
+        finding._audit_user = request.user
         finding.delete()
         return redirect('project_detail', pk=project_id)
     return render(request, 'findings/finding_confirm_delete.html', {'finding': finding})
