@@ -9,16 +9,16 @@
     <form method="post" id="finding-form">
       {% csrf_token %}
       {% for field in form %}
-      <div class="form-group {% if field.name == 'save_to_vkb' %}form-check{% endif %}">
+      <div class="mb-3 {% if field.name == 'save_to_vkb' %}form-check{% endif %}">
         {% if field.name == 'save_to_vkb' %}
         {{ field }} <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
         {% else %}
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
         {{ field }}
         {% endif %}
 
         {% if field.help_text %}
-        <small class="form-text text-muted">{{ field.help_text }}</small>
+        <div class="form-text">{{ field.help_text }}</div>
         {% endif %}
         {% for error in field.errors %}
         <div class="text-danger">{{ error }}</div>
@@ -26,7 +26,7 @@
       </div>
       {% endfor %}
       <button type="submit" class="btn btn-primary">Save</button>
-      <a href="{% url 'project_detail' project.pk %}" class="btn btn-secondary ml-2">Cancel</a>
+      <a href="{% url 'project_detail' project.pk %}" class="btn btn-secondary ms-2">Cancel</a>
     </form>
   </div>
 </div>
@@ -34,37 +34,31 @@
 
 {% block scripts %}
 <script>
-  $(function () {
-    // Initialize Select2
-    $('select').select2({
-      theme: 'bootstrap4'
-    })
-
-    // Add form-control class to inputs
-    $('input:not([type="checkbox"]):not([type="radio"]), select, textarea').addClass('form-control');
-    $('input[type="checkbox"]').addClass('form-check-input');
-
-    // Custom VKB fetch logic
-    // Note: using $('#id_vkb') for jQuery consistent with above
-    $('#id_vkb').on('change', function () {
-      const vkbId = $(this).val();
-      if (!vkbId) return;
-
-      $.ajax({
-        url: `/vkb/api/${vkbId}/`,
-        success: function (data) {
-          $('#id_title').val(data.title);
-          $('#id_description').val(data.description);
-          $('#id_impact').val(data.impact);
-          $('#id_recommendation').val(data.recommendation);
-
-          // For Select2, valid way to set value is .val().trigger('change')
-          if ($('#id_vkb_category').length) {
-            $('#id_vkb_category').val(data.category).trigger('change');
-          }
-        }
-      });
-    });
-  });
+document.addEventListener('DOMContentLoaded', function () {
+    var vkbSelect = document.getElementById('id_vkb');
+    if (vkbSelect) {
+        vkbSelect.closest('.ts-wrapper')?.addEventListener('change', function () {
+            var vkbId = vkbSelect.value;
+            if (!vkbId) return;
+            fetch('/vkb/api/' + vkbId + '/')
+                .then(function (r) { return r.json(); })
+                .then(function (data) {
+                    document.getElementById('id_title').value = data.title;
+                    document.getElementById('id_description').value = data.description;
+                    document.getElementById('id_impact').value = data.impact;
+                    document.getElementById('id_recommendation').value = data.recommendation;
+                    var cat = document.getElementById('id_vkb_category');
+                    if (cat) {
+                        for (var i = 0; i < cat.options.length; i++) {
+                            if (cat.options[i].value === data.category) {
+                                cat.selectedIndex = i;
+                                break;
+                            }
+                        }
+                    }
+                });
+        });
+    }
+});
 </script>
 {% endblock %}

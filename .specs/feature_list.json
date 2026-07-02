@@ -641,7 +641,7 @@
       "area": "ui",
       "title": "JS Dependencies v4 \u2014 TomSelect, flatpickr, Summernote BS5, IMask",
       "user_visible_behavior": "Select dropdowns, date pickers, rich text editor, and input masks all work with Bootstrap 5 without jQuery dependencies.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Select2 replaced with TomSelect \u2014 select dropdowns render correctly.",
         "Tempusdominus replaced with flatpickr \u2014 date inputs show date picker.",
@@ -650,7 +650,21 @@
         "BS-Custom-File-Input removed (Bootstrap 5 native).",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "TomSelect 2.3.1 CDN (CSS+JS) in base template \u2014 auto-inits all <select> elements globally",
+        "flatpickr 4.6.13 CDN (CSS+JS) \u2014 auto-inits .flatpickr class elements",
+        "Quill.js 2.0.2 CDN (CSS+JS) \u2014 custom QuillWidget replaces django-summernote",
+        "findings/widgets.py: QuillWidget renders Quill editor + hidden textarea sync, theme snow, 250px height",
+        "Removed django-summernote (INSTALLED_APPS, urls.py, requirements.txt)",
+        "Removed jQuery from all form templates (Select2 init \u2192 auto-handled by TomSelect)",
+        "Removed Tempusdominus/BS4 datepicker \u2192 flatpickr auto-init",
+        "Removed BS-Custom-File-Input (BS5 native file input)",
+        "Removed InputMask + DateRangePicker + Moment.js from CDN",
+        "findings/finding_form.html: VKB fetch jQuery\u2192fetch API, BS5 classes (mb-3, ms-2, form-label, form-text)",
+        "projects/project_form.html: Tempusdominus\u2192flatpickr, BS5 input-group with bi-calendar icon",
+        "All 7 form templates updated: BS5 classes, TomSelect auto-init, no jQuery scripts",
+        "22 tests pass, init.sh OK"
+      ],
       "notes": "TomSelect: vanilla JS, BS5-compatible, drop-in CDN. flatpickr: lightweight date picker, no jQuery. Summernote: upgrade django-summernote to v0.10+ (Summernote 0.9+ has BS5 support) OR replace with django-quill-editor (Quill.js). IMask: vanilla JS input mask library."
     },
     {

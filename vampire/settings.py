@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'findings',
     'reports',
     'audit',
-    'django_summernote',
 ]
 
 MIDDLEWARE = [

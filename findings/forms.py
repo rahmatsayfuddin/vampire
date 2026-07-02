@@ -1,5 +1,5 @@
 from django import forms
-from django_summernote.widgets import SummernoteWidget
+from .widgets import QuillWidget
 from .models import Finding
 from vkb.models import VulnerabilityKnowledgeBase
 
@@ -37,5 +37,5 @@ class FindingForm(forms.ModelForm):
             'affected', 'severity', 'score', 'poc', 'status'
         ]
         widgets = {
-            'poc': SummernoteWidget(),
+            'poc': QuillWidget(),
         }

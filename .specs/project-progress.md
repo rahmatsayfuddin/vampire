@@ -1,35 +1,38 @@
 # VAMPIRE — Project Progress
 
-## 2026-07-01 — Session summary
+## 2026-07-02 — Session summary
 
-### Completed (14/23 features)
+### Completed (20/28 features)
 
 **DevOps (4/4):**
-- devops-001: Redefined .gitignore — removed 150 tracked __pycache__, added .env
-- devops-002: Dockerize — Dockerfile + docker-compose with PostgreSQL 16
-- devops-003: DB migration SQLite → PostgreSQL — env-based config, migrate_db.sh
-- devops-004: Default port 8001 — port 8000 occupied by Docker Desktop
+- devops-001 to 004: .gitignore, Dockerize, DB migration, port 8001
 
 **Architecture (2/2):**
-- arch-001: Layered architecture assessment — NOT layered, refactor recommended
-- arch-002: Refactor to layered — 4 service modules, views are thin HTTP handlers
+- arch-001/002: Assessment + refactor to layered services
 
 **Bugs (2/2):**
-- bug-001: project_detail empty data — removed unused context, dead org_detail code
-- bug-002: Report thread crash — added 'failed' status, styled UI badges
+- bug-001/002: project_detail empty data, report thread crash
 
-**Features (6/11):**
-- feat-001: Dashboard analytics — Chart.js severity/SPI doughnuts, SLA compliance %
-- feat-002: Search & filter findings — search bar, severity/status/project/date filters
+**Features:**
+- feat-001: Dashboard analytics — Chart.js severity/SPI doughnuts, SLA %
+- feat-002: Search & filter findings — q, severity, status, project, date
 - feat-006: Audit trail — auto-log create/update/delete for Finding + Project
-- feat-007: Report History list page (/reports/) — table with filter dropdowns
-- improve-006: MD-based report generation — Markdown template with 7 sections
-- improve-007: WYSIWYG PoC editor — django-summernote with image paste/upload
+- feat-007: Report History list page (/reports/) with filter dropdowns
+- feat-008: Report Preview — MD rendered as styled HTML in browser
+- improve-001: SLA Profiles — configurable per-project SLA templates
+- improve-006: MD-based report generation (replaces PDF/DOCX)
+- improve-007: WYSIWYG PoC editor → upgraded to Quill.js in ui-002
+- improve-008: Edit Template Design — admin UI for MD report template
+- tech-001: Unit tests — SLA, SPI, views (22 tests)
+
+**UI Migration (2/5):**
+- ui-001: Core Layout v4 — base template + login + sidebar + CDN swap (BS5, no jQuery)
+- ui-002: JS Dependencies v4 — TomSelect, flatpickr, Quill.js
 
 ### Active feature
 - None
 
 ### Next
-- tech-001: Unit tests (priority 8)
-- feat-003: SLA email notifications (priority 13)
-- improve-001: SLA configurable per project (priority 14)
+- ui-003: Icons Migration — contextual Bootstrap Icons
+- ui-004: Template Porting 1 — findings, projects, organizations
+- ui-005: Template Porting 2 — remaining templates
