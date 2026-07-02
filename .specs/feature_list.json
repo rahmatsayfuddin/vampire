@@ -818,7 +818,7 @@
       "area": "ui",
       "title": "UI Form organization \u2014 improve form layout and styling (logo upload, textareas)",
       "user_visible_behavior": "Organization create/edit form looks polished with proper spacing, file upload styling, and responsive textareas.",
-      "status": "passing",
+      "status": "not_started",
       "verification": [
         "Open /organizations/create/ \u2014 verify form looks clean and professional.",
         "Verify logo upload input has proper BS5 styling.",
@@ -827,15 +827,7 @@
         "Verify on mobile the form is fully responsive.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [
-        "Widget rows added to description/scope/impact/recommendation textareas (3 rows) in all forms",
-        "Finding form: redesigned with 2-column layout, VKB at top, severity+status inline",
-        "Quill editor height: 250px \u2192 350px",
-        "save_to_vkb: form-check with fw-bold label, auto-checked when VKB selected",
-        "Report buttons: d-flex flex-wrap gap-2 for responsive spacing",
-        "Card shadow-sm for subtle elevation on all forms",
-        "22 tests pass"
-      ],
+      "evidence": [],
       "notes": "Current issue: form uses basic field rendering with minimal styling. Improve: card elevation (shadow-sm), proper textarea rows, file input with BS5 native styling, consistent spacing between fields."
     },
     {
@@ -844,7 +836,7 @@
       "area": "ui",
       "title": "UI Form project \u2014 improve form layout (date pickers, SLA dropdown, textareas)",
       "user_visible_behavior": "Project create/edit form looks polished with flatpickr date pickers, TomSelect SLA profile dropdown, and proper textarea sizing.",
-      "status": "passing",
+      "status": "not_started",
       "verification": [
         "Open /projects/create/ \u2014 verify form looks clean.",
         "Verify date inputs trigger flatpickr calendar popup.",
@@ -853,15 +845,7 @@
         "Verify Save and Cancel buttons have proper spacing.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [
-        "Widget rows added to description/scope/impact/recommendation textareas (3 rows) in all forms",
-        "Finding form: redesigned with 2-column layout, VKB at top, severity+status inline",
-        "Quill editor height: 250px \u2192 350px",
-        "save_to_vkb: form-check with fw-bold label, auto-checked when VKB selected",
-        "Report buttons: d-flex flex-wrap gap-2 for responsive spacing",
-        "Card shadow-sm for subtle elevation on all forms",
-        "22 tests pass"
-      ],
+      "evidence": [],
       "notes": "Current issue: form has basic field rendering, flatpickr should auto-attach to date inputs, SLA dropdown needs TomSelect (already auto-initialized), textareas need row attribute."
     },
     {
@@ -870,7 +854,7 @@
       "area": "ui",
       "title": "UI Form finding \u2014 improve form layout (Quill editor, VKB select, checkbox)",
       "user_visible_behavior": "Finding create/edit form looks polished with Quill PoC editor having proper height, TomSelect VKB dropdown, and clean checkbox layout.",
-      "status": "passing",
+      "status": "not_started",
       "verification": [
         "Open finding create form \u2014 verify layout is clean.",
         "Verify Quill editor has good height (not cramped).",
@@ -879,15 +863,7 @@
         "Verify Save and Cancel buttons have proper spacing.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [
-        "Widget rows added to description/scope/impact/recommendation textareas (3 rows) in all forms",
-        "Finding form: redesigned with 2-column layout, VKB at top, severity+status inline",
-        "Quill editor height: 250px \u2192 350px",
-        "save_to_vkb: form-check with fw-bold label, auto-checked when VKB selected",
-        "Report buttons: d-flex flex-wrap gap-2 for responsive spacing",
-        "Card shadow-sm for subtle elevation on all forms",
-        "22 tests pass"
-      ],
+      "evidence": [],
       "notes": "Current issue: Quill editor height too short (250px), VKB select needs TomSelect (auto-init handles this), save_to_vkb checkbox styling needs BS5 form-check class correctly."
     },
     {
@@ -896,7 +872,7 @@
       "area": "ui",
       "title": "Finding creation flow \u2014 VKB-first wizard: ask VKB first, then form, then VKB save",
       "user_visible_behavior": "Creating a finding follows a 3-step wizard: (1) Choose VKB entry or skip, (2) Fill in the form (pre-filled if VKB selected), (3) After submit, optionally save to VKB.",
-      "status": "passing",
+      "status": "not_started",
       "verification": [
         "Click Add Finding from project detail.",
         "Step 1: See VKB selection dropdown + Skip button.",
@@ -908,15 +884,7 @@
         "Uncheck and confirm \u2014 only finding created.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [
-        "Widget rows added to description/scope/impact/recommendation textareas (3 rows) in all forms",
-        "Finding form: redesigned with 2-column layout, VKB at top, severity+status inline",
-        "Quill editor height: 250px \u2192 350px",
-        "save_to_vkb: form-check with fw-bold label, auto-checked when VKB selected",
-        "Report buttons: d-flex flex-wrap gap-2 for responsive spacing",
-        "Card shadow-sm for subtle elevation on all forms",
-        "22 tests pass"
-      ],
+      "evidence": [],
       "notes": "Current flow: all fields + VKB select + save_to_vkb checkbox on one page (cramped). New flow: clean wizard with 3 distinct steps. Backend: modify create_finding view to handle the multi-step form OR use a single-page progressive disclosure (JS show/hide sections)."
     },
     {
@@ -925,7 +893,7 @@
       "area": "ui",
       "title": "UI Form VKB \u2014 improve form layout (textareas, category select)",
       "user_visible_behavior": "VKB create/edit form looks polished with proper textarea heights, TomSelect category dropdown, and clean spacing.",
-      "status": "passing",
+      "status": "not_started",
       "verification": [
         "Open /vkb/create/ \u2014 verify form looks clean.",
         "Verify title input has proper width.",
@@ -934,15 +902,7 @@
         "Verify Save and Back buttons have proper spacing.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [
-        "Widget rows added to description/scope/impact/recommendation textareas (3 rows) in all forms",
-        "Finding form: redesigned with 2-column layout, VKB at top, severity+status inline",
-        "Quill editor height: 250px \u2192 350px",
-        "save_to_vkb: form-check with fw-bold label, auto-checked when VKB selected",
-        "Report buttons: d-flex flex-wrap gap-2 for responsive spacing",
-        "Card shadow-sm for subtle elevation on all forms",
-        "22 tests pass"
-      ],
+      "evidence": [],
       "notes": "Current issue: basic field rendering, long textareas default to single row. Improve: add rows=4 to textarea fields in form, proper form-label and mb-3 spacing."
     },
     {
@@ -951,7 +911,7 @@
       "area": "ui",
       "title": "Report action buttons \u2014 responsive spacing (wrap with gap, not cramped)",
       "user_visible_behavior": "Report action buttons (Preview, Download, Delete) have proper gap spacing when wrapping to 2 rows on smaller screens. No cramped overlapping buttons.",
-      "status": "passing",
+      "status": "not_started",
       "verification": [
         "Generate a report and go to /reports/.",
         "Resize browser to ~768px width (tablet).",
@@ -961,15 +921,7 @@
         "Verify same behavior on project_detail report history section.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [
-        "Widget rows added to description/scope/impact/recommendation textareas (3 rows) in all forms",
-        "Finding form: redesigned with 2-column layout, VKB at top, severity+status inline",
-        "Quill editor height: 250px \u2192 350px",
-        "save_to_vkb: form-check with fw-bold label, auto-checked when VKB selected",
-        "Report buttons: d-flex flex-wrap gap-2 for responsive spacing",
-        "Card shadow-sm for subtle elevation on all forms",
-        "22 tests pass"
-      ],
+      "evidence": [],
       "notes": "Current issue: buttons use d-inline for form and btn for links \u2014 when screen is narrow, wrapping causes 2 buttons inline and 1 below with no vertical gap (mt-0). Fix: wrap buttons in a div.d-flex.flex-wrap.gap-2 or add mt-2 to all buttons when wrapping."
     }
   ]
