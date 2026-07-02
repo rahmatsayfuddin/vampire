@@ -82,7 +82,6 @@
           <label class="form-label fw-bold">
             <i class="bi bi-paperclip me-1"></i>Proof of Concept
           </label>
-          <div id="quill-editor" style="height: 400px;"></div>
           {{ form.poc }}
         </div>
         <button type="submit" class="btn btn-primary btn-lg">
@@ -126,8 +125,6 @@
 
 {% block scripts %}
 <script>
-var quill = null;
-
 function useVkb() {
     var vkbId = document.getElementById('id_vkb').value;
     if (!vkbId) { alert('Please select a VKB entry first.'); return; }
@@ -150,12 +147,6 @@ function showStep2() {
     document.getElementById('step-1').style.display = 'none';
     document.getElementById('step-2').style.display = 'block';
     document.getElementById('step-label').textContent = 'Step 2 of 3';
-    if (!quill) {
-        quill = new Quill('#quill-editor', { theme: 'snow' });
-        var pocTextarea = document.getElementById('id_poc');
-        if (pocTextarea.value) quill.root.innerHTML = pocTextarea.value;
-        quill.on('text-change', function() { pocTextarea.value = quill.root.innerHTML; });
-    }
 }
 
 function backToStep1() {
