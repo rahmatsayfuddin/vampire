@@ -2,37 +2,30 @@
 
 ## 2026-07-02 — Session summary
 
-### Completed (20/28 features)
+### Completed (23/28 features)
 
-**DevOps (4/4):**
-- devops-001 to 004: .gitignore, Dockerize, DB migration, port 8001
+**DevOps (4/4):** devops-001 to 004 — .gitignore, Dockerize, DB migration, port 8001
 
-**Architecture (2/2):**
-- arch-001/002: Assessment + refactor to layered services
+**Architecture (2/2):** arch-001/002 — Assessment + refactor to layered services
 
-**Bugs (2/2):**
-- bug-001/002: project_detail empty data, report thread crash
+**Bugs (2/2):** bug-001/002 — project_detail empty data, report thread crash
 
-**Features:**
-- feat-001: Dashboard analytics — Chart.js severity/SPI doughnuts, SLA %
-- feat-002: Search & filter findings — q, severity, status, project, date
-- feat-006: Audit trail — auto-log create/update/delete for Finding + Project
-- feat-007: Report History list page (/reports/) with filter dropdowns
-- feat-008: Report Preview — MD rendered as styled HTML in browser
-- improve-001: SLA Profiles — configurable per-project SLA templates
-- improve-006: MD-based report generation (replaces PDF/DOCX)
-- improve-007: WYSIWYG PoC editor → upgraded to Quill.js in ui-002
-- improve-008: Edit Template Design — admin UI for MD report template
-- tech-001: Unit tests — SLA, SPI, views (22 tests)
+**Features (10):** feat-001/002/006/007/008, improve-001/006/007/008, tech-001
 
-**UI Migration (2/5):**
-- ui-001: Core Layout v4 — base template + login + sidebar + CDN swap (BS5, no jQuery)
-- ui-002: JS Dependencies v4 — TomSelect, flatpickr, Quill.js
+**UI Migration (5/5):** ui-001 to 005 — AdminLTE v3→v4 complete
+- ui-001: Core Layout v4 — BS5, no jQuery, Bootstrap Icons
+- ui-002: JS Deps v4 — TomSelect, flatpickr, Quill.js
+- ui-003: Icons Migration — contextual Bootstrap Icons with severity colors
+- ui-004: Template Porting 1 — findings, projects, organizations → BS5
+- ui-005: Template Porting 2 — remaining templates → BS5
+- Zero BS4 classes remaining, zero Font Awesome, zero jQuery
 
 ### Active feature
 - None
 
-### Next
-- ui-003: Icons Migration — contextual Bootstrap Icons
-- ui-004: Template Porting 1 — findings, projects, organizations
-- ui-005: Template Porting 2 — remaining templates
+### Remaining (5)
+- feat-003: SLA email notifications
+- feat-004: REST API
+- feat-005: Export/Import CSV/Excel
+- improve-002: Auth enhancements
+- improve-005: Custom user model (deferred)

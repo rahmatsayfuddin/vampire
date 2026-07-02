@@ -23,7 +23,7 @@
     <h5>Add Menu to this Role</h5>
     <form method="post" class="form-inline">
       {% csrf_token %}
-      <select name="menu_id" class="form-control mr-2">
+      <select name="menu_id" class="form-control me-2">
         {% for menu in unassigned_menus %}
           <option value="{{ menu.pk }}">{{ menu.menu_name }} - {{ menu.menu_url }}</option>
         {% endfor %}

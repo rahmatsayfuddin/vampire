@@ -10,7 +10,7 @@
     <form method="post">
       {% csrf_token %}
       <button type="submit" class="btn btn-danger">Yes, remove</button>
-      <a href="{% url 'project_detail' assignment.project.pk %}" class="btn btn-secondary ml-2">Cancel</a>
+      <a href="{% url 'project_detail' assignment.project.pk %}" class="btn btn-secondary ms-2">Cancel</a>
     </form>
   </div>
 </div>

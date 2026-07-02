@@ -730,7 +730,7 @@
       "area": "ui",
       "title": "Template Porting 2 \u2014 remaining templates (dashboard, reports, audit, users, VKB, assignments, stakeholders)",
       "user_visible_behavior": "Dashboard charts, report pages, audit log, user management, VKB, assignments, and stakeholders all render with AdminLTE 4.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Verify dashboard renders with chart doughnuts and stat boxes.",
         "Verify report list renders with filter form, preview/download/delete buttons.",
@@ -744,7 +744,19 @@
         "Verify stakeholder add/remove forms.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "VKB: list, form \u2192 BS5 (mb-3, form-label, form-text text-body-secondary, ms-2)",
+        "Assignments: confirm_delete \u2192 BS5 (ms-2)",
+        "Stakeholders: confirm_delete \u2192 BS5 (ms-2)",
+        "Roles: list, detail, form, confirm_delete \u2192 BS5 (mb-3, me-2, form-label, ms-2)",
+        "Menus: list, form, confirm_delete \u2192 BS5 (mb-3, ms-2)",
+        "Reports: edit_template, report_list \u2192 BS5 (form-text text-body-secondary, float-end, w-100)",
+        "Audit: audit_list \u2192 BS5 (text-body-secondary, float-end)",
+        "SLA: profile_list, form, confirm_delete \u2192 BS5 (text-body-secondary, mb-3)",
+        "User/group: form, confirm_delete \u2192 BS5 (mb-3, float-end, btn-outline-secondary)",
+        "Zero remaining BS4 classes (ml-*, mr-*, float-left/right, btn-block, form-group, badge badge-*, fa fa-*)",
+        "22 tests pass, init.sh OK"
+      ],
       "notes": "Dashboard: Chart.js stays (framework-agnostic). Report pages: minimal changes (already MD-only). User/group: Django built-in templates. Lower priority than ui-004 since these are less complex."
     }
   ]

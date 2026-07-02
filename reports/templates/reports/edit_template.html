@@ -11,7 +11,7 @@
         <form method="post">
             {% csrf_token %}
             {{ form.content }}
-            <small class="form-text text-muted mt-2">
+            <small class="form-text text-body-secondary mt-2">
                 Uses Django template syntax. Available variables: <code>project</code>, <code>findings</code>, <code>today</code>.
                 Iterate findings with <code>{% verbatim %}{% for finding in findings %}{% endverbatim %}</code>.
             </small>

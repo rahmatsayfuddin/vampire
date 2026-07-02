@@ -9,7 +9,7 @@
     </div>
     <div class="card-body">
         <p>Are you sure you want to delete the SLA profile <strong>{{ profile.name }}</strong>?</p>
-        <p class="text-muted">Projects using this profile will fall back to the default SLA.</p>
+        <p class="text-body-secondary">Projects using this profile will fall back to the default SLA.</p>
         <form method="post">
             {% csrf_token %}
             <button type="submit" class="btn btn-danger">Delete</button>

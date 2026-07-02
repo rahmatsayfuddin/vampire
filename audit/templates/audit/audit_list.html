@@ -30,7 +30,7 @@
                         {% endif %}
                     </td>
                     <td>{{ log.content_type.model }} #{{ log.object_id }}</td>
-                    <td><small class="text-muted">{{ log.changes|truncatechars:200 }}</small></td>
+                    <td><small class="text-body-secondary">{{ log.changes|truncatechars:200 }}</small></td>
                 </tr>
                 {% empty %}
                 <tr><td colspan="5" class="text-center">No audit entries.</td></tr>
@@ -39,7 +39,7 @@
         </table>
     </div>
     <div class="card-footer clearfix">
-        <ul class="pagination pagination-sm m-0 float-right">
+        <ul class="pagination pagination-sm m-0 float-end">
             {% if page_obj.has_previous %}
             <li class="page-item"><a class="page-link" href="?page=1">&laquo;</a></li>
             <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Prev</a></li>
