@@ -5,40 +5,42 @@
 {% block content %}
 <div class="row">
     <div class="col-lg-3 col-6">
-        <div class="small-box bg-info">
+        <div class="small-box text-bg-primary">
             <div class="inner">
                 <h3>{{ project_count }}</h3>
-                <p>My Projects</p>
+                <p>Projects</p>
             </div>
-            <div class="icon"><i class="bi bi-folder2"></i></div>
-            <a href="{% url 'project_list' %}" class="small-box-footer">More info <i class="bi bi-chevron-right"></i></a>
+            <i class="bi bi-folder2 small-box-icon"></i>
+            <a href="{% url 'project_list' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">More info <i class="bi bi-chevron-right"></i></a>
         </div>
     </div>
     <div class="col-lg-3 col-6">
-        <div class="small-box bg-success">
+        <div class="small-box text-bg-success">
             <div class="inner">
                 <h3>{{ finding_count }}</h3>
-                <p>My Findings</p>
+                <p>Findings</p>
             </div>
-            <div class="icon"><i class="bi bi-bug-fill"></i></div>
+            <i class="bi bi-bug-fill small-box-icon"></i>
+            <a href="{% url 'finding_list' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">More info <i class="bi bi-chevron-right"></i></a>
         </div>
     </div>
     <div class="col-lg-3 col-6">
-        <div class="small-box bg-{% if late_count > 0 %}danger{% else %}success{% endif %}">
+        <div class="small-box text-bg-{% if late_count > 0 %}danger{% else %}success{% endif %}">
             <div class="inner">
                 <h3>{{ late_count }}</h3>
                 <p>Late Findings</p>
             </div>
-            <div class="icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
+            <i class="bi bi-exclamation-triangle-fill small-box-icon"></i>
+            <a href="{% url 'finding_list' %}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">More info <i class="bi bi-chevron-right"></i></a>
         </div>
     </div>
     <div class="col-lg-3 col-6">
-        <div class="small-box bg-{% if sla_compliance >= 80 %}success{% elif sla_compliance >= 50 %}warning{% else %}danger{% endif %}">
+        <div class="small-box text-bg-{% if sla_compliance >= 80 %}success{% elif sla_compliance >= 50 %}warning{% else %}danger{% endif %}">
             <div class="inner">
                 <h3>{{ sla_compliance }}%</h3>
                 <p>SLA Compliance</p>
             </div>
-            <div class="icon"><i class="bi bi-hourglass-split"></i></div>
+            <i class="bi bi-hourglass-split small-box-icon"></i>
         </div>
     </div>
 </div>
@@ -80,8 +82,8 @@
                         <tr>
                             <td><a href="{% url 'finding_detail' f.pk %}">{{ f.title }}</a></td>
                             <td>
-                                <span class="badge bg-{% if f.severity == 'Critical' %}danger{% elif f.severity == 'High' %}warning text-dark{% elif f.severity == 'Medium' %}info text-dark{% else %}success{% endif %}">
-                                    <i class="bi bi-{% if f.severity == 'Critical' %}exclamation-diamond-fill{% elif f.severity == 'High' %}exclamation-triangle-fill{% elif f.severity == 'Medium' %}info-circle-fill{% else %}arrow-down-circle-fill{% endif %} me-1"></i>{{ f.severity }}
+                                <span class="badge bg-{% if f.severity == 'Critical' %}dark{% elif f.severity == 'High' %}danger{% elif f.severity == 'Medium' %}warning text-dark{% elif f.severity == 'Low' %}info text-dark{% else %}success{% endif %}">
+                                    <i class="bi bi-{% if f.severity == 'Critical' %}exclamation-diamond-fill{% elif f.severity == 'High' %}exclamation-triangle-fill{% elif f.severity == 'Medium' %}info-circle-fill{% elif f.severity == 'Low' %}arrow-down-circle-fill{% else %}info-circle{% endif %} me-1"></i>{{ f.severity }}
                                 </span>
                             </td>
                             <td>{{ f.project.project_name }}</td>
@@ -133,10 +135,11 @@
     var severityLabels = {{ severity_labels|safe }};
     var severityData = {{ severity_data|safe }};
     var severityColors = {
-        'Critical': '#dc3545',
-        'High': '#fd7e14',
-        'Medium': '#17a2b8',
-        'Low': '#28a745'
+        'Critical': '#212529',
+        'High': '#dc3545',
+        'Medium': '#ffc107',
+        'Low': '#0d6efd',
+        'Info': '#198754'
     };
     new Chart(severityCtx, {
         type: 'doughnut',

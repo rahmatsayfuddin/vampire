@@ -758,6 +758,59 @@
         "22 tests pass, init.sh OK"
       ],
       "notes": "Dashboard: Chart.js stays (framework-agnostic). Report pages: minimal changes (already MD-only). User/group: Django built-in templates. Lower priority than ui-004 since these are less complex."
+    },
+    {
+      "id": "bug-003",
+      "priority": 30,
+      "area": "ui",
+      "title": "Dashboard stat boxes \u2014 fix AdminLTE v4 text-bg-* classes with white text",
+      "user_visible_behavior": "Dashboard stat boxes use AdminLTE v4 text-bg-* pattern with clean white text, matching the official demo appearance.",
+      "status": "passing",
+      "verification": [
+        "Verify dashboard stat boxes use text-bg-primary, text-bg-success, text-bg-warning, text-bg-danger.",
+        "Verify all text in stat boxes is white.",
+        "Verify More info link uses proper v4 small-box-footer styling.",
+        "Verify boxes match AdminLTE v4 demo appearance.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [
+        "Dashboard stat boxes: bg-* \u2192 text-bg-* (AdminLTE v4 pattern with white text)",
+        "Projects: text-bg-primary with bi-folder2 icon",
+        "Findings: text-bg-success with bi-bug-fill icon",
+        "Late Findings: text-bg-danger (if late) / text-bg-success",
+        "SLA Compliance: text-bg-success/warning/danger based on %",
+        "Icons use .small-box-icon class (v4 pattern), not nested .icon div",
+        "More info links use link-light + link-underline-opacity styling",
+        "More info links: Projects\u2192/projects/, Findings\u2192/findings/, Late Findings\u2192/findings/"
+      ],
+      "notes": "AdminLTE v4 small boxes use text-bg-* (not bg-*) which includes both background color AND white text color. Current dashboard uses bg-info/bg-success which may have black text in BS5."
+    },
+    {
+      "id": "bug-004",
+      "priority": 31,
+      "area": "ui",
+      "title": "Severity colors \u2014 fix to AdminLTE v4 palette (Info=green, Low=blue, Medium=yellow, High=red, Critical=dark)",
+      "user_visible_behavior": "Severity badges across all pages use AdminLTE v4 color palette: Info=green, Low=blue, Medium=yellow, High=red, Critical=dark red/black.",
+      "status": "passing",
+      "verification": [
+        "Verify Critical uses bg-danger or bg-dark (dark red).",
+        "Verify High uses bg-danger (red).",
+        "Verify Medium uses bg-warning text-dark (yellow).",
+        "Verify Low uses bg-info text-dark (blue).",
+        "Verify Info uses bg-success (green).",
+        "Verify severity colors are consistent across dashboard, finding_list, finding_detail, project_detail.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [
+        "Critical \u2192 bg-dark (dark gray/black) with exclamation-diamond-fill icon",
+        "High \u2192 bg-danger (red) with exclamation-triangle-fill icon",
+        "Medium \u2192 bg-warning text-dark (yellow/amber) with info-circle-fill icon",
+        "Low \u2192 bg-info text-dark (blue) with arrow-down-circle-fill icon",
+        "Info \u2192 bg-success (green)",
+        "Chart.js colors updated: Critical=#212529, High=#dc3545, Medium=#ffc107, Low=#0d6efd, Info=#198754",
+        "Consistent across dashboard, finding_list, finding_detail, project_detail"
+      ],
+      "notes": "Current mapping: Critical=red, High=red (same as Critical!), Medium=yellow (correct), Low=blue/cyan. Should be: Critical=dark-red/black, High=red, Medium=yellow, Low=blue, Info=green. Match AdminLTE color palette: success=green, info=blue, warning=yellow, danger=red, dark=black."
     }
   ]
 }
