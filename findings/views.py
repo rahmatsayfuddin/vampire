@@ -6,9 +6,10 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
+import bleach
 from .models import Finding
 from .forms import FindingForm
-from .services import FindingService
+from .services import FindingService, ALLOWED_TAGS, ALLOWED_ATTRS
 from projects.models import Project
 from projects.services import ProjectService
 from audit.models import AuditLog
@@ -106,6 +107,7 @@ def create_finding(request, project_id):
 @login_required
 def finding_detail(request, pk):
     finding = FindingService.get_finding_for_user(pk, request.user)
+    finding.poc = bleach.clean(finding.poc or '', tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS)
     content_type = ContentType.objects.get_for_model(Finding)
     audit_logs = AuditLog.objects.filter(content_type=content_type, object_id=finding.pk)[:10]
     return render(request, 'findings/finding_detail.html', {

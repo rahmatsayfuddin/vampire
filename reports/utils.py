@@ -1,12 +1,17 @@
 import os
+import bleach
 from django.conf import settings
 from datetime import datetime
+from findings.services import ALLOWED_TAGS, ALLOWED_ATTRS
 
 
 def generate_report_file(project, findings, format='md'):
+    findings_list = list(findings)
+    for f in findings_list:
+        f.poc = bleach.clean(f.poc or '', tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS)
     context = {
         'project': project,
-        'findings': findings,
+        'findings': findings_list,
         'today': datetime.now().date(),
     }
 

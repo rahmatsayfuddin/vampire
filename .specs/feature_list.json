@@ -1215,7 +1215,7 @@
       "area": "security",
       "title": "Sanitize PoC HTML output with bleach/html-sanitizer before |safe rendering",
       "user_visible_behavior": "PoC content renders safely without script injection risks. All HTML tags except allowed whitelist are stripped.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Create a finding with <script>alert(1)</script> in PoC via Quill (or direct DB).",
         "View finding detail \u2014 verify script tag is stripped.",
@@ -1223,7 +1223,13 @@
         "Verify report preview also sanitizes PoC.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "findings/services.py: ALLOWED_TAGS (p, br, strong, em, u, s, ol, ul, li, blockquote, pre, code, a, img, h1-h4) + ALLOWED_ATTRS (a:href/target, img:src/alt)",
+        "findings/views.py: finding_detail sanitizes poc with bleach.clean() before rendering",
+        "reports/utils.py: generate_report_file sanitizes each finding poc with bleach.clean() before template rendering",
+        "Verified: <script> stripped, <img onerror> attribute stripped, safe HTML (bold, lists, images) preserved",
+        "22 tests pass"
+      ],
       "notes": "Use bleach library (already installed as transitive dep). Whitelist: p, br, strong, em, u, s, ol, ul, li, blockquote, pre, code, a, img. Strip all other tags. Apply in finding_detail.html and report_template.md via a template filter or view-level sanitization."
     },
     {

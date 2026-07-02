@@ -1,8 +1,13 @@
 from datetime import timedelta
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
+import bleach
 from .models import Finding
 from vkb.models import VulnerabilityKnowledgeBase
+
+ALLOWED_TAGS = ['p', 'br', 'strong', 'em', 'u', 's', 'ol', 'ul', 'li',
+                'blockquote', 'pre', 'code', 'a', 'img', 'h1', 'h2', 'h3', 'h4']
+ALLOWED_ATTRS = {'a': ['href', 'target'], 'img': ['src', 'alt']}
 
 
 class SlaService:
