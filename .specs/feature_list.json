@@ -871,7 +871,7 @@
       "area": "ui",
       "title": "UI Form finding \u2014 improve form layout (Quill editor, VKB select, checkbox)",
       "user_visible_behavior": "Finding create/edit form looks polished with Quill PoC editor having proper height, TomSelect VKB dropdown, and clean checkbox layout.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Open finding create form \u2014 verify layout is clean.",
         "Verify Quill editor has good height (not cramped).",
@@ -880,7 +880,14 @@
         "Verify Save and Cancel buttons have proper spacing.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "3-step wizard layout: step-1 (VKB), step-2 (form), step-3 (save to VKB)",
+        "Fields: 2-column layout (severity/status/cvss, impact/recommendation)",
+        "Quill editor: 400px height, lazy-init on step-2 visible (avoids hidden-div bug)",
+        "AJAX form submission: fetch() POST, JSON response, spinner on submit button",
+        "Step indicators: Step 1/2/3 label in card header, bi-check-circle on success",
+        "Back button: step-2 can go back to step-1 to change VKB selection"
+      ],
       "notes": "Current issue: Quill editor height too short (250px), VKB select needs TomSelect (auto-init handles this), save_to_vkb checkbox styling needs BS5 form-check class correctly."
     },
     {
@@ -889,7 +896,7 @@
       "area": "ui",
       "title": "Finding creation flow \u2014 VKB-first wizard: ask VKB first, then form, then VKB save",
       "user_visible_behavior": "Creating a finding follows a 3-step wizard: (1) Choose VKB entry or skip, (2) Fill in the form (pre-filled if VKB selected), (3) After submit, optionally save to VKB.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Click Add Finding from project detail.",
         "Step 1: See VKB selection dropdown + Skip button.",
@@ -901,7 +908,15 @@
         "Uncheck and confirm \u2014 only finding created.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "Step 1: VKB select + Use Template / Start from Scratch buttons",
+        "Use Template: fetch VKB API \u2192 auto-fill title/desc/impact/recommendation/category",
+        "Skip: empty form, user fills manually",
+        "Step 2: Form with Quill PoC (lazy init via JS, not via widget), AJAX submission",
+        "create_finding view: handles AJAX POST (JSON response) and Step 3 VKB save",
+        "Step 3: success icon + category dropdown + Save to VKB / Skip buttons",
+        "Save to VKB: POST to create_finding with save_to_vkb=1 \u2192 promote_to_vkb()"
+      ],
       "notes": "Current flow: all fields + VKB select + save_to_vkb checkbox on one page (cramped). New flow: clean wizard with 3 distinct steps. Backend: modify create_finding view to handle the multi-step form OR use a single-page progressive disclosure (JS show/hide sections)."
     },
     {

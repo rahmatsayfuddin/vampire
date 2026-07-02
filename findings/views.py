@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
+from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
 from .models import Finding
 from .forms import FindingForm
@@ -73,27 +74,29 @@ def create_finding(request, project_id):
     project = ProjectService.get_project_for_user(project_id, request.user)
 
     if request.method == 'POST':
-        form = FindingForm(request.POST)
-        if form.is_valid():
-            finding = form.save(commit=False)
-            finding.project = project
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            form = FindingForm(request.POST)
+            if form.is_valid():
+                finding = form.save(commit=False)
+                finding.project = project
+                selected_vkb = request.POST.get('vkb')
+                if selected_vkb:
+                    finding.vkb_reference_id = selected_vkb
+                FindingService.set_closed_at_by_status(finding)
+                finding._audit_user = request.user
+                finding.save()
+                return JsonResponse({'success': True, 'finding_id': finding.pk})
+            errors = {k: v[0] for k, v in form.errors.items()}
+            return JsonResponse({'success': False, 'errors': str(errors)})
 
-            selected_vkb = request.POST.get('vkb')
-            if selected_vkb:
-                finding.vkb_reference_id = selected_vkb
-
-            FindingService.set_closed_at_by_status(finding)
-            finding._audit_user = request.user
-            finding.save()
-
-            if form.cleaned_data.get('save_to_vkb'):
-                category = form.cleaned_data.get('vkb_category')
-                FindingService.promote_to_vkb(finding, category)
-
+        if request.POST.get('save_to_vkb'):
+            finding_id = request.POST.get('finding_id')
+            finding = get_object_or_404(Finding, pk=finding_id, project=project)
+            category = request.POST.get('vkb_category_final')
+            FindingService.promote_to_vkb(finding, category)
             return redirect('project_detail', pk=project_id)
-    else:
-        form = FindingForm()
 
+    form = FindingForm()
     return render(request, 'findings/finding_form.html', {'form': form, 'project': project})
 
 @login_required
