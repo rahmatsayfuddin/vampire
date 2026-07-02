@@ -1,6 +1,6 @@
 {
   "project": "vampire",
-  "last_updated": "2026-07-01",
+  "last_updated": "2026-07-02",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -607,31 +607,103 @@
       "notes": "Create ReportTemplate model with content (TextField). If a template record exists, use it; otherwise fall back to reports/templates/reports/report_template.md. Add /reports/template/ route (admin only). Use Summernote or plain textarea for editing raw MD."
     },
     {
-      "id": "improve-009",
-      "priority": 24,
+      "id": "ui-001",
+      "priority": 25,
       "area": "ui",
-      "title": "Redesign UI \u2014 migrate AdminLTE v3\u2192v4 (Bootstrap 5 + no jQuery)",
-      "user_visible_behavior": "The entire application UI updates to AdminLTE v4 \u2014 modern look with dark mode support, Bootstrap Icons replacing Font Awesome, smoother sidebar animations, and no jQuery dependency.",
+      "title": "Core Layout v4 \u2014 base template, login, sidebar, navbar, CDN swap",
+      "user_visible_behavior": "The entire app gets a modern AdminLTE 4 foundation with Bootstrap 5.3, no jQuery, Bootstrap Icons replacing Font Awesome, and a clean dark sidebar.",
       "status": "not_started",
       "verification": [
-        "Verify AdminLTE v4 CSS/JS loaded from CDN (no v3 CDN references remain).",
-        "Verify Bootstrap 5.3 classes used throughout (no bs4 classes).",
-        "Verify jQuery removed from base template.",
-        "Verify All Font Awesome icons replaced with Bootstrap Icons.",
-        "Verify layout uses v4 classes: app-wrapper, app-header, app-sidebar, app-main.",
-        "Verify sidebar pushmenu works with data-lte-toggle (not data-widget).",
-        "Verify Dark mode toggle works.",
-        "Verify Select2 still works (v4 compatible) or replaced with Choices.js / TomSelect.",
-        "Verify Summernote still works or replaced with CKEditor/Quill (Bootstrap 5 compat).",
-        "Verify Date picker still works or replaced with flatpickr.",
-        "Verify all CRUD pages render correctly.",
-        "Verify Dashboard charts render correctly (Chart.js is framework-agnostic).",
-        "Verify Login page renders correctly.",
-        "./init.sh passes.",
-        "All 22 tests pass."
+        "Verify base_adminlte.html uses v4 CDN (adminlte.min.css, bootstrap.bundle.js, overlayscrollbars, bootstrap-icons).",
+        "Verify no jQuery CDN, no Font Awesome CDN, no AdminLTE v3 JS remain.",
+        "Login page renders correctly with v4 layout.",
+        "Sidebar renders with v4 classes (app-sidebar, sidebar-menu).",
+        "Navbar hamburger toggles sidebar via data-lte-toggle=\"sidebar\".",
+        "All sidebar links work.",
+        "./init.sh + 22 tests pass."
       ],
       "evidence": [],
-      "notes": "AdminLTE v4 migration checklist: 1) Replace CDN includes (adminlte.css, bootstrap.bundle.js, overlayscrollbars, bootstrap-icons). 2) Remove jQuery CDN + AdminLTE v3 JS. 3) Update base_adminlte.html layout classes (wrapper\u2192app-wrapper, main-header\u2192app-header, main-sidebar\u2192app-sidebar, content-wrapper\u2192app-main, nav-sidebar\u2192sidebar-menu). 4) Replace Font Awesome (fa fa-*) with Bootstrap Icons (bi bi-*). 5) Replace data-widget with data-lte-toggle. 6) Replace Select2 (jQuery-dependent) with Tom Select (vanilla JS, Bootstrap 5 compatible). 7) Summernote v0.8 is jQuery-based \u2192 upgrade to django-summernote v0.10+ (Summernote v0.9+ Bootstrap 5 support) or replace with CKEditor 5. 8) Tempusdominus Bootstrap 4 \u2192 flatpickr. 9) Remove InputMask jQuery plugin. 10) Remove BS-Custom-File-Input (Bootstrap 5 has native). High effort, breaks many templates."
+      "notes": "Foundation for ui-002 through ui-005. Remove all v3 CDN references. Rewrite base_adminlte.html layout markup: wrapper\u2192app-wrapper, main-header\u2192app-header, main-sidebar\u2192app-sidebar, content-wrapper\u2192app-main. Remove all Font Awesome (fa fa-*) references from base template."
+    },
+    {
+      "id": "ui-002",
+      "priority": 26,
+      "area": "ui",
+      "title": "JS Dependencies v4 \u2014 TomSelect, flatpickr, Summernote BS5, IMask",
+      "user_visible_behavior": "Select dropdowns, date pickers, rich text editor, and input masks all work with Bootstrap 5 without jQuery dependencies.",
+      "status": "not_started",
+      "verification": [
+        "Select2 replaced with TomSelect \u2014 select dropdowns render correctly.",
+        "Tempusdominus replaced with flatpickr \u2014 date inputs show date picker.",
+        "Summernote upgraded to BS5-compatible version \u2014 PoC editor renders correctly.",
+        "InputMask replaced with IMask (or removed if not used).",
+        "BS-Custom-File-Input removed (Bootstrap 5 native).",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "TomSelect: vanilla JS, BS5-compatible, drop-in CDN. flatpickr: lightweight date picker, no jQuery. Summernote: upgrade django-summernote to v0.10+ (Summernote 0.9+ has BS5 support) OR replace with django-quill-editor (Quill.js). IMask: vanilla JS input mask library."
+    },
+    {
+      "id": "ui-003",
+      "priority": 27,
+      "area": "ui",
+      "title": "Icons Migration v4 \u2014 Font Awesome \u2192 Bootstrap Icons (contextual mapping)",
+      "user_visible_behavior": "All icons are replaced with semantic Bootstrap Icons \u2014 severity badges include colored icons, action buttons have contextual icons, navigation is intuitive.",
+      "status": "not_started",
+      "verification": [
+        "Verify no fa fa-* class remains in any template.",
+        "Verify sidebar icons use bi bi-* with semantic choices.",
+        "Verify severity badges show colored icons (Critical=diamond, High=triangle, etc).",
+        "Verify action buttons have contextual icons (edit=pencil, delete=trash, download=download, etc).",
+        "Verify status badges have icons (Open=folder, Closed=check-circle).",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "See the contextual icon mapping document. Key principles: right=forward, left=back, down=download, up=collapse. Color coding: Critical=text-danger + diamond, High=text-warning + triangle, Medium=text-info + info-circle, Low=text-success + arrow-down."
+    },
+    {
+      "id": "ui-004",
+      "priority": 28,
+      "area": "ui",
+      "title": "Template Porting 1 \u2014 findings, projects, organizations templates to v4",
+      "user_visible_behavior": "All findings (list, detail, form), projects (list, detail, form, SLA profiles), and organizations (list, detail, form) pages render correctly with AdminLTE 4 styling.",
+      "status": "not_started",
+      "verification": [
+        "Verify findings list/search/filter form renders with v4 classes.",
+        "Verify finding detail page Activity section renders correctly.",
+        "Verify finding form with Summernote v4 renders PoC field correctly.",
+        "Verify project list renders with SPI badges.",
+        "Verify project detail renders all sections (team, stakeholders, findings, reports, activity, SLA profile).",
+        "Verify project form with SLA profile dropdown and date picker.",
+        "Verify SLA profile list, create, edit, delete pages.",
+        "Verify organization list, detail, create, edit pages.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Changes: card classes, badge bg-* (not badge-*), spacing ms-*/me-* (not ml-*/mr-*), float-start/float-end, form-group\u2192mb-3, Table classes. Porting order: findings first (most complex), then projects, then organizations."
+    },
+    {
+      "id": "ui-005",
+      "priority": 29,
+      "area": "ui",
+      "title": "Template Porting 2 \u2014 remaining templates (dashboard, reports, audit, users, VKB, assignments, stakeholders)",
+      "user_visible_behavior": "Dashboard charts, report pages, audit log, user management, VKB, assignments, and stakeholders all render with AdminLTE 4.",
+      "status": "not_started",
+      "verification": [
+        "Verify dashboard renders with chart doughnuts and stat boxes.",
+        "Verify report list renders with filter form, preview/download/delete buttons.",
+        "Verify report template editor renders with monospace textarea.",
+        "Verify MD report preview page renders styled HTML.",
+        "Verify audit log renders with pagination.",
+        "Verify user list/create/edit pages.",
+        "Verify group list/create/edit pages.",
+        "Verify VKB list/create/edit pages.",
+        "Verify assignment add/remove forms.",
+        "Verify stakeholder add/remove forms.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Dashboard: Chart.js stays (framework-agnostic). Report pages: minimal changes (already MD-only). User/group: Django built-in templates. Lower priority than ui-004 since these are less complex."
     }
   ]
 }
