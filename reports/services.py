@@ -22,13 +22,13 @@ class ReportService:
 
     @staticmethod
     def delete_report_file(report):
-        path = os.path.join(settings.MEDIA_ROOT, 'reports', report.file_name)
+        path = os.path.join(settings.MEDIA_ROOT, 'reports', os.path.basename(report.file_name))
         if os.path.exists(path):
             os.remove(path)
 
     @staticmethod
     def file_exists(report):
-        path = os.path.join(settings.MEDIA_ROOT, 'reports', report.file_name)
+        path = os.path.join(settings.MEDIA_ROOT, 'reports', os.path.basename(report.file_name))
         return os.path.exists(path)
 
 
