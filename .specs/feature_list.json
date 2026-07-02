@@ -1030,6 +1030,36 @@
         ".md file download: includes raw HTML (supported by most MD renderers)"
       ],
       "notes": "Current MD template renders {{ finding.poc }} as raw HTML inside MD. Need: 1) For preview: keep HTML as-is. 2) For .md file: either strip HTML tags and convert to MD syntax, or keep HTML inline (some MD renderers support raw HTML). 3) Images: ensure /media/ URLs in <img> tags are accessible in preview. 4) Consider markdown extension for HTML-in-MD handling."
+    },
+    {
+      "id": "devops-005",
+      "priority": 41,
+      "area": "docs",
+      "title": "Update README.md \u2014 reflect current v4 tech stack, features, Docker, port 8001",
+      "user_visible_behavior": "Repository README accurately describes the project's current technology stack, all 20+ features, Docker setup, and port 8001.",
+      "status": "passing",
+      "verification": [
+        "README lists correct tech stack: Django 5.2.3, PostgreSQL, AdminLTE 4, Bootstrap 5.3, Chart.js, TomSelect, flatpickr, Quill.js.",
+        "README describes all major features: dashboard analytics, search/filter, SLA profiles, audit trail, MD reports, WYSIWYG PoC, report template editor, image upload.",
+        "README mentions Docker support (docker compose up --build).",
+        "README uses port 8001 (not 8000).",
+        "README shows correct project structure (audit app, services layer).",
+        "./init.sh passes."
+      ],
+      "evidence": [
+        "README reflects current tech stack: Django 5.2.3, AdminLTE 4, BS5, Bootstrap Icons, Chart.js, TomSelect, flatpickr, Quill.js, PostgreSQL",
+        "Features: dashboard analytics, search/filter, SLA profiles, audit trail, MD reports, WYSIWYG PoC, image upload, report template editor",
+        "Docker: docker compose up --build with PostgreSQL 16",
+        "Port 8001 documented (macOS Docker Desktop conflict)",
+        "Project structure: 13 apps including audit, services layer, widgets",
+        "./init.sh documented as baseline verification",
+        "Dependencies: 6 packages (was 5 with xhtml2pdf+python-docx)",
+        "Core models: 10 models listed including SlaProfile, AuditLog, ReportTemplate",
+        "Architecture section: FBV + services layer per app",
+        "Configuration table with env variables",
+        "Screenshots skipped, license and contributing kept unchanged"
+      ],
+      "notes": "Skip screenshots/usage section. Keep license and contributing unchanged. Focus on tech stack accuracy, feature completeness, and setup instructions."
     }
   ]
 }

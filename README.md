@@ -1,338 +1,225 @@
 # VAMPIRE - Penetration Testing Management System
 
-A comprehensive Django-based platform for managing security assessments, penetration testing projects, and vulnerability tracking. VAMPIRE streamlines the entire penetration testing workflow from project planning to report generation.
+A Django-based platform for managing security assessments, penetration testing projects, and vulnerability tracking with SLA compliance, audit trails, and Markdown report generation.
 
-## 🎯 Overview
+## Overview
 
 VAMPIRE is designed for security teams and penetration testers who need to:
 - Manage multiple penetration testing projects
-- Track security findings with SLA compliance
-- Generate professional PDF and Word reports
-- Maintain a reusable vulnerability knowledge base
-- Monitor project performance and deadlines
+- Track security findings with configurable SLA profiles
+- Generate Markdown reports with live preview
+- Maintain a reusable vulnerability knowledge base (VKB)
+- Monitor project performance with SPI metrics and dashboard analytics
 
-## ✨ Features
+## Features
 
-### 📦 Product Management
-- Create and manage products with logos and descriptions
-- Organize projects by product
-- Track security assessments per product
+### Dashboard & Analytics
+- Interactive dashboard with Chart.js severity and SPI doughnut charts
+- SLA compliance rate with color-coded indicators
+- Recent findings and projects tables
+- Non-admin users see only assigned project data
 
-### 📊 Project Management
-- Full project lifecycle management (Planned → In Progress → Completed → On Hold)
-- **Schedule Performance Index (SPI)** calculation
-  - Automatically tracks if projects are on time or delayed
-  - Formula: `SPI = Planned Duration / Actual Duration`
-  - Visual indicators: 🟢 On time (SPI ≥ 1) | 🔴 Delayed (SPI < 1)
-- Project scope and description tracking
-- Date management (start, end, completion dates)
+### Project Management
+- Full lifecycle: Planned → In Progress → Completed → On Hold
+- Schedule Performance Index (SPI) — automatic on-time/delayed tracking
+- Configurable SLA Profiles per project (Critical/High/Medium/Low)
+- Team assignments and stakeholder tracking
 
-### 🔍 Findings Management
-- Comprehensive vulnerability tracking
-- **Severity levels**: Low, Medium, High, Critical
-- **SLA Tracking** with automatic compliance monitoring:
-  - Critical: 7 days
-  - High: 14 days
-  - Medium: 30 days
-  - Low: 60 days
-- Status tracking: Open, Closed, Risk Acceptance
-- Proof of Concept (PoC) documentation
-- CVSS score support
-- Automatic late finding detection
-- Delay calculation in days
+### Findings Management
+- Severity levels: Critical (dark), High (red), Medium (yellow), Low (blue)
+- SLA tracking with automatic late detection and delay days
+- WYSIWYG Proof of Concept (Quill.js) with image upload support
+- 3-step creation wizard: VKB template → form → save to VKB
+- Advanced search with keyword, severity, status, project, and date range filters
+- Pagination with filter-parameter preservation
 
-### 📚 Vulnerability Knowledge Base (VKB)
-- Reusable vulnerability templates
-- **8 Standard Categories**:
-  - Injection-Based Vulnerabilities
-  - Authentication & Session Flaws
-  - Access Control Issues
-  - Security Misconfigurations
-  - Data Exposure & Cryptographic Failures
-  - Web & API-Specific Vulnerabilities
-  - Memory & Low-Level Vulnerabilities
-  - Other Notable Vulnerabilities
-- Reference VKB entries when creating findings
-- Save custom findings to VKB for future use
+### Vulnerability Knowledge Base (VKB)
+- 8 standard vulnerability categories
+- Reusable templates with 3-click import into findings
+- Promote custom findings to VKB for future reuse
 
-### 👥 Team & Stakeholder Management
-- **Team Assignments**: Assign team members to projects with roles
-- **Stakeholder Tracking**: Manage client contacts per project
-- Project member visibility in reports
+### Audit Trail
+- Automatic logging of create, update, and delete for Findings and Projects
+- Field-level change tracking (e.g. `severity: Medium → High`)
+- Activity feed on finding and project detail pages
+- Global audit log at `/audit/` (admin only)
 
-### 📄 Professional Report Generation
-- **Multiple Formats**: PDF and DOCX (Word)
-- **Background Processing**: Asynchronous report generation
-- **Comprehensive Sections**:
-  1. Cover Page
-  2. Document Details
-  3. Scope
-  4. Project Members
-  5. Stakeholders
-  6. Methodology (OWASP-based)
-  7. Executive Summary
-  8. Finding Summary
-  9. Detailed Findings
-- **Report History**: Track all generated reports
-- Download and delete functionality
-- Timestamped filenames
+### Report Generation
+- One-click Markdown report generation (async background)
+- Live preview of Markdown reports as styled HTML
+- Editable report template via admin UI (`/reports/template/`)
+- Report history list with project/format/status filters
+- Download and delete with responsive action buttons
 
-## 🛠️ Technologies Used
+## Tech Stack
 
-- **Framework**: Django 5.2.3
-- **Database**: SQLite (development)
-- **PDF Generation**: xhtml2pdf (pisa)
-- **Word Generation**: python-docx
-- **Language**: Python 3.13
-- **Template Engine**: Django Templates
+| Component | Technology |
+|---|---|
+| Framework | Django 5.2.3 |
+| Database | SQLite (dev) / PostgreSQL 16 (Docker) |
+| Frontend | AdminLTE 4, Bootstrap 5.3, Bootstrap Icons |
+| Charts | Chart.js 4.4 |
+| Rich Text | Quill.js 2.0 (vanilla JS) |
+| Select | TomSelect 2.3 (vanilla JS) |
+| Date Picker | flatpickr 4.6 |
+| Icons | Bootstrap Icons 1.11 |
+| Server | Gunicorn (Docker) |
+| Language | Python 3.13 |
 
-## 📋 Prerequisites
+## Dependencies
 
-- Python 3.8 or higher
-- pip (Python package manager)
-- Virtual environment (recommended)
-
-## 🚀 Installation
-
-### 1. Clone the Repository
-
-```bash
-git clone <repository-url>
-cd vampire
+```
+Django==5.2.3
+gunicorn
+psycopg2-binary
+whitenoise
+Pillow
+markdown
 ```
 
-### 2. Create Virtual Environment
+## Quick Start
+
+### Prerequisites
+- Python 3.8+
+- Docker & Docker Compose (for PostgreSQL)
+
+### Local Development
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-### 3. Install Dependencies
-
-```bash
-pip install django==5.2.3
-pip install xhtml2pdf
-pip install python-docx
-```
-
-Or create a `requirements.txt` and install:
-
-```bash
+git clone <repo-url> && cd vampire
+python3 -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
+./init.sh
+python manage.py runserver 0.0.0.0:8001
 ```
 
-### 4. Database Setup
+Application: `http://127.0.0.1:8001/`
+
+### Docker
 
 ```bash
-python manage.py migrate
+docker compose up --build
 ```
 
-### 5. Create Superuser (Optional)
+Includes PostgreSQL 16 with persistent volumes. Application: `http://127.0.0.1:8001/`
+
+> **Note:** Port 8001 is used because macOS Docker Desktop occupies port 8000.
+
+### Baseline Checks
 
 ```bash
-python manage.py createsuperuser
+./init.sh          # check + migrate + test (22 tests)
+python manage.py test    # run tests directly
 ```
 
-### 6. Run Development Server
-
-```bash
-python manage.py runserver
-```
-
-The application will be available at `http://127.0.0.1:8000/`
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 vampire/
-├── assignments/          # Team assignment management
-├── findings/            # Vulnerability findings
-├── products/            # Product management
-├── projects/            # Project management
-├── reports/             # Report generation
-│   └── sections/        # Report section modules
-├── stakeholders/        # Stakeholder management
-├── vkb/                 # Vulnerability Knowledge Base
-├── vampire/             # Main project settings
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-├── media/               # Uploaded files (logos, reports)
-├── db.sqlite3           # SQLite database
-└── manage.py            # Django management script
+├── assignments/        # Team assignment management
+├── audit/              # Audit trail (auto-logging)
+├── findings/           # Vulnerability findings
+│   ├── services.py     # SLA engine + finding lifecycle
+│   ├── widgets.py      # Quill.js WYSIWYG widget
+│   └── templates/      # Wizard + edit forms
+├── menus/              # Menu management
+├── organizations/      # Organization (product) management
+├── projects/           # Project management
+│   ├── services.py     # SPI calculator + project lifecycle
+│   └── templates/      # Project forms + SLA profiles
+├── reports/            # Markdown report generation
+│   ├── services.py     # Report generation + file management
+│   └── templates/      # Report list + template editor
+├── roles/              # Role-based menu access
+├── stakeholders/       # Client contact management
+├── users/              # User & group management
+├── vkb/                # Vulnerability Knowledge Base
+├── vampire/            # Django settings & main URL config
+├── templates/          # Base layout + dashboard
+├── .specs/             # Feature list + progress tracking
+├── init.sh             # Baseline verification script
+├── Dockerfile          # Docker build
+├── docker-compose.yml  # Docker services
+└── requirements.txt    # Python dependencies
 ```
 
-## 🔧 Configuration
+## Architecture
 
-### Settings
+Function-Based Views (FBV) with a services layer. Business logic is extracted from models and views into `services.py` per app:
 
-Key settings in `vampire/settings.py`:
+| App | Services |
+|---|---|
+| `findings/` | `SlaService` (SLA engine), `FindingService` (auth, lifecycle, VKB promotion) |
+| `projects/` | `ProjectMetricsService` (SPI), `ProjectService` (auth, lifecycle) |
+| `organizations/` | `OrganizationService` (user-scoped queries) |
+| `reports/` | `ReportService` (file ops), `ReportGenerationService` (async) |
 
-- **SECRET_KEY**: Change in production (use environment variables)
-- **DEBUG**: Set to `False` in production
-- **ALLOWED_HOSTS**: Add your domain in production
-- **MEDIA_ROOT**: Directory for uploaded files
-- **MEDIA_URL**: URL prefix for media files
+## Core Models
 
-### Environment Variables (Recommended for Production)
+- **Organization** — Products/companies being tested
+- **Project** — Pentesting engagements with SPI + SLA profile
+- **SlaProfile** — Configurable per-project SLA day templates
+- **Finding** — Security vulnerabilities with WYSIWYG PoC
+- **VulnerabilityKnowledgeBase** — Reusable vulnerability templates
+- **Assignment** — Team member assignments
+- **Stakeholder** — Client contacts per project
+- **ReportHistory** — Generated Markdown report tracking
+- **AuditLog** — Auto-logged create/update/delete events
+- **ReportTemplate** — Editable MD report template
 
-```python
-import os
-
-SECRET_KEY = os.environ.get('SECRET_KEY', 'your-secret-key')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
-```
-
-## 📖 Usage Guide
-
-### 1. Create a Product
-
-Navigate to `/products/` and create a new product with name, logo, and description.
-
-### 2. Create a Project
-
-- Go to `/projects/` or create from product detail page
-- Fill in project details:
-  - Project name
-  - Description and scope
-  - Select product
-  - Set start and end dates
-  - Choose status
-
-### 3. Assign Team Members
-
-- From project detail page, click "Assign New User"
-- Select user and assign a role/title
-
-### 4. Add Stakeholders
-
-- From project detail page, click "Add Stakeholder"
-- Enter name, email, and position
-
-### 5. Create Findings
-
-- Navigate to project detail page
-- Click "Add Finding"
-- Fill in:
-  - Title, description, impact, recommendation
-  - Severity level
-  - Affected systems
-  - Optional: Reference VKB entry or save to VKB
-- System automatically tracks SLA compliance
-
-### 6. Generate Reports
-
-- From project detail page
-- Click "Generate PDF" or "Generate Word"
-- Report generates in background
-- Download when status shows "Done"
-
-## 🔍 Key Metrics
+## Key Metrics
 
 ### Schedule Performance Index (SPI)
-
-The SPI is automatically calculated for each project:
-
-- **SPI ≥ 1**: Project is on time or ahead of schedule 🟢
-- **SPI < 1**: Project is delayed 🔴
-
-Formula: `SPI = Planned Duration / Actual Duration`
+- `SPI ≥ 1` → On track / ahead of schedule 🟢
+- `SPI < 1` → Delayed 🔴
+- Formula: `Planned Duration / Actual Duration`
 
 ### SLA Compliance
+- Customizable per project via SLA Profiles
+- Default: Critical=7d, High=14d, Medium=30d, Low=60d
+- Automatic late detection with color-coded indicators
+- SLA compliance percentage tracked on dashboard
 
-Findings are automatically monitored for SLA compliance:
+## Configuration
 
-- System flags findings that exceed their SLA deadline
-- Shows delay in days
-- Visual indicators in finding lists
+Key environment variables (via `.env` or Docker Compose):
 
-## 🗄️ Database Models
+| Variable | Default | Description |
+|---|---|---|
+| `SECRET_KEY` | *(dev only)* | Django secret key |
+| `DEBUG` | `True` | Debug mode |
+| `ALLOWED_HOSTS` | `*` | Allowed hostnames |
+| `DB_HOST` | *(unset = SQLite)* | PostgreSQL host |
+| `DB_PORT` | `5432` | PostgreSQL port |
+| `DB_NAME` | `vampire` | Database name |
+| `DB_USER` | `vampire` | Database user |
+| `DB_PASSWORD` | *(change me)* | Database password |
 
-### Core Models
+> When `DB_HOST` is unset, the app uses SQLite for local development.
 
-- **Product**: Products being tested
-- **Project**: Penetration testing projects
-- **Finding**: Security vulnerabilities
-- **VulnerabilityKnowledgeBase**: Reusable vulnerability templates
-- **Assignment**: Team member assignments
-- **Stakeholder**: Client contacts
-- **ReportHistory**: Generated report tracking
+## Development
 
-## 🔒 Security Considerations
+| Command | Purpose |
+|---|---|
+| `./init.sh` | Check + migrate + test |
+| `python manage.py test` | Run 22 tests |
+| `python manage.py makemigrations` | Create migrations |
+| `python manage.py migrate` | Apply migrations |
+| `python manage.py createsuperuser` | Create admin user |
+| `docker compose up --build` | Run with PostgreSQL |
 
-⚠️ **Important**: Before deploying to production:
+## Future Enhancements
 
-1. Change `SECRET_KEY` in `settings.py`
-2. Set `DEBUG = False`
-3. Configure `ALLOWED_HOSTS`
-4. Use environment variables for sensitive data
-5. Set up proper database (PostgreSQL recommended for production)
-6. Configure static file serving
-7. Enable HTTPS
-8. Review and harden security settings
+- [ ] REST API
+- [ ] Email SLA notifications
+- [ ] CSV/Excel export & import
+- [ ] Password reset & rate-limited login
+- [ ] Custom user model
 
-## 🧪 Development
+## License
 
-### Running Tests
-
-```bash
-python manage.py test
-```
-
-### Creating Migrations
-
-```bash
-python manage.py makemigrations
-python manage.py migrate
-```
-
-### Collecting Static Files
-
-```bash
-python manage.py collectstatic
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🐛 Known Issues
-
-- Report generation runs synchronously in background threads (consider using Celery for production)
-- SQLite database is suitable for development only (use PostgreSQL for production)
-
-## 🔮 Future Enhancements
-
-- [ ] REST API endpoints
-- [ ] Advanced reporting with charts and graphs
-- [ ] Email notifications for SLA breaches
-- [ ] Integration with vulnerability scanners
-- [ ] Dashboard with analytics
-- [ ] Export functionality (CSV, Excel)
-- [ ] Multi-language support
-- [ ] Advanced search and filtering
-
-## 📞 Support
-
-For issues, questions, or contributions, please open an issue on the repository.
-
-## 🙏 Acknowledgments
-
-- OWASP Testing Guide for methodology standards
-- Django community for the excellent framework
-- All contributors and users of this project
+MIT License. See LICENSE file.
 
 ---
 
-**VAMPIRE** - Making penetration testing management easier, one project at a time. 🧛
-
+**VAMPIRE** — Penetration Testing Management
