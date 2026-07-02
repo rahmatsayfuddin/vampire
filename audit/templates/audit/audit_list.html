@@ -24,9 +24,9 @@
                     <td>{{ log.timestamp|date:"Y-m-d H:i" }}</td>
                     <td>{{ log.user.username|default:"—" }}</td>
                     <td>
-                        {% if log.action == 'create' %}<span class="badge badge-success">Created</span>
-                        {% elif log.action == 'update' %}<span class="badge badge-warning">Updated</span>
-                        {% else %}<span class="badge badge-danger">Deleted</span>
+                        {% if log.action == 'create' %}<span class="badge bg-success">Created</span>
+                        {% elif log.action == 'update' %}<span class="badge bg-warning">Updated</span>
+                        {% else %}<span class="badge bg-danger">Deleted</span>
                         {% endif %}
                     </td>
                     <td>{{ log.content_type.model }} #{{ log.object_id }}</td>

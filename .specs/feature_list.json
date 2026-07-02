@@ -673,7 +673,7 @@
       "area": "ui",
       "title": "Icons Migration v4 \u2014 Font Awesome \u2192 Bootstrap Icons (contextual mapping)",
       "user_visible_behavior": "All icons are replaced with semantic Bootstrap Icons \u2014 severity badges include colored icons, action buttons have contextual icons, navigation is intuitive.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Verify no fa fa-* class remains in any template.",
         "Verify sidebar icons use bi bi-* with semantic choices.",
@@ -682,7 +682,16 @@
         "Verify status badges have icons (Open=folder, Closed=check-circle).",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "All 13 remaining Font Awesome icons replaced with contextual Bootstrap Icons",
+        "Dashboard stat boxes: bi-folder2, bi-bug-fill, bi-exclamation-triangle-fill, bi-hourglass-split, bi-chevron-right",
+        "Severity badges with colored icons: exclamation-diamond-fill (Critical), exclamation-triangle-fill (High), info-circle-fill (Medium), arrow-down-circle-fill (Low)",
+        "Action buttons: bi-plus, bi-pencil, bi-trash, bi-eye, bi-person-plus, bi-download, bi-file-earmark-plus",
+        "Status icons: bi-check-circle (on track/closed), bi-x-circle (delayed/failed), bi-exclamation-triangle-fill (late)",
+        "Section headings with contextual icons: bi-people (team), bi-person-lines-fill (stakeholders), bi-bug (findings), bi-clock-history (activity/audit)",
+        "Zero remaining fa fa-* or fas fa-* in any template",
+        "22 tests pass"
+      ],
       "notes": "See the contextual icon mapping document. Key principles: right=forward, left=back, down=download, up=collapse. Color coding: Critical=text-danger + diamond, High=text-warning + triangle, Medium=text-info + info-circle, Low=text-success + arrow-down."
     },
     {
@@ -691,7 +700,7 @@
       "area": "ui",
       "title": "Template Porting 1 \u2014 findings, projects, organizations templates to v4",
       "user_visible_behavior": "All findings (list, detail, form), projects (list, detail, form, SLA profiles), and organizations (list, detail, form) pages render correctly with AdminLTE 4 styling.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Verify findings list/search/filter form renders with v4 classes.",
         "Verify finding detail page Activity section renders correctly.",
@@ -703,7 +712,16 @@
         "Verify organization list, detail, create, edit pages.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "findings: list, detail, form ported to BS5 (badge bg-*, text-body-secondary, float-end, bi icons)",
+        "projects: list, detail, form, project_confirm_delete, sla_profile_* ported to BS5",
+        "organizations: list, detail, form, confirm_delete ported to BS5",
+        "user/group: list, form, confirm_delete ported to BS5",
+        "All badge-badge-* replaced with badge bg-* (10 instances across 4 templates)",
+        "All ml-2 replaced with ms-2, float-right\u2192float-end, form-text text-muted\u2192text-body-secondary",
+        "Zero remaining BS4 classes in ported templates",
+        "22 tests pass, init.sh OK"
+      ],
       "notes": "Changes: card classes, badge bg-* (not badge-*), spacing ms-*/me-* (not ml-*/mr-*), float-start/float-end, form-group\u2192mb-3, Table classes. Porting order: findings first (most complex), then projects, then organizations."
     },
     {

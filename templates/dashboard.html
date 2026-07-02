@@ -10,8 +10,8 @@
                 <h3>{{ project_count }}</h3>
                 <p>My Projects</p>
             </div>
-            <div class="icon"><i class="fas fa-project-diagram"></i></div>
-            <a href="{% url 'project_list' %}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+            <div class="icon"><i class="bi bi-folder2"></i></div>
+            <a href="{% url 'project_list' %}" class="small-box-footer">More info <i class="bi bi-chevron-right"></i></a>
         </div>
     </div>
     <div class="col-lg-3 col-6">
@@ -20,7 +20,7 @@
                 <h3>{{ finding_count }}</h3>
                 <p>My Findings</p>
             </div>
-            <div class="icon"><i class="fas fa-bug"></i></div>
+            <div class="icon"><i class="bi bi-bug-fill"></i></div>
         </div>
     </div>
     <div class="col-lg-3 col-6">
@@ -29,7 +29,7 @@
                 <h3>{{ late_count }}</h3>
                 <p>Late Findings</p>
             </div>
-            <div class="icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
         </div>
     </div>
     <div class="col-lg-3 col-6">
@@ -38,7 +38,7 @@
                 <h3>{{ sla_compliance }}%</h3>
                 <p>SLA Compliance</p>
             </div>
-            <div class="icon"><i class="fas fa-clock"></i></div>
+            <div class="icon"><i class="bi bi-hourglass-split"></i></div>
         </div>
     </div>
 </div>
@@ -79,7 +79,11 @@
                         {% for f in recent_findings %}
                         <tr>
                             <td><a href="{% url 'finding_detail' f.pk %}">{{ f.title }}</a></td>
-                            <td><span class="badge badge-{% if f.severity == 'Critical' %}danger{% elif f.severity == 'High' %}warning{% elif f.severity == 'Medium' %}info{% else %}success{% endif %}">{{ f.severity }}</span></td>
+                            <td>
+                                <span class="badge bg-{% if f.severity == 'Critical' %}danger{% elif f.severity == 'High' %}warning text-dark{% elif f.severity == 'Medium' %}info text-dark{% else %}success{% endif %}">
+                                    <i class="bi bi-{% if f.severity == 'Critical' %}exclamation-diamond-fill{% elif f.severity == 'High' %}exclamation-triangle-fill{% elif f.severity == 'Medium' %}info-circle-fill{% else %}arrow-down-circle-fill{% endif %} me-1"></i>{{ f.severity }}
+                                </span>
+                            </td>
                             <td>{{ f.project.project_name }}</td>
                         </tr>
                         {% empty %}
@@ -105,7 +109,7 @@
                             <td>{{ p.status }}</td>
                             <td>
                                 {% if p.spi %}
-                                <span class="badge badge-{% if p.spi >= 1 %}success{% else %}danger{% endif %}">{{ p.spi }}</span>
+                                <span class="badge bg-{% if p.spi >= 1 %}success{% else %}danger{% endif %}">{{ p.spi }}</span>
                                 {% else %}
                                 —
                                 {% endif %}

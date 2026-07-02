@@ -3,7 +3,7 @@
 {% block title %}Findings List{% endblock %}
 
 {% block content %}
-<div class="card card-primary card-outline">
+<div class="card card-outline card-primary">
     <div class="card-header">
         <h3 class="card-title">Findings</h3>
     </div>
@@ -39,18 +39,18 @@
                     </select>
                 </div>
                 <div class="col-md-2 mb-2">
-                    <button type="submit" class="btn btn-primary btn-block">Filter</button>
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-funnel me-1"></i>Filter</button>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-2 mb-2">
-                    <input type="date" name="date_from" class="form-control" placeholder="From" value="{{ filters.date_from }}">
+                    <input type="date" name="date_from" class="form-control" value="{{ filters.date_from }}">
                 </div>
                 <div class="col-md-2 mb-2">
-                    <input type="date" name="date_to" class="form-control" placeholder="To" value="{{ filters.date_to }}">
+                    <input type="date" name="date_to" class="form-control" value="{{ filters.date_to }}">
                 </div>
                 <div class="col-md-2 mb-2">
-                    <a href="{% url 'finding_list' %}" class="btn btn-outline-secondary btn-block">Clear</a>
+                    <a href="{% url 'finding_list' %}" class="btn btn-outline-secondary w-100"><i class="bi bi-x-circle me-1"></i>Clear</a>
                 </div>
             </div>
         </form>
@@ -74,26 +74,26 @@
                     <td>
                         <a href="{% url 'project_detail' finding.project.id %}">{{ finding.project.project_name }}</a>
                         <br>
-                        <small class="text-muted">{{ finding.project.organization.name }}</small>
+                        <small class="text-body-secondary">{{ finding.project.organization.name }}</small>
                     </td>
                     <td>
                         {% if finding.severity == 'Critical' %}
-                        <span class="badge badge-danger">Critical</span>
+                        <span class="badge bg-danger"><i class="bi bi-exclamation-diamond-fill me-1"></i>Critical</span>
                         {% elif finding.severity == 'High' %}
-                        <span class="badge badge-danger">High</span>
+                        <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-triangle-fill me-1"></i>High</span>
                         {% elif finding.severity == 'Medium' %}
-                        <span class="badge badge-warning">Medium</span>
+                        <span class="badge bg-info text-dark"><i class="bi bi-info-circle-fill me-1"></i>Medium</span>
                         {% elif finding.severity == 'Low' %}
-                        <span class="badge badge-info">Low</span>
+                        <span class="badge bg-success"><i class="bi bi-arrow-down-circle-fill me-1"></i>Low</span>
                         {% else %}
-                        <span class="badge badge-secondary">Info</span>
+                        <span class="badge bg-secondary">Info</span>
                         {% endif %}
                     </td>
                     <td>{{ finding.status }}</td>
                     <td>
-                        <a href="{% url 'finding_detail' finding.pk %}" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> View</a>
+                        <a href="{% url 'finding_detail' finding.pk %}" class="btn btn-sm btn-info"><i class="bi bi-eye"></i> View</a>
                         {% if perms.findings.change_finding %}
-                        <a href="{% url 'finding_edit' finding.pk %}" class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</a>
+                        <a href="{% url 'finding_edit' finding.pk %}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i> Edit</a>
                         {% endif %}
                     </td>
                 </tr>
@@ -106,19 +106,17 @@
         </table>
     </div>
     <div class="card-footer clearfix">
-        <ul class="pagination pagination-sm m-0 float-right">
+        <ul class="pagination pagination-sm m-0 float-end">
             {% if page_obj.has_previous %}
-            <li class="page-item"><a class="page-link" href="?page=1{% if query_string %}&{{ query_string }}{% endif %}">&laquo; First</a></li>
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query_string %}&{{ query_string }}{% endif %}">Previous</a></li>
+            <li class="page-item"><a class="page-link" href="?page=1{% if query_string %}&{{ query_string }}{% endif %}">&laquo;</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if query_string %}&{{ query_string }}{% endif %}">Prev</a></li>
             {% endif %}
-
             <li class="page-item disabled">
                 <a class="page-link" href="#">Page {{ page_obj.number|default:1 }} of {{ num_pages|default:1 }}</a>
             </li>
-
             {% if page_obj.has_next %}
             <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if query_string %}&{{ query_string }}{% endif %}">Next</a></li>
-            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query_string %}&{{ query_string }}{% endif %}">Last &raquo;</a></li>
+            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if query_string %}&{{ query_string }}{% endif %}">&raquo;</a></li>
             {% endif %}
         </ul>
     </div>

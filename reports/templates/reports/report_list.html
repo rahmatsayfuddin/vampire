@@ -60,15 +60,15 @@
                     <td>{{ report.project.organization.name }}</td>
                     <td>{{ report.file_name|default:"—" }}</td>
                     <td>
-                        {% if report.format == 'md' %}<span class="badge badge-primary">MD</span>
-                        {% elif report.format == 'pdf' %}<span class="badge badge-info">PDF</span>
-                        {% else %}<span class="badge badge-secondary">Word</span>
+                        {% if report.format == 'md' %}<span class="badge bg-primary">MD</span>
+                        {% elif report.format == 'pdf' %}<span class="badge bg-info">PDF</span>
+                        {% else %}<span class="badge bg-secondary">Word</span>
                         {% endif %}
                     </td>
                     <td>
-                        {% if report.status == 'loading' %}<span class="badge badge-warning">Loading</span>
-                        {% elif report.status == 'done' %}<span class="badge badge-success">Done</span>
-                        {% elif report.status == 'failed' %}<span class="badge badge-danger">Failed</span>
+                        {% if report.status == 'loading' %}<span class="badge bg-warning">Loading</span>
+                        {% elif report.status == 'done' %}<span class="badge bg-success">Done</span>
+                        {% elif report.status == 'failed' %}<span class="badge bg-danger">Failed</span>
                         {% endif %}
                     </td>
                     <td>{{ report.created_at|date:"Y-m-d H:i" }}</td>

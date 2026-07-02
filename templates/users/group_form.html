@@ -22,7 +22,7 @@
                 {{ field }}
                 {% endif %}
                 {% if field.help_text %}
-                <small class="form-text text-muted">{{ field.help_text }}</small>
+                <small class="form-text text-body-secondary">{{ field.help_text }}</small>
                 {% endif %}
                 {% for error in field.errors %}
                 <span class="text-danger">{{ error }}</span>
@@ -32,7 +32,7 @@
         </div>
         <div class="card-footer">
             <button type="submit" class="btn btn-primary">Save</button>
-            <a href="{% url 'group_list' %}" class="btn btn-default float-right">Cancel</a>
+            <a href="{% url 'group_list' %}" class="btn btn-outline-secondary float-end">Cancel</a>
         </div>
     </form>
 </div>
