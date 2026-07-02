@@ -557,7 +557,7 @@
       "area": "reports",
       "title": "Report Preview (MD) \u2014 render Markdown as HTML in browser",
       "user_visible_behavior": "On the report list and project detail page, clicking Preview opens the Markdown report rendered as styled HTML in a new tab (like PDF preview, but for MD).",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Generate a report from a project.",
         "Click Preview on a done MD report.",
@@ -566,7 +566,16 @@
         "Verify project_detail.html shows Preview option.",
         "./init.sh passes."
       ],
-      "evidence": [],
+      "evidence": [
+        "pip install markdown added to requirements.txt",
+        "reports/views.py: preview_report view \u2014 reads .md file, converts to HTML via markdown.markdown()",
+        "HTML wrapped in Bootstrap 4 styled page with headings, tables, code blocks, images",
+        "reports/urls.py: path(\"preview/<int:report_id>/\") \u2192 preview_report",
+        "report_list.html: Preview button added for all done reports (replaces PDF-only preview)",
+        "project_detail.html: Preview button added for all done reports",
+        "Tested: MD\u2192HTML conversion works (h1-h3, tables, bold, code, blockquotes)",
+        "./init.sh passes, 22 tests pass"
+      ],
       "notes": "Use Python markdown library (pip install markdown) to convert .md content to HTML. Serve via Django view that reads the file, converts MD\u2192HTML, wraps in a minimal HTML template with styling. Add markdown to requirements.txt."
     },
     {

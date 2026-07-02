@@ -165,10 +165,7 @@
         </span>
         <span>
           {% if report.status == "done" %}
-          {% if report.format == 'pdf' %}
-          <a href="{% url 'download_report' report.id %}?preview=true" target="_blank"
-            class="btn btn-sm btn-secondary">Preview</a>
-          {% endif %}
+          <a href="{% url 'preview_report' report.id %}" target="_blank" class="btn btn-sm btn-secondary">Preview</a>
           <a href="{% url 'download_report' report.id %}" class="btn btn-sm btn-info">Download</a>
           {% endif %}
           <form action="{% url 'delete_report' report.id %}" method="post" class="d-inline">

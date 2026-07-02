@@ -1,4 +1,5 @@
 import os
+import markdown
 from django.conf import settings
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseNotFound
@@ -64,6 +65,41 @@ def generate_report(request, project_id):
     ReportGenerationService.start_generation(history.id)
 
     return redirect('project_detail', pk=project.id)
+
+
+def preview_report(request, report_id):
+    report = get_object_or_404(ReportHistory, id=report_id)
+    path = os.path.join(settings.MEDIA_ROOT, 'reports', report.file_name)
+
+    if not ReportService.file_exists(report):
+        return HttpResponseNotFound('File not found.')
+
+    with open(path, 'r') as f:
+        md_content = f.read()
+
+    html_content = markdown.markdown(md_content, extensions=['tables', 'fenced_code', 'codehilite'])
+    return HttpResponse(f'''<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{report.file_name} — Preview</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+<style>
+    body {{ padding: 2rem; max-width: 900px; margin: 0 auto; }}
+    h1 {{ border-bottom: 2px solid #dee2e6; padding-bottom: 0.5rem; }}
+    h2 {{ margin-top: 1.5rem; }}
+    h3 {{ margin-top: 1.2rem; color: #495057; }}
+    table {{ margin: 1rem 0; }}
+    hr {{ margin: 2rem 0; }}
+    code {{ background: #f8f9fa; padding: 2px 6px; border-radius: 3px; }}
+    pre {{ background: #f8f9fa; padding: 1rem; border-radius: 5px; }}
+    img {{ max-width: 100%; }}
+    blockquote {{ border-left: 4px solid #dee2e6; padding-left: 1rem; color: #6c757d; }}
+</style>
+</head>
+<body>{html_content}</body>
+</html>''')
 
 
 def download_report(request, report_id):
