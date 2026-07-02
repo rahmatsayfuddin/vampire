@@ -955,6 +955,60 @@
       ],
       "evidence": [],
       "notes": "Current issue: buttons use d-inline for form and btn for links \u2014 when screen is narrow, wrapping causes 2 buttons inline and 1 below with no vertical gap (mt-0). Fix: wrap buttons in a div.d-flex.flex-wrap.gap-2 or add mt-2 to all buttons when wrapping."
+    },
+    {
+      "id": "bug-005",
+      "priority": 38,
+      "area": "ui",
+      "title": "Fix Quill WYSIWYG \u2014 init via JS setelah step-2 visible, bukan widget inline script",
+      "user_visible_behavior": "Quill editor renders correctly with toolbar and editable area when Step 2 of the finding wizard becomes visible.",
+      "status": "not_started",
+      "verification": [
+        "Open Add Finding \u2192 click Skip to go to Step 2.",
+        "Verify Quill editor shows toolbar (bold, italic, underline, etc).",
+        "Type text, apply formatting \u2014 verify formatting is applied.",
+        "Submit the form \u2014 verify PoC content is saved correctly.",
+        "Edit an existing finding \u2014 verify Quill loads with existing content.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Widget inline <script> inits Quill during DOM parse while #step-2 is display:none, giving 0px dimensions. Fix: QuillWidget render only <div> + <textarea> (no <script>). Template JS inits Quill after step-2 becomes display:block. Need to handle both create (new Quill) and edit (Quill with existing content) paths."
+    },
+    {
+      "id": "improve-010",
+      "priority": 39,
+      "area": "findings",
+      "title": "PoC Image upload \u2014 upload handler simpan ke MEDIA, return URL ke Quill",
+      "user_visible_behavior": "When pasting or uploading an image in the PoC Quill editor, the image is uploaded to the server and stored in MEDIA_ROOT/poc_images/. Quill inserts the image as <img src=\"/media/poc_images/...\"> instead of base64.",
+      "status": "not_started",
+      "verification": [
+        "Open finding form, go to Step 2.",
+        "Paste an image from clipboard into Quill editor.",
+        "Verify image appears in editor.",
+        "Inspect element \u2014 verify src is /media/poc_images/... not data:image...",
+        "Save finding, view detail \u2014 verify image renders.",
+        "Generate MD report \u2014 verify image appears or has proper path reference.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Quill default paste image -> base64 data URI (huge, bloats DB). Need custom image handler: 1) Create Django view that accepts multipart image upload, saves to MEDIA_ROOT/poc_images/, returns JSON with URL. 2) Configure Quill toolbar with image button + custom upload handler. 3) Quill inserts <img src=\"/media/poc_images/uuid.png\">. 4) Cleanup: delete orphaned images when finding is deleted."
+    },
+    {
+      "id": "improve-011",
+      "priority": 40,
+      "area": "reports",
+      "title": "MD report: handle PoC HTML content (images, formatting) in report generation",
+      "user_visible_behavior": "MD reports properly render PoC content that may contain HTML from Quill (images, bold, lists). Images that are /media/ URLs are accessible in the report preview.",
+      "status": "not_started",
+      "verification": [
+        "Create a finding with PoC containing: bold text, bullet list, an uploaded image.",
+        "Generate MD report.",
+        "Preview the report \u2014 verify bold text, list, and image render correctly.",
+        "Verify image src points to valid /media/poc_images/ path.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Current MD template renders {{ finding.poc }} as raw HTML inside MD. Need: 1) For preview: keep HTML as-is. 2) For .md file: either strip HTML tags and convert to MD syntax, or keep HTML inline (some MD renderers support raw HTML). 3) Images: ensure /media/ URLs in <img> tags are accessible in preview. 4) Consider markdown extension for HTML-in-MD handling."
     }
   ]
 }
