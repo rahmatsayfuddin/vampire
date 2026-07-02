@@ -157,10 +157,18 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
+      document.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]):not([data-no-bs5])').forEach(function (el) {
+        if (!el.classList.contains('form-control') && !el.classList.contains('form-select')) {
+          el.classList.add('form-control');
+        }
+      });
+      document.querySelectorAll('textarea:not([data-no-bs5])').forEach(function (el) {
+        el.classList.add('form-control');
+      });
       document.querySelectorAll('select:not([data-no-tomselect])').forEach(function (el) {
         new TomSelect(el, { plugins: ['dropdown_input'] });
       });
-      document.querySelectorAll('.flatpickr').forEach(function (el) {
+      document.querySelectorAll('input[type="date"]').forEach(function (el) {
         flatpickr(el, { dateFormat: 'Y-m-d' });
       });
     });

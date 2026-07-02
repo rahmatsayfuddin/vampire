@@ -6,5 +6,7 @@ class OrganizationForm(forms.ModelForm):
         model = Organization
         fields = ['name', 'logo', 'description']
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 3}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'logo': forms.FileInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }

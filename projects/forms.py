@@ -13,8 +13,14 @@ class ProjectForm(forms.ModelForm):
         model = Project
         fields = ['project_name', 'description', 'scope', 'organization', 'sla_profile', 'start_date', 'end_date', 'status']
         widgets = {
-            'description': forms.Textarea(attrs={'rows': 3}),
-            'scope': forms.Textarea(attrs={'rows': 3}),
+            'project_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'scope': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'organization': forms.Select(attrs={'class': 'form-select'}),
+            'sla_profile': forms.Select(attrs={'class': 'form-select'}),
+            'start_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
         }
 
     def __init__(self, *args, **kwargs):
