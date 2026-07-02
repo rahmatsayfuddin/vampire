@@ -2,6 +2,18 @@ from django.db import models
 from django.utils import timezone
 from projects.models import Project
 
+
+class ReportTemplate(models.Model):
+    name = models.CharField(max_length=100, default='Default')
+    content = models.TextField()
+
+    class Meta:
+        verbose_name = 'Report Template'
+
+    def __str__(self):
+        return self.name
+
+
 class ReportHistory(models.Model):
     FORMAT_CHOICES = [
         ('md', 'Markdown'),

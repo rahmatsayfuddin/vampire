@@ -1,5 +1,4 @@
 import os
-from django.template.loader import render_to_string
 from django.conf import settings
 from datetime import datetime
 
@@ -16,7 +15,13 @@ def generate_report_file(project, findings, format='md'):
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
 
     if format == 'md':
-        md_content = render_to_string('reports/report_template.md', context)
+        template = get_template()
+
+        from django.template import Template, Context
+        t = Template(template)
+        c = Context(context)
+        md_content = t.render(c)
+
         with open(output_path, 'w') as out:
             out.write(md_content)
     else:
@@ -24,3 +29,15 @@ def generate_report_file(project, findings, format='md'):
 
     print("Report generated at:", output_path)
     return filename
+
+
+def get_template():
+    try:
+        from reports.models import ReportTemplate
+        obj = ReportTemplate.objects.get(pk=1)
+        return obj.content
+    except Exception:
+        pass
+
+    with open(os.path.join(settings.BASE_DIR, 'reports/templates/reports/report_template.md'), 'r') as f:
+        return f.read()

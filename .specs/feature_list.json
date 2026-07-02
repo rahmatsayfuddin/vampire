@@ -584,7 +584,7 @@
       "area": "reports",
       "title": "Edit Template Design \u2014 admin UI for editing the MD report template",
       "user_visible_behavior": "Admins can edit the Markdown report template via a web UI (/reports/template/). Changes are saved to a database-backed template that overrides the default file-based template.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Navigate to /reports/template/ as superuser.",
         "Verify the current template content is displayed in a text editor.",
@@ -593,7 +593,17 @@
         "Reset to default option restores the original file-based template.",
         "./init.sh passes."
       ],
-      "evidence": [],
+      "evidence": [
+        "ReportTemplate model: name + content TextField + migration 0005",
+        "Reports/templates/reports/edit_template.html: admin-only editor with large textarea",
+        "sidebar: Report Template link under ADMINISTRATION (fas fa-file-code)",
+        "reports/views.py: edit_template view \u2014 superuser-only, get_or_create with file-based default",
+        "reports/forms.py: ReportTemplateForm with monospace Textarea widget",
+        "reports/utils.py: get_template() \u2192 DB template if exists, fallback to file-based template",
+        "reports/utils.py: generate_report_file() uses Django Template.from_string() to render DB template",
+        "reports/urls.py: /reports/template/ \u2192 edit_report_template",
+        "./init.sh passes, 22 tests pass"
+      ],
       "notes": "Create ReportTemplate model with content (TextField). If a template record exists, use it; otherwise fall back to reports/templates/reports/report_template.md. Add /reports/template/ route (admin only). Use Summernote or plain textarea for editing raw MD."
     },
     {

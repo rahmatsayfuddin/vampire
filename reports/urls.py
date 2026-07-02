@@ -7,4 +7,5 @@ urlpatterns = [
     path('download/<int:report_id>/', views.download_report, name='download_report'),
     path('preview/<int:report_id>/', views.preview_report, name='preview_report'),
     path('delete/<int:report_id>/', views.delete_report, name='delete_report'),
+    path('template/', views.edit_template, name='edit_report_template'),
 ]

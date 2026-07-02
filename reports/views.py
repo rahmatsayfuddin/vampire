@@ -5,11 +5,31 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseNotFound
 from django.views.decorators.http import require_POST
 from django.core.paginator import Paginator
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 
-from .models import ReportHistory
+from .models import ReportHistory, ReportTemplate
+from .forms import ReportTemplateForm
 from projects.models import Project
 from .services import ReportService, ReportGenerationService
+
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def edit_template(request):
+    template, _ = ReportTemplate.objects.get_or_create(
+        pk=1,
+        defaults={'content': open('reports/templates/reports/report_template.md').read()},
+    )
+
+    if request.method == 'POST':
+        form = ReportTemplateForm(request.POST, instance=template)
+        if form.is_valid():
+            form.save()
+            return redirect('edit_report_template')
+    else:
+        form = ReportTemplateForm(instance=template)
+
+    return render(request, 'reports/edit_template.html', {'form': form})
 
 
 @login_required
