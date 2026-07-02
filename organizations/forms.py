@@ -5,3 +5,6 @@ class OrganizationForm(forms.ModelForm):
     class Meta:
         model = Organization
         fields = ['name', 'logo', 'description']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+        }

@@ -1,32 +1,81 @@
 {% extends "base_adminlte.html" %}
 {% block title %}Add Finding{% endblock %}
 {% block content %}
-<div class="card card-primary card-outline">
+<div class="card card-outline card-primary shadow-sm">
   <div class="card-header">
-    <h3 class="card-title">Add Finding to Project: {{ project.project_name }}</h3>
+    <h3 class="card-title"><i class="bi bi-bug me-2"></i>Add Finding to {{ project.project_name }}</h3>
   </div>
   <div class="card-body">
     <form method="post" id="finding-form">
       {% csrf_token %}
-      {% for field in form %}
-      <div class="mb-3 {% if field.name == 'save_to_vkb' %}form-check{% endif %}">
-        {% if field.name == 'save_to_vkb' %}
-        {{ field }} <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {% else %}
-        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-        {{ field }}
-        {% endif %}
-
-        {% if field.help_text %}
-        <div class="form-text">{{ field.help_text }}</div>
-        {% endif %}
-        {% for error in field.errors %}
-        <div class="text-danger">{{ error }}</div>
-        {% endfor %}
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label fw-bold"><i class="bi bi-book me-1"></i>Use VKB Template (optional)</label>
+          {{ form.vkb }}
+          <div class="form-text">Select a VKB entry to auto-fill fields below, or leave blank to enter manually.</div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.vkb_category.id_for_label }}" class="form-label fw-bold">VKB Category</label>
+          {{ form.vkb_category }}
+          <div class="form-text">If saving to VKB, choose a category.</div>
+        </div>
       </div>
-      {% endfor %}
-      <button type="submit" class="btn btn-primary">Save</button>
-      <a href="{% url 'project_detail' project.pk %}" class="btn btn-secondary ms-2">Cancel</a>
+
+      <hr>
+
+      <div class="row">
+        <div class="col-md-8 mb-3">
+          <label for="{{ form.title.id_for_label }}" class="form-label">Title</label>
+          {{ form.title }}
+        </div>
+        <div class="col-md-2 mb-3">
+          <label for="{{ form.severity.id_for_label }}" class="form-label">Severity</label>
+          {{ form.severity }}
+        </div>
+        <div class="col-md-2 mb-3">
+          <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+          {{ form.status }}
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="{{ form.affected.id_for_label }}" class="form-label">Affected Asset</label>
+        {{ form.affected }}
+      </div>
+
+      <div class="mb-3">
+        <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+        {{ form.description }}
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.impact.id_for_label }}" class="form-label">Impact</label>
+          {{ form.impact }}
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="{{ form.recommendation.id_for_label }}" class="form-label">Recommendation</label>
+          {{ form.recommendation }}
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="{{ form.score.id_for_label }}" class="form-label">CVSS Score (optional)</label>
+        {{ form.score }}
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Proof of Concept</label>
+        {{ form.poc }}
+      </div>
+
+      <div class="form-check mb-3">
+        {{ form.save_to_vkb }}
+        <label class="form-check-label fw-bold" for="{{ form.save_to_vkb.id_for_label }}">Save this finding to VKB for future reuse</label>
+      </div>
+
+      <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Save Finding</button>
+      <a href="{% url 'project_detail' project.pk %}" class="btn btn-secondary ms-2"><i class="bi bi-x-lg me-1"></i>Cancel</a>
     </form>
   </div>
 </div>
@@ -36,29 +85,27 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var vkbSelect = document.getElementById('id_vkb');
-    if (vkbSelect) {
-        vkbSelect.closest('.ts-wrapper')?.addEventListener('change', function () {
-            var vkbId = vkbSelect.value;
-            if (!vkbId) return;
-            fetch('/vkb/api/' + vkbId + '/')
-                .then(function (r) { return r.json(); })
-                .then(function (data) {
-                    document.getElementById('id_title').value = data.title;
-                    document.getElementById('id_description').value = data.description;
-                    document.getElementById('id_impact').value = data.impact;
-                    document.getElementById('id_recommendation').value = data.recommendation;
-                    var cat = document.getElementById('id_vkb_category');
-                    if (cat) {
-                        for (var i = 0; i < cat.options.length; i++) {
-                            if (cat.options[i].value === data.category) {
-                                cat.selectedIndex = i;
-                                break;
-                            }
-                        }
+    if (!vkbSelect) return;
+
+    vkbSelect.addEventListener('change', function () {
+        var vkbId = this.value;
+        if (!vkbId) return;
+        fetch('/vkb/api/' + vkbId + '/')
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                document.getElementById('id_title').value = data.title || '';
+                document.getElementById('id_description').value = data.description || '';
+                document.getElementById('id_impact').value = data.impact || '';
+                document.getElementById('id_recommendation').value = data.recommendation || '';
+                var cat = document.getElementById('id_vkb_category');
+                if (cat) {
+                    for (var i = 0; i < cat.options.length; i++) {
+                        if (cat.options[i].value === data.category) { cat.selectedIndex = i; break; }
                     }
-                });
-        });
-    }
+                }
+                document.getElementById('id_save_to_vkb').checked = true;
+            });
+    });
 });
 </script>
 {% endblock %}

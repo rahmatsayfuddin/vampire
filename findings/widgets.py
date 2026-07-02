@@ -8,7 +8,7 @@ class QuillWidget(forms.Textarea):
         textarea = super().render(name, value, attrs, renderer)
         editor_id = f'quill-editor-{name}'
         return f'''
-<div id="{editor_id}" style="height: 250px;">{value or ''}</div>
+<div id="{editor_id}" style="height: 350px;">{value or ''}</div>
 {textarea}
 <script>
 (function() {{

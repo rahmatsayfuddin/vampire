@@ -12,6 +12,10 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = ['project_name', 'description', 'scope', 'organization', 'sla_profile', 'start_date', 'end_date', 'status']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+            'scope': forms.Textarea(attrs={'rows': 3}),
+        }
 
     def __init__(self, *args, **kwargs):
         organization_id = kwargs.pop('organization_id', None)

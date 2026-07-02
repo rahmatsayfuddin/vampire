@@ -74,13 +74,20 @@
                     <td>{{ report.created_at|date:"Y-m-d H:i" }}</td>
                     <td>
                         {% if report.status == 'done' %}
-                        <a href="{% url 'preview_report' report.id %}" target="_blank" class="btn btn-sm btn-secondary">Preview</a>
-                        <a href="{% url 'download_report' report.id %}" class="btn btn-sm btn-info">Download</a>
-                        {% endif %}
+                        <div class="d-flex flex-wrap gap-2">
+                            <a href="{% url 'preview_report' report.id %}" target="_blank" class="btn btn-sm btn-secondary"><i class="bi bi-eye me-1"></i>Preview</a>
+                            <a href="{% url 'download_report' report.id %}" class="btn btn-sm btn-info"><i class="bi bi-download me-1"></i>Download</a>
+                            <form action="{% url 'delete_report' report.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash me-1"></i>Delete</button>
+                            </form>
+                        </div>
+                        {% else %}
                         <form action="{% url 'delete_report' report.id %}" method="post" class="d-inline">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            <button type="submit" class="btn btn-sm btn-danger"><i class="bi bi-trash me-1"></i>Delete</button>
                         </form>
+                        {% endif %}
                     </td>
                 </tr>
                 {% empty %}
