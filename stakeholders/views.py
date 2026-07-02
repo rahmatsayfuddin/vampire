@@ -1,8 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required, permission_required
 from .models import Stakeholder
 from .forms import StakeholderForm
 from projects.models import Project
 
+@login_required
+@permission_required('projects.change_project', raise_exception=True)
 def add_stakeholder(request, project_id):
     project = get_object_or_404(Project, pk=project_id)
     if request.method == 'POST':
@@ -16,6 +19,8 @@ def add_stakeholder(request, project_id):
         form = StakeholderForm()
     return render(request, 'stakeholders/stakeholder_form.html', {'form': form, 'project': project})
 
+@login_required
+@permission_required('projects.change_project', raise_exception=True)
 def remove_stakeholder(request, stakeholder_id):
     stakeholder = get_object_or_404(Stakeholder, pk=stakeholder_id)
     project_id = stakeholder.project.pk

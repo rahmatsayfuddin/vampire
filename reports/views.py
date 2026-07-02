@@ -13,6 +13,12 @@ from projects.models import Project
 from .services import ReportService, ReportGenerationService
 
 
+def _get_report_for_user(report_id, user):
+    if user.is_superuser:
+        return get_object_or_404(ReportHistory, id=report_id)
+    return get_object_or_404(ReportHistory, id=report_id, project__assignment__user=user)
+
+
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def edit_template(request):
@@ -77,9 +83,13 @@ def report_list(request):
     })
 
 
+@login_required
 @require_POST
 def generate_report(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
+    if request.user.is_superuser:
+        project = get_object_or_404(Project, id=project_id)
+    else:
+        project = get_object_or_404(Project, id=project_id, assignment__user=request.user)
 
     history = ReportGenerationService.create_history(project, 'md')
     ReportGenerationService.start_generation(history.id)
@@ -87,8 +97,9 @@ def generate_report(request, project_id):
     return redirect('project_detail', pk=project.id)
 
 
+@login_required
 def preview_report(request, report_id):
-    report = get_object_or_404(ReportHistory, id=report_id)
+    report = _get_report_for_user(report_id, request.user)
     path = os.path.join(settings.MEDIA_ROOT, 'reports', report.file_name)
 
     if not ReportService.file_exists(report):
@@ -123,7 +134,7 @@ def preview_report(request, report_id):
 
 
 def download_report(request, report_id):
-    report = get_object_or_404(ReportHistory, id=report_id)
+    report = _get_report_for_user(report_id, request.user)
     path = os.path.join(settings.MEDIA_ROOT, 'reports', report.file_name)
 
     if not ReportService.file_exists(report):
@@ -137,9 +148,10 @@ def download_report(request, report_id):
         return response
 
 
+@login_required
 @require_POST
 def delete_report(request, report_id):
-    report = get_object_or_404(ReportHistory, id=report_id)
+    report = _get_report_for_user(report_id, request.user)
 
     ReportService.delete_report_file(report)
     report.delete()

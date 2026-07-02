@@ -453,7 +453,7 @@
         "Verify the account is temporarily locked."
       ],
       "evidence": [],
-      "notes": "Django has built-in password reset views (django.contrib.auth.urls already included). Just need templates and email config. For rate-limiting: django-axes or manual implementation with django-ratelimit."
+      "notes": "Covers sec-007 (login rate limiting). Scope: password reset templates + email backend + django-axes rate limiting. sec-007 is a subset of this feature."
     },
     {
       "id": "feat-006",
@@ -1069,14 +1069,19 @@
       "area": "security",
       "title": "Add @login_required to reports views (generate, preview, download, delete)",
       "user_visible_behavior": "Unauthenticated users cannot access report endpoints. All report views require login.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Log out and try to access /reports/download/1/, /reports/preview/1/, /reports/generate/1/.",
         "Verify all return 302 redirect to login page.",
         "Verify logged-in users can still access reports.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "generate_report: @login_required + user-scoped project access",
+        "preview_report: @login_required + _get_report_for_user()",
+        "download_report: @login_required + _get_report_for_user()",
+        "delete_report: @login_required + _get_report_for_user()"
+      ],
       "notes": "reports/views.py: generate_report, preview_report, download_report, delete_report \u2014 currently only have @require_POST (generate/delete) or no decorator at all."
     },
     {
@@ -1085,7 +1090,7 @@
       "area": "security",
       "title": "Fix IDOR: scope report download/preview/delete to project ownership",
       "user_visible_behavior": "User A cannot access reports belonging to projects they are not assigned to.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Create project P1 assigned to User A, generate a report.",
         "Login as User B, try to download/preview/delete the report from P1 via direct URL.",
@@ -1093,7 +1098,10 @@
         "User A can still access their own reports.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "_get_report_for_user(report_id, user): superuser sees all, others filtered by project__assignment__user",
+        "Used in preview_report, download_report, delete_report"
+      ],
       "notes": "reports/views.py: download_report, preview_report, delete_report use get_object_or_404(ReportHistory, id=report_id) without checking project__assignment__user. Add user-scoping filter."
     },
     {
@@ -1102,13 +1110,16 @@
       "area": "security",
       "title": "Add @login_required to stakeholders views (add, remove)",
       "user_visible_behavior": "Unauthenticated users cannot add or remove stakeholders.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Log out and try to POST add/remove stakeholder endpoints.",
         "Verify 302 redirect to login.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "add_stakeholder: @login_required + @permission_required(projects.change_project)",
+        "remove_stakeholder: @login_required + @permission_required(projects.change_project)"
+      ],
       "notes": "stakeholders/views.py: add_stakeholder, remove_stakeholder \u2014 no decorators at all."
     },
     {
@@ -1117,14 +1128,20 @@
       "area": "security",
       "title": "Add @login_required to all VKB views (list, create, update, delete, api)",
       "user_visible_behavior": "Unauthenticated users cannot access VKB endpoints. Logged-in users can.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Log out, try to access /vkb/, /vkb/create/, /vkb/api/1/.",
         "Verify 302 redirect.",
         "Logged-in user can access VKB.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "vkb_list: @login_required",
+        "vkb_create: @login_required + @permission_required(vkb.add_vkb)",
+        "vkb_update: @login_required + @permission_required(vkb.change_vkb)",
+        "vkb_delete: @login_required + @permission_required(vkb.delete_vkb)",
+        "get_vkb_json: @login_required"
+      ],
       "notes": "vkb/views.py: vkb_list, vkb_create, vkb_update, vkb_delete, get_vkb_json \u2014 all 5 missing @login_required."
     },
     {
@@ -1174,7 +1191,7 @@
         "./init.sh + 22 tests pass."
       ],
       "evidence": [],
-      "notes": "Options: django-axes (full-featured, DB-backed) or manual session-based counter. django-axes adds migrations + middleware. Simpler approach: extend LoginView to track failed attempts in session."
+      "notes": "Covered by improve-002 (Authentication enhancements). Rate limiting will be implemented as part of that feature."
     },
     {
       "id": "sec-008",
