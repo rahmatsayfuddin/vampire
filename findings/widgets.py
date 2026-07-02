@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.safestring import mark_safe
 
 
 class QuillWidget(forms.Textarea):
@@ -7,7 +8,7 @@ class QuillWidget(forms.Textarea):
         attrs['style'] = 'display: none;'
         textarea = super().render(name, value, attrs, renderer)
         editor_id = f'quill-editor-{name}'
-        return f'''
+        return mark_safe(f'''
 <div id="{editor_id}" style="height: 400px;">{value or ''}</div>
 {textarea}
 <script>
@@ -23,4 +24,4 @@ class QuillWidget(forms.Textarea):
     }});
 }})();
 </script>
-'''
+''')
