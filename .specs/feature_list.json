@@ -612,7 +612,7 @@
       "area": "ui",
       "title": "Core Layout v4 \u2014 base template, login, sidebar, navbar, CDN swap",
       "user_visible_behavior": "The entire app gets a modern AdminLTE 4 foundation with Bootstrap 5.3, no jQuery, Bootstrap Icons replacing Font Awesome, and a clean dark sidebar.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Verify base_adminlte.html uses v4 CDN (adminlte.min.css, bootstrap.bundle.js, overlayscrollbars, bootstrap-icons).",
         "Verify no jQuery CDN, no Font Awesome CDN, no AdminLTE v3 JS remain.",
@@ -622,7 +622,17 @@
         "All sidebar links work.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "base_adminlte.html: AdminLTE v4 CDN \u2014 bootstrap-icons 1.11.3, overlayscrollbars 2.10.1, adminlte 4.0.0-alpha2",
+        "base_adminlte.html: JS \u2014 popper 2.11.8, bootstrap 5.3.3 bundle, overlayscrollbars 2.10.1, adminlte 4.0.0-alpha2",
+        "Removed all v3 CDN: jQuery 3.7.1, Font Awesome 4.7, AdminLTE v3 CSS/JS, Select2, Select2-BS4-theme, Tempusdominus BS4, DateRangePicker, Moment.js, InputMask, BS-Custom-File-Input",
+        "Layout: app-wrapper, app-header, app-sidebar (bg-dark data-bs-theme=dark), app-main, app-footer",
+        "Sidebar: sidebar-menu (not nav-sidebar), data-lte-toggle=treeview, brand-link\u2192sidebar-brand, fw-light",
+        "Sidebar icons: Bootstrap Icons (bi-speedometer2, bi-building, bi-folder2, bi-bug, bi-book, bi-file-earmark-text, bi-people, bi-shield-lock, bi-hourglass-split, bi-file-earmark-code, bi-clock-history)",
+        "Navbar: hamburger with data-lte-toggle=sidebar (not data-widget=pushmenu), ms-auto (not ml-auto)",
+        "Login page: standalone centered layout with min-vh-100, card shadow, bi-person/bi-lock icons, auth_content block",
+        "22 tests pass, init.sh OK"
+      ],
       "notes": "Foundation for ui-002 through ui-005. Remove all v3 CDN references. Rewrite base_adminlte.html layout markup: wrapper\u2192app-wrapper, main-header\u2192app-header, main-sidebar\u2192app-sidebar, content-wrapper\u2192app-main. Remove all Font Awesome (fa fa-*) references from base template."
     },
     {

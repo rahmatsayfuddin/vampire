@@ -3,112 +3,121 @@
 <html lang="en">
 
 <head>
-  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}VAMPIRE{% endblock %}</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.1/dist/css/adminlte.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
-  <!-- Select2 -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
-  <link rel="stylesheet"
-    href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@x.x.x/dist/select2-bootstrap4.min.css">
-  <!-- DateRangePicker -->
-  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
-  <!-- Tempusdominus Bootstrap 4 -->
-  <link href="
-https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.2/build/css/tempusdominus-bootstrap-4.min.css
-" rel="stylesheet">
-
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/styles/overlayscrollbars.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0-alpha2/dist/css/adminlte.min.css">
+  {% block head_extra %}{% endblock %}
 </head>
 
-<body class="hold-transition {% if user.is_authenticated %}sidebar-mini{% else %}login-page{% endif %}">
+<body class="{% if user.is_authenticated %}layout-fixed sidebar-expand-lg bg-body-tertiary{% endif %}">
   {% if user.is_authenticated %}
-  <div class="wrapper">
+  <div class="app-wrapper">
 
-    <!-- Navbar -->
-    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
-      <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-        </li>
-        {% block navbar_left %}{% endblock %}
-      </ul>
-      <ul class="navbar-nav ml-auto">
-        {% block navbar_right %}
-        {% if user.is_authenticated %}
-        <li class="nav-item d-none d-sm-inline-block">
-          <span class="nav-link">Hello, {{ user.username }}</span>
-        </li>
-        <li class="nav-item d-none d-sm-inline-block">
-          <form action="{% url 'logout' %}" method="post" class="d-inline">
-            {% csrf_token %}
-            <button type="submit" class="nav-link btn btn-link" style="padding: 0.5rem 1rem;">Logout</button>
-          </form>
-        </li>
-        {% else %}
-        <li class="nav-item d-none d-sm-inline-block">
-          <a href="{% url 'login' %}" class="nav-link">Login</a>
-        </li>
-        {% endif %}
-        {% endblock %}
-      </ul>
+    <nav class="app-header navbar navbar-expand bg-body">
+      <div class="container-fluid">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+              <i class="bi bi-list"></i>
+            </a>
+          </li>
+          {% block navbar_left %}{% endblock %}
+        </ul>
+        <ul class="navbar-nav ms-auto">
+          {% block navbar_right %}
+          <li class="nav-item d-none d-sm-inline-block">
+            <span class="nav-link">Hello, {{ user.username }}</span>
+          </li>
+          <li class="nav-item d-none d-sm-inline-block">
+            <form action="{% url 'logout' %}" method="post" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="nav-link btn btn-link">Logout</button>
+            </form>
+          </li>
+          {% endblock %}
+        </ul>
+      </div>
     </nav>
 
-    <!-- Main Sidebar Container -->
-    <aside class="main-sidebar sidebar-dark-primary elevation-4">
-      <a href="/" class="brand-link">
-        <span class="brand-text font-weight-light">VAMPIRE</span>
-      </a>
-      <div class="sidebar">
+    <aside class="app-sidebar bg-dark" data-bs-theme="dark">
+      <div class="sidebar-brand">
+        <a href="/" class="brand-link">
+          <span class="brand-text fw-light">VAMPIRE</span>
+        </a>
+      </div>
+      <div class="sidebar-wrapper">
         {% block sidebar %}
         <nav class="mt-2">
-          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-            <li class="nav-item"><a href="/organizations/" class="nav-link"><i class="nav-icon fas fa-building"></i>
+          <ul class="sidebar-menu flex-column" data-lte-toggle="treeview" role="menu">
+            <li class="nav-item">
+              <a href="{% url 'dashboard' %}" class="nav-link">
+                <i class="nav-icon bi bi-speedometer2"></i>
+                <p>Dashboard</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/organizations/" class="nav-link">
+                <i class="nav-icon bi bi-building"></i>
                 <p>Organizations</p>
-              </a></li>
-            <li class="nav-item"><a href="/projects/" class="nav-link"><i class="nav-icon fas fa-project-diagram"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/projects/" class="nav-link">
+                <i class="nav-icon bi bi-folder2"></i>
                 <p>Projects</p>
-              </a></li>
-            <li class="nav-item"><a href="/findings/" class="nav-link"><i class="nav-icon fas fa-bug"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/findings/" class="nav-link">
+                <i class="nav-icon bi bi-bug"></i>
                 <p>Findings</p>
-              </a></li>
-            <li class="nav-item"><a href="/vkb/" class="nav-link"><i class="nav-icon fas fa-book"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/vkb/" class="nav-link">
+                <i class="nav-icon bi bi-book"></i>
                 <p>VKB</p>
-              </a></li>
-            <li class="nav-item"><a href="/reports/" class="nav-link"><i class="nav-icon fas fa-file-alt"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/reports/" class="nav-link">
+                <i class="nav-icon bi bi-file-earmark-text"></i>
                 <p>Reports</p>
-              </a></li>
+              </a>
+            </li>
 
             {% if user.is_superuser or "Manager" in user.groups.all.0.name %}
             <li class="nav-header">ADMINISTRATION</li>
             <li class="nav-item">
               <a href="{% url 'user_list' %}" class="nav-link">
-                <i class="nav-icon fas fa-users"></i>
+                <i class="nav-icon bi bi-people"></i>
                 <p>User Management</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{% url 'group_list' %}" class="nav-link">
-                <i class="nav-icon fas fa-user-shield"></i>
+                <i class="nav-icon bi bi-shield-lock"></i>
                 <p>Role Management</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{% url 'sla_profile_list' %}" class="nav-link">
-                <i class="nav-icon fas fa-clock"></i>
+                <i class="nav-icon bi bi-hourglass-split"></i>
                 <p>SLA Profiles</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{% url 'edit_report_template' %}" class="nav-link">
-                <i class="nav-icon fas fa-file-code"></i>
+                <i class="nav-icon bi bi-file-earmark-code"></i>
                 <p>Report Template</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{% url 'audit:audit_list' %}" class="nav-link">
-                <i class="nav-icon fas fa-history"></i>
+                <i class="nav-icon bi bi-clock-history"></i>
                 <p>Audit Log</p>
               </a>
             </li>
@@ -119,38 +128,26 @@ https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.2/build/css/tempusdo
       </div>
     </aside>
 
-    <!-- Content Wrapper -->
-    <div class="content-wrapper">
-      <section class="content pt-3">
+    <main class="app-main">
+      <div class="app-content">
         <div class="container-fluid">
-          {% endif %}
           {% block content %}{% endblock %}
-          {% if user.is_authenticated %}
         </div>
-      </section>
-    </div>
+      </div>
+    </main>
 
-    <footer class="main-footer">
+    <footer class="app-footer">
       <strong>VAMPIRE</strong>
     </footer>
   </div>
+  {% else %}
+  {% block auth_content %}{% endblock %}
   {% endif %}
 
-  <script src="https://cdn.jsdelivr.net/npm/[email protected]/dist/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/[email protected]/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/[email protected]/dist/js/adminlte.min.js"></script>
-  <!-- Select2 -->
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <!-- InputMask -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.7/jquery.inputmask.min.js"></script>
-  <!-- DateRangePicker -->
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
-  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-  <!-- Tempusdominus Bootstrap 4 -->
-  <script
-    src="https://cdn.jsdelivr.net/npm/tempusdominus-bootstrap-4@5.39.2/build/js/tempusdominus-bootstrap-4.min.js"></script>
-  <!-- BS-Custom-File-Input -->
-  <script src="https://cdn.jsdelivr.net/npm/bs-custom-file-input/dist/bs-custom-file-input.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/overlayscrollbars@2.10.1/browser/overlayscrollbars.browser.es6.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/admin-lte@4.0.0-alpha2/dist/js/adminlte.min.js"></script>
 
   {% block scripts %}{% endblock %}
 </body>
