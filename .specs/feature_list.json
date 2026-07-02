@@ -550,6 +550,69 @@
         "./init.sh passes"
       ],
       "notes": "Port 8000 is always occupied by Docker Desktop on macOS. docker-compose.yml already uses 8001. Need to update: manage.py or settings.py RUNSERVER_PORT, init.sh banner, and any hardcoded URL references in documentation."
+    },
+    {
+      "id": "feat-008",
+      "priority": 22,
+      "area": "reports",
+      "title": "Report Preview (MD) \u2014 render Markdown as HTML in browser",
+      "user_visible_behavior": "On the report list and project detail page, clicking Preview opens the Markdown report rendered as styled HTML in a new tab (like PDF preview, but for MD).",
+      "status": "not_started",
+      "verification": [
+        "Generate a report from a project.",
+        "Click Preview on a done MD report.",
+        "Verify the browser renders formatted HTML (headings, tables, bold, code blocks).",
+        "Verify report_list.html shows a Preview button for MD reports.",
+        "Verify project_detail.html shows Preview option.",
+        "./init.sh passes."
+      ],
+      "evidence": [],
+      "notes": "Use Python markdown library (pip install markdown) to convert .md content to HTML. Serve via Django view that reads the file, converts MD\u2192HTML, wraps in a minimal HTML template with styling. Add markdown to requirements.txt."
+    },
+    {
+      "id": "improve-008",
+      "priority": 23,
+      "area": "reports",
+      "title": "Edit Template Design \u2014 admin UI for editing the MD report template",
+      "user_visible_behavior": "Admins can edit the Markdown report template via a web UI (/reports/template/). Changes are saved to a database-backed template that overrides the default file-based template.",
+      "status": "not_started",
+      "verification": [
+        "Navigate to /reports/template/ as superuser.",
+        "Verify the current template content is displayed in a text editor.",
+        "Edit the template, save.",
+        "Generate a new report \u2014 verify it uses the edited template.",
+        "Reset to default option restores the original file-based template.",
+        "./init.sh passes."
+      ],
+      "evidence": [],
+      "notes": "Create ReportTemplate model with content (TextField). If a template record exists, use it; otherwise fall back to reports/templates/reports/report_template.md. Add /reports/template/ route (admin only). Use Summernote or plain textarea for editing raw MD."
+    },
+    {
+      "id": "improve-009",
+      "priority": 24,
+      "area": "ui",
+      "title": "Redesign UI \u2014 migrate AdminLTE v3\u2192v4 (Bootstrap 5 + no jQuery)",
+      "user_visible_behavior": "The entire application UI updates to AdminLTE v4 \u2014 modern look with dark mode support, Bootstrap Icons replacing Font Awesome, smoother sidebar animations, and no jQuery dependency.",
+      "status": "not_started",
+      "verification": [
+        "Verify AdminLTE v4 CSS/JS loaded from CDN (no v3 CDN references remain).",
+        "Verify Bootstrap 5.3 classes used throughout (no bs4 classes).",
+        "Verify jQuery removed from base template.",
+        "Verify All Font Awesome icons replaced with Bootstrap Icons.",
+        "Verify layout uses v4 classes: app-wrapper, app-header, app-sidebar, app-main.",
+        "Verify sidebar pushmenu works with data-lte-toggle (not data-widget).",
+        "Verify Dark mode toggle works.",
+        "Verify Select2 still works (v4 compatible) or replaced with Choices.js / TomSelect.",
+        "Verify Summernote still works or replaced with CKEditor/Quill (Bootstrap 5 compat).",
+        "Verify Date picker still works or replaced with flatpickr.",
+        "Verify all CRUD pages render correctly.",
+        "Verify Dashboard charts render correctly (Chart.js is framework-agnostic).",
+        "Verify Login page renders correctly.",
+        "./init.sh passes.",
+        "All 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "AdminLTE v4 migration checklist: 1) Replace CDN includes (adminlte.css, bootstrap.bundle.js, overlayscrollbars, bootstrap-icons). 2) Remove jQuery CDN + AdminLTE v3 JS. 3) Update base_adminlte.html layout classes (wrapper\u2192app-wrapper, main-header\u2192app-header, main-sidebar\u2192app-sidebar, content-wrapper\u2192app-main, nav-sidebar\u2192sidebar-menu). 4) Replace Font Awesome (fa fa-*) with Bootstrap Icons (bi bi-*). 5) Replace data-widget with data-lte-toggle. 6) Replace Select2 (jQuery-dependent) with Tom Select (vanilla JS, Bootstrap 5 compatible). 7) Summernote v0.8 is jQuery-based \u2192 upgrade to django-summernote v0.10+ (Summernote v0.9+ Bootstrap 5 support) or replace with CKEditor 5. 8) Tempusdominus Bootstrap 4 \u2192 flatpickr. 9) Remove InputMask jQuery plugin. 10) Remove BS-Custom-File-Input (Bootstrap 5 has native). High effort, breaks many templates."
     }
   ]
 }
