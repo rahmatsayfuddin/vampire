@@ -1,7 +1,11 @@
+import uuid
+import os as os_module
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 from .models import Finding
 from .forms import FindingForm
 from .services import FindingService
@@ -125,7 +129,24 @@ def edit_finding(request, pk):
     else:
         form = FindingForm(instance=finding)
 
-    return render(request, 'findings/finding_form.html', {'form': form, 'project': finding.project})
+    return render(request, 'findings/finding_edit.html', {'form': form, 'project': finding.project})
+
+@login_required
+@permission_required('findings.add_finding', raise_exception=True)
+def upload_poc_image(request):
+    if request.method == 'POST' and request.FILES.get('image'):
+        image = request.FILES['image']
+        ext = os_module.path.splitext(image.name)[1] or '.png'
+        filename = f'{uuid.uuid4()}{ext}'
+        upload_dir = os_module.path.join(settings.MEDIA_ROOT, 'poc_images')
+        os_module.makedirs(upload_dir, exist_ok=True)
+        path = os_module.path.join(upload_dir, filename)
+        with open(path, 'wb+') as dest:
+            for chunk in image.chunks():
+                dest.write(chunk)
+        url = f'{settings.MEDIA_URL}poc_images/{filename}'
+        return JsonResponse({'url': url})
+    return JsonResponse({'error': 'No image provided'}, status=400)
 
 @login_required
 @permission_required('findings.delete_finding', raise_exception=True)

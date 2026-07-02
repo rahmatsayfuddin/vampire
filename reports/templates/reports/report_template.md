@@ -87,7 +87,7 @@
 
 {% if finding.poc %}
 **Proof of Concept:**
-{{ finding.poc }}
+{{ finding.poc|safe }}
 
 {% endif %}
 ---
