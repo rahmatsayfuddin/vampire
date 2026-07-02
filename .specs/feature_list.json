@@ -925,7 +925,7 @@
       "area": "ui",
       "title": "UI Form VKB \u2014 improve form layout (textareas, category select)",
       "user_visible_behavior": "VKB create/edit form looks polished with proper textarea heights, TomSelect category dropdown, and clean spacing.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Open /vkb/create/ \u2014 verify form looks clean.",
         "Verify title input has proper width.",
@@ -934,7 +934,9 @@
         "Verify Save and Back buttons have proper spacing.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "VKB form: textarea rows=3, mb-3 spacing, form-label, form-text, clean Save/Back buttons \u2014 AdminLTE v4 compliant"
+      ],
       "notes": "Current issue: basic field rendering, long textareas default to single row. Improve: add rows=4 to textarea fields in form, proper form-label and mb-3 spacing."
     },
     {
@@ -943,7 +945,7 @@
       "area": "ui",
       "title": "Report action buttons \u2014 responsive spacing (wrap with gap, not cramped)",
       "user_visible_behavior": "Report action buttons (Preview, Download, Delete) have proper gap spacing when wrapping to 2 rows on smaller screens. No cramped overlapping buttons.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Generate a report and go to /reports/.",
         "Resize browser to ~768px width (tablet).",
@@ -953,7 +955,9 @@
         "Verify same behavior on project_detail report history section.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "report_list.html + project_detail.html: report action buttons use d-flex flex-wrap gap-2 for responsive spacing \u2014 no cramped wrapping"
+      ],
       "notes": "Current issue: buttons use d-inline for form and btn for links \u2014 when screen is narrow, wrapping causes 2 buttons inline and 1 below with no vertical gap (mt-0). Fix: wrap buttons in a div.d-flex.flex-wrap.gap-2 or add mt-2 to all buttons when wrapping."
     },
     {
