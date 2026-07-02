@@ -1062,6 +1062,167 @@
         "Each section includes field tables, URL patterns, tips, and expected results"
       ],
       "notes": "Skip screenshots/usage section. Keep license and contributing unchanged. Focus on tech stack accuracy, feature completeness, and setup instructions."
+    },
+    {
+      "id": "sec-001",
+      "priority": 42,
+      "area": "security",
+      "title": "Add @login_required to reports views (generate, preview, download, delete)",
+      "user_visible_behavior": "Unauthenticated users cannot access report endpoints. All report views require login.",
+      "status": "not_started",
+      "verification": [
+        "Log out and try to access /reports/download/1/, /reports/preview/1/, /reports/generate/1/.",
+        "Verify all return 302 redirect to login page.",
+        "Verify logged-in users can still access reports.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "reports/views.py: generate_report, preview_report, download_report, delete_report \u2014 currently only have @require_POST (generate/delete) or no decorator at all."
+    },
+    {
+      "id": "sec-002",
+      "priority": 43,
+      "area": "security",
+      "title": "Fix IDOR: scope report download/preview/delete to project ownership",
+      "user_visible_behavior": "User A cannot access reports belonging to projects they are not assigned to.",
+      "status": "not_started",
+      "verification": [
+        "Create project P1 assigned to User A, generate a report.",
+        "Login as User B, try to download/preview/delete the report from P1 via direct URL.",
+        "Verify User B gets 404.",
+        "User A can still access their own reports.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "reports/views.py: download_report, preview_report, delete_report use get_object_or_404(ReportHistory, id=report_id) without checking project__assignment__user. Add user-scoping filter."
+    },
+    {
+      "id": "sec-003",
+      "priority": 44,
+      "area": "security",
+      "title": "Add @login_required to stakeholders views (add, remove)",
+      "user_visible_behavior": "Unauthenticated users cannot add or remove stakeholders.",
+      "status": "not_started",
+      "verification": [
+        "Log out and try to POST add/remove stakeholder endpoints.",
+        "Verify 302 redirect to login.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "stakeholders/views.py: add_stakeholder, remove_stakeholder \u2014 no decorators at all."
+    },
+    {
+      "id": "sec-004",
+      "priority": 45,
+      "area": "security",
+      "title": "Add @login_required to all VKB views (list, create, update, delete, api)",
+      "user_visible_behavior": "Unauthenticated users cannot access VKB endpoints. Logged-in users can.",
+      "status": "not_started",
+      "verification": [
+        "Log out, try to access /vkb/, /vkb/create/, /vkb/api/1/.",
+        "Verify 302 redirect.",
+        "Logged-in user can access VKB.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "vkb/views.py: vkb_list, vkb_create, vkb_update, vkb_delete, get_vkb_json \u2014 all 5 missing @login_required."
+    },
+    {
+      "id": "sec-005",
+      "priority": 46,
+      "area": "security",
+      "title": "Add security headers (HSTS, nosniff, XSS filter, cookie secure)",
+      "user_visible_behavior": "Browser receives security headers protecting against common web attacks.",
+      "status": "not_started",
+      "verification": [
+        "Deploy and check response headers.",
+        "Verify Strict-Transport-Security header present.",
+        "Verify X-Content-Type-Options: nosniff.",
+        "Verify X-XSS-Protection header.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Add to settings.py: SECURE_HSTS_SECONDS, SECURE_CONTENT_TYPE_NOSNIFF, SECURE_BROWSER_XSS_FILTER, SESSION_COOKIE_SECURE, CSRF_COOKIE_SECURE. Enable only when DEBUG=False (conditional on env)."
+    },
+    {
+      "id": "sec-006",
+      "priority": 47,
+      "area": "security",
+      "title": "Set DEBUG=False as safe production default",
+      "user_visible_behavior": "Production deployments do not expose debug information or allow arbitrary host access.",
+      "status": "not_started",
+      "verification": [
+        "Verify DEBUG defaults to False when env var not set.",
+        "Verify DEBUG can still be set to True via .env.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "settings.py line 27: change default from 'True' to 'False'. Update .env.example accordingly."
+    },
+    {
+      "id": "sec-007",
+      "priority": 48,
+      "area": "security",
+      "title": "Add login rate limiting (django-axes or session-based)",
+      "user_visible_behavior": "After 5 failed login attempts, the account is temporarily locked for 15 minutes.",
+      "status": "not_started",
+      "verification": [
+        "Attempt 5 failed logins.",
+        "Verify account is locked (error message).",
+        "Wait 15 minutes, verify login works again.",
+        "Verify lockout applies per-account and per-IP.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Options: django-axes (full-featured, DB-backed) or manual session-based counter. django-axes adds migrations + middleware. Simpler approach: extend LoginView to track failed attempts in session."
+    },
+    {
+      "id": "sec-008",
+      "priority": 49,
+      "area": "security",
+      "title": "Add logging \u2014 Django logging framework for security events",
+      "user_visible_behavior": "Security events (login failures, permission denied, suspicious activity) are logged to console/file.",
+      "status": "not_started",
+      "verification": [
+        "Trigger a failed login and check console output.",
+        "Verify log contains timestamp, IP, username, event type.",
+        "Verify production logging writes to file (not just console).",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Add LOGGING dict to settings.py with handlers for console (dev) and file (prod). Log auth events, 403/404/500 errors. Use existing Django signals (user_login_failed, user_logged_in)."
+    },
+    {
+      "id": "sec-009",
+      "priority": 50,
+      "area": "security",
+      "title": "Sanitize PoC HTML output with bleach/html-sanitizer before |safe rendering",
+      "user_visible_behavior": "PoC content renders safely without script injection risks. All HTML tags except allowed whitelist are stripped.",
+      "status": "not_started",
+      "verification": [
+        "Create a finding with <script>alert(1)</script> in PoC via Quill (or direct DB).",
+        "View finding detail \u2014 verify script tag is stripped.",
+        "Verify legitimate HTML (bold, lists, images) still renders.",
+        "Verify report preview also sanitizes PoC.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Use bleach library (already installed as transitive dep). Whitelist: p, br, strong, em, u, s, ol, ul, li, blockquote, pre, code, a, img. Strip all other tags. Apply in finding_detail.html and report_template.md via a template filter or view-level sanitization."
+    },
+    {
+      "id": "sec-010",
+      "priority": 51,
+      "area": "security",
+      "title": "Validate file_name in report file ops to prevent path traversal",
+      "user_visible_behavior": "Report file operations are safe from directory traversal attacks even if file_name is manipulated.",
+      "status": "not_started",
+      "verification": [
+        "Verify os.path.basename() is applied to file_name before os.path.join.",
+        "Verify file operations stay within MEDIA_ROOT/reports/.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "reports/services.py: delete_report_file() and file_exists() use os.path.join(settings.MEDIA_ROOT, 'reports', report.file_name). Add os.path.basename(report.file_name) to strip any ../ path traversal attempts."
     }
   ]
 }
