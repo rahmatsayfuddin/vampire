@@ -1057,7 +1057,9 @@
         "Core models: 10 models listed including SlaProfile, AuditLog, ReportTemplate",
         "Architecture section: FBV + services layer per app",
         "Configuration table with env variables",
-        "Screenshots skipped, license and contributing kept unchanged"
+        "Screenshots skipped, license and contributing kept unchanged",
+        "Usage Guide: 12 step-by-step sections \u2014 Admin setup, Organization, SLA Profiles, Project, Assignments, Stakeholders, Finding Wizard, VKB, Report Template, Reports, Audit Trail, Search & Filter",
+        "Each section includes field tables, URL patterns, tips, and expected results"
       ],
       "notes": "Skip screenshots/usage section. Keep license and contributing unchanged. Focus on tech stack accuracy, feature completeness, and setup instructions."
     }
