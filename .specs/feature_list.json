@@ -1341,6 +1341,22 @@
         "Evidence sanitized with same bleach whitelist as PoC (sec-009 pattern)"
       ],
       "notes": "Pending discussion on flow. RiskAcceptance model: finding FK, reason, accepted_by FK, accepted_at, expires_at. Future: auto-reopen expired risk acceptances via management command or cron."
+    },
+    {
+      "id": "bug-006",
+      "priority": 55,
+      "area": "findings",
+      "title": "TypeError: timedelta days NoneType \u2014 sla_due_date crashes saat Risk Acceptance tanpa RA record",
+      "user_visible_behavior": "Finding with status=Risk Acceptance but no RiskAcceptance record (e.g. manually edited status) does not crash.",
+      "status": "not_started",
+      "verification": [
+        "Create a finding, manually set status to 'Risk Acceptance' via shell.",
+        "Verify viewing the finding detail page does not crash.",
+        "Verify SLA due date falls back to a default value (not error).",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "findings/services.py:44 \u2014 sla_due_date() calls timedelta(days=cls.sla_days(finding)) but sla_days returns None for Risk Acceptance. Fix: fallback to default SLA (30 days) or use sla_days(finding) or 30."
     }
   ]
 }
