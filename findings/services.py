@@ -1,5 +1,5 @@
-from datetime import timedelta
-from django.utils import timezone
+from datetime import timedelta, datetime, date, timezone
+from django.utils import timezone as tz
 from django.shortcuts import get_object_or_404
 import bleach
 from .models import Finding
@@ -19,7 +19,16 @@ class SlaService:
     }
 
     @classmethod
+    def _get_ra_expiry(cls, finding):
+        ra = finding.risk_acceptances.first()
+        if ra:
+            return datetime.combine(ra.accept_until, datetime.min.time()).replace(tzinfo=timezone.utc)
+        return None
+
+    @classmethod
     def sla_days(cls, finding):
+        if finding.status == 'Risk Acceptance':
+            return None
         profile = finding.project.sla_profile
         if profile:
             attr = f'sla_{finding.severity.lower()}'
@@ -28,27 +37,32 @@ class SlaService:
 
     @classmethod
     def sla_due_date(cls, finding):
+        if finding.status == 'Risk Acceptance':
+            expiry = cls._get_ra_expiry(finding)
+            if expiry:
+                return expiry
         return finding.created_at + timedelta(days=cls.sla_days(finding))
 
     @classmethod
     def is_late(cls, finding, now=None):
         if now is None:
-            now = timezone.now()
+            now = tz.now()
         if finding.status == 'Closed' and finding.closed_at:
             return finding.closed_at > cls.sla_due_date(finding)
-        if finding.status == 'Open':
+        if finding.status in ('Open', 'Risk Acceptance'):
             return now > cls.sla_due_date(finding)
         return False
 
     @classmethod
     def sla_delay_days(cls, finding, now=None):
         if now is None:
-            now = timezone.now()
+            now = tz.now()
+        due = cls.sla_due_date(finding)
         if finding.status == 'Closed' and finding.closed_at:
-            delta = (finding.closed_at - cls.sla_due_date(finding)).days
+            delta = (finding.closed_at - due).days
             return max(0, delta)
-        elif finding.status == 'Open':
-            delta = (now - cls.sla_due_date(finding)).days
+        if finding.status in ('Open', 'Risk Acceptance'):
+            delta = (now - due).days
             return max(0, delta)
         return 0
 
@@ -70,7 +84,7 @@ class FindingService:
     @staticmethod
     def set_closed_at_by_status(finding):
         if finding.status == 'Closed' and not finding.closed_at:
-            finding.closed_at = timezone.now()
+            finding.closed_at = tz.now()
         elif finding.status != 'Closed':
             finding.closed_at = None
 
@@ -84,3 +98,26 @@ class FindingService:
             recommendation=finding.recommendation,
             category=category,
         )
+
+    @staticmethod
+    def accept_risk(finding, reason, evidence, user, accept_until):
+        from .models import RiskAcceptance
+        ra = RiskAcceptance.objects.create(
+            finding=finding, reason=reason, evidence=evidence,
+            accepted_by=user, accept_until=accept_until,
+        )
+        finding.status = 'Risk Acceptance'
+        finding.save()
+        return ra
+
+    @staticmethod
+    def reopen(finding):
+        finding.status = 'Open'
+        finding.closed_at = None
+        finding.save()
+
+    @staticmethod
+    def close(finding):
+        finding.status = 'Closed'
+        finding.closed_at = tz.now()
+        finding.save()

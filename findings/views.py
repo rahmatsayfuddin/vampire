@@ -8,7 +8,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 import bleach
 from itertools import chain
-from .models import Finding, FindingComment
+from .models import Finding, FindingComment, RiskAcceptance
 from .forms import FindingForm
 from .services import FindingService, ALLOWED_TAGS, ALLOWED_ATTRS
 from projects.models import Project
@@ -113,13 +113,17 @@ def finding_detail(request, pk):
     audit_logs = AuditLog.objects.filter(content_type=content_type, object_id=finding.pk)
     comments = FindingComment.objects.filter(finding=finding).select_related('user')
     timeline = sorted(
-        chain(audit_logs, comments),
-        key=lambda x: x.timestamp if hasattr(x, 'timestamp') else x.created_at,
+        chain(audit_logs, comments, RiskAcceptance.objects.filter(finding=finding)),
+        key=lambda x: x.timestamp if hasattr(x, 'timestamp') else (x.created_at if hasattr(x, 'created_at') else x.accepted_at),
         reverse=True
     )[:20]
+    ra_latest = finding.risk_acceptances.first()
+    if ra_latest:
+        ra_latest.evidence = bleach.clean(ra_latest.evidence or '', tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS)
     return render(request, 'findings/finding_detail.html', {
         'finding': finding,
         'timeline': timeline,
+        'ra_latest': ra_latest,
     })
 
 @login_required
@@ -165,6 +169,21 @@ def add_comment(request, pk):
         if content:
             FindingComment.objects.create(finding=finding, user=request.user, content=content)
     return redirect('finding_detail', pk=finding.pk)
+
+@login_required
+@permission_required('findings.change_finding', raise_exception=True)
+def accept_risk(request, pk):
+    finding = FindingService.get_finding_for_user(pk, request.user)
+    if request.method == 'POST':
+        reason = request.POST.get('reason', '').strip()
+        evidence = request.POST.get('evidence', '').strip()
+        accept_until = request.POST.get('accept_until', '').strip()
+        if reason and accept_until:
+            from datetime import datetime
+            accept_date = datetime.strptime(accept_until, '%Y-%m-%d').date()
+            FindingService.accept_risk(finding, reason, evidence, request.user, accept_date)
+        return redirect('finding_detail', pk=finding.pk)
+    return render(request, 'findings/accept_risk_form.html', {'finding': finding})
 
 @login_required
 @permission_required('findings.delete_finding', raise_exception=True)

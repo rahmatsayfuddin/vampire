@@ -1312,7 +1312,7 @@
       "area": "findings",
       "title": "Risk Acceptance \u2014 formal risk acceptance with reason, expiry, and audit trail",
       "user_visible_behavior": "When accepting a risk, user must provide a reason and optional expiry date. The finding status changes to 'Risk Acceptance'. A RiskAcceptance record is created with full audit trail.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Click Accept Risk on an open finding.",
         "Fill reason and expiry date in the form.",
@@ -1322,7 +1322,18 @@
         "Verify audit log records the action.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "RiskAcceptance model: finding FK, reason, evidence, accepted_by FK, accepted_at, accept_until",
+        "Multiple RAs allowed \u2014 .risk_acceptances.all() shows history, latest determines SLA",
+        "SlaService: sla_days() returns None for RA status; sla_due_date() uses accept_until from latest RA",
+        "is_late() and sla_delay_days() compare now vs accept_until for RA status",
+        "FindingService.accept_risk(): creates RiskAcceptance record + sets status to Risk Acceptance",
+        "accept_risk_form.html: reason, evidence (HTML/image/link), accept_until required",
+        "finding_detail: RA info box with reason, evidence rendered via bleach|safe, expiry badge, Accept Risk button",
+        "Timeline: RA entries shown with shield-check icon (risk accepted until X: reason)",
+        "No auto-reopen when expired \u2014 is_late() marks it as late/expired",
+        "Evidence sanitized with same bleach whitelist as PoC (sec-009 pattern)"
+      ],
       "notes": "Pending discussion on flow. RiskAcceptance model: finding FK, reason, accepted_by FK, accepted_at, expires_at. Future: auto-reopen expired risk acceptances via management command or cron."
     }
   ]

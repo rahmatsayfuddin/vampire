@@ -63,3 +63,18 @@ class FindingComment(models.Model):
 
     def __str__(self):
         return f'{self.user.username}: {self.content[:50]}'
+
+
+class RiskAcceptance(models.Model):
+    finding = models.ForeignKey(Finding, on_delete=models.CASCADE, related_name='risk_acceptances')
+    reason = models.TextField()
+    evidence = models.TextField(blank=True)
+    accepted_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    accepted_at = models.DateTimeField(auto_now_add=True)
+    accept_until = models.DateField()
+
+    class Meta:
+        ordering = ['-accepted_at']
+
+    def __str__(self):
+        return f'Risk accepted by {self.accepted_by} until {self.accept_until}'
