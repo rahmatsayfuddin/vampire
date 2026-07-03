@@ -2,7 +2,7 @@ from datetime import timedelta, datetime, date, timezone
 from django.utils import timezone as tz
 from django.shortcuts import get_object_or_404
 import bleach
-from .models import Finding
+from .models import Finding, FindingComment
 from vkb.models import VulnerabilityKnowledgeBase
 
 ALLOWED_TAGS = ['p', 'br', 'strong', 'em', 'u', 's', 'ol', 'ul', 'li',
@@ -111,10 +111,11 @@ class FindingService:
         return ra
 
     @staticmethod
-    def reopen(finding):
+    def reopen(finding, reason, user):
         finding.status = 'Open'
         finding.closed_at = None
         finding.save()
+        FindingComment.objects.create(finding=finding, user=user, content=f'Reopened: {reason}')
 
     @staticmethod
     def close(finding):

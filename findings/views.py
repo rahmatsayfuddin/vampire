@@ -186,6 +186,25 @@ def accept_risk(request, pk):
     return render(request, 'findings/accept_risk_form.html', {'finding': finding})
 
 @login_required
+@permission_required('findings.change_finding', raise_exception=True)
+def close_finding(request, pk):
+    finding = FindingService.get_finding_for_user(pk, request.user)
+    if request.method == 'POST':
+        FindingService.close(finding)
+        return redirect('finding_detail', pk=finding.pk)
+    return redirect('finding_detail', pk=finding.pk)
+
+@login_required
+@permission_required('findings.change_finding', raise_exception=True)
+def reopen_finding(request, pk):
+    finding = FindingService.get_finding_for_user(pk, request.user)
+    if request.method == 'POST':
+        reason = request.POST.get('reason', '').strip()
+        FindingService.reopen(finding, reason or 'No reason provided', request.user)
+        return redirect('finding_detail', pk=finding.pk)
+    return redirect('finding_detail', pk=finding.pk)
+
+@login_required
 @permission_required('findings.delete_finding', raise_exception=True)
 def delete_finding(request, pk):
     finding = FindingService.get_finding_for_user(pk, request.user)

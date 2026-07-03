@@ -1,6 +1,6 @@
 {
   "project": "vampire",
-  "last_updated": "2026-07-02",
+  "last_updated": "2026-07-03",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -1294,7 +1294,7 @@
       "area": "findings",
       "title": "Quick actions \u2014 Close, Reopen, Accept Risk buttons on finding detail",
       "user_visible_behavior": "Finding detail page shows contextual action buttons: Open\u2192[Close][Accept Risk], Closed\u2192[Reopen], Risk Acceptance\u2192[Reopen]. No need to open edit form just to change status.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Open a finding with status=Open \u2014 verify Close and Accept Risk buttons visible.",
         "Click Close \u2014 verify finding status changes to Closed and closed_at is set.",
@@ -1303,7 +1303,13 @@
         "Click Accept Risk \u2014 verify form appears with reason textarea and expiry date.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "Close button (status=Open or RA): triggers confirm modal \u2192 POST close_finding \u2192 FindingService.close()",
+        "Reopen button (status=Closed or RA): triggers modal with reason textarea \u2192 POST \u2192 FindingService.reopen(finding, reason, user)",
+        "Reopen reason automatically saved as FindingComment (appears in timeline)",
+        "FindingService.reopen() updated: +reason +user params, creates FindingComment",
+        "FindingService.close() + reopen() already in services.py from feat-011"
+      ],
       "notes": "Pending discussion on exact flow. Add FindingService.close_finding(), reopen_finding(), accept_risk(). Buttons on finding_detail.html replace the need to go through edit form for status changes. Confirm page or modal for each action."
     },
     {
