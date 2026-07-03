@@ -7,7 +7,8 @@ from django.http import JsonResponse
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 import bleach
-from .models import Finding
+from itertools import chain
+from .models import Finding, FindingComment
 from .forms import FindingForm
 from .services import FindingService, ALLOWED_TAGS, ALLOWED_ATTRS
 from projects.models import Project
@@ -109,10 +110,16 @@ def finding_detail(request, pk):
     finding = FindingService.get_finding_for_user(pk, request.user)
     finding.poc = bleach.clean(finding.poc or '', tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRS)
     content_type = ContentType.objects.get_for_model(Finding)
-    audit_logs = AuditLog.objects.filter(content_type=content_type, object_id=finding.pk)[:10]
+    audit_logs = AuditLog.objects.filter(content_type=content_type, object_id=finding.pk)
+    comments = FindingComment.objects.filter(finding=finding).select_related('user')
+    timeline = sorted(
+        chain(audit_logs, comments),
+        key=lambda x: x.timestamp if hasattr(x, 'timestamp') else x.created_at,
+        reverse=True
+    )[:20]
     return render(request, 'findings/finding_detail.html', {
         'finding': finding,
-        'audit_logs': audit_logs,
+        'timeline': timeline,
     })
 
 @login_required
@@ -149,6 +156,15 @@ def upload_poc_image(request):
         url = f'{settings.MEDIA_URL}poc_images/{filename}'
         return JsonResponse({'url': url})
     return JsonResponse({'error': 'No image provided'}, status=400)
+
+@login_required
+def add_comment(request, pk):
+    finding = FindingService.get_finding_for_user(pk, request.user)
+    if request.method == 'POST':
+        content = request.POST.get('content', '').strip()
+        if content:
+            FindingComment.objects.create(finding=finding, user=request.user, content=content)
+    return redirect('finding_detail', pk=finding.pk)
 
 @login_required
 @permission_required('findings.delete_finding', raise_exception=True)

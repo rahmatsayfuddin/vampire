@@ -2,6 +2,7 @@ from django.db import models
 from datetime import timedelta
 from projects.models import Project
 from vkb.models import VulnerabilityKnowledgeBase
+from django.conf import settings
 
 class Finding(models.Model):
     SEVERITY_CHOICES = [
@@ -49,3 +50,16 @@ class Finding(models.Model):
     def sla_delay_days(self):
         from .services import SlaService
         return SlaService.sla_delay_days(self)
+
+
+class FindingComment(models.Model):
+    finding = models.ForeignKey(Finding, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.user.username}: {self.content[:50]}'

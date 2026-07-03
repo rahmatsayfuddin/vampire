@@ -1271,7 +1271,7 @@
       "area": "findings",
       "title": "Comment on Finding \u2014 threaded discussion per finding",
       "user_visible_behavior": "Users can add comments to findings. A comment section appears on the finding detail page showing all comments with timestamps and authors.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Open a finding detail page \u2014 verify Comment section exists.",
         "Type a comment and submit \u2014 verify it appears in the list.",
@@ -1279,7 +1279,13 @@
         "Verify multiple users can comment on the same finding.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "FindingComment model: finding FK, user FK, content TextField, created_at",
+        "Unified timeline: chain(audit_logs, comments) sorted by timestamp, last 20 entries",
+        "Timeline icons: create=green +, update=amber pencil, delete=red trash, comment=info chat-dots",
+        "Comment form in card footer: input-group with text input + Comment button",
+        "Finding detail: 2-column layout with severity badge, status, SLA, late indicator, CVSS"
+      ],
       "notes": "FindingComment model: finding FK, user FK, content TextField, created_at. UI: comment list + input form below Activity section on finding detail. No edit/delete for comments initially."
     },
     {
