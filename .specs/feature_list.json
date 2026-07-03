@@ -1264,6 +1264,60 @@
         "Defense-in-depth: file_name is server-generated, but basename protects future bugs"
       ],
       "notes": "reports/services.py: delete_report_file() and file_exists() use os.path.join(settings.MEDIA_ROOT, 'reports', report.file_name). Add os.path.basename(report.file_name) to strip any ../ path traversal attempts."
+    },
+    {
+      "id": "feat-009",
+      "priority": 52,
+      "area": "findings",
+      "title": "Comment on Finding \u2014 threaded discussion per finding",
+      "user_visible_behavior": "Users can add comments to findings. A comment section appears on the finding detail page showing all comments with timestamps and authors.",
+      "status": "not_started",
+      "verification": [
+        "Open a finding detail page \u2014 verify Comment section exists.",
+        "Type a comment and submit \u2014 verify it appears in the list.",
+        "Verify comment shows username and timestamp.",
+        "Verify multiple users can comment on the same finding.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "FindingComment model: finding FK, user FK, content TextField, created_at. UI: comment list + input form below Activity section on finding detail. No edit/delete for comments initially."
+    },
+    {
+      "id": "feat-010",
+      "priority": 53,
+      "area": "findings",
+      "title": "Quick actions \u2014 Close, Reopen, Accept Risk buttons on finding detail",
+      "user_visible_behavior": "Finding detail page shows contextual action buttons: Open\u2192[Close][Accept Risk], Closed\u2192[Reopen], Risk Acceptance\u2192[Reopen]. No need to open edit form just to change status.",
+      "status": "not_started",
+      "verification": [
+        "Open a finding with status=Open \u2014 verify Close and Accept Risk buttons visible.",
+        "Click Close \u2014 verify finding status changes to Closed and closed_at is set.",
+        "Open a closed finding \u2014 verify Reopen button visible.",
+        "Click Reopen \u2014 verify status changes to Open and closed_at cleared.",
+        "Click Accept Risk \u2014 verify form appears with reason textarea and expiry date.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Pending discussion on exact flow. Add FindingService.close_finding(), reopen_finding(), accept_risk(). Buttons on finding_detail.html replace the need to go through edit form for status changes. Confirm page or modal for each action."
+    },
+    {
+      "id": "feat-011",
+      "priority": 54,
+      "area": "findings",
+      "title": "Risk Acceptance \u2014 formal risk acceptance with reason, expiry, and audit trail",
+      "user_visible_behavior": "When accepting a risk, user must provide a reason and optional expiry date. The finding status changes to 'Risk Acceptance'. A RiskAcceptance record is created with full audit trail.",
+      "status": "not_started",
+      "verification": [
+        "Click Accept Risk on an open finding.",
+        "Fill reason and expiry date in the form.",
+        "Submit \u2014 verify finding status changes to Risk Acceptance.",
+        "Verify RiskAcceptance record is created with reason, accepted_by, accepted_at, expires_at.",
+        "Verify risk acceptance details appear on finding detail page.",
+        "Verify audit log records the action.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Pending discussion on flow. RiskAcceptance model: finding FK, reason, accepted_by FK, accepted_at, expires_at. Future: auto-reopen expired risk acceptances via management command or cron."
     }
   ]
 }
