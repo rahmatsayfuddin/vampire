@@ -41,7 +41,7 @@ class SlaService:
             expiry = cls._get_ra_expiry(finding)
             if expiry:
                 return expiry
-        return finding.created_at + timedelta(days=cls.sla_days(finding))
+        return finding.created_at + timedelta(days=cls.sla_days(finding) or 30)
 
     @classmethod
     def is_late(cls, finding, now=None):
