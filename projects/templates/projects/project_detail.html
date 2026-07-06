@@ -296,6 +296,34 @@
   </div>
 </div>
 
+<div class="card card-outline card-info mt-3">
+  <div class="card-header">
+    <h3 class="card-title"><i class="bi bi-journal-text me-2"></i>Notes</h3>
+  </div>
+  <div class="card-body p-0">
+    <div class="list-group list-group-flush">
+      {% for note in notes %}
+      <div class="list-group-item">
+        <strong>{{ note.user.username|default:"System" }}</strong>
+        <small class="text-body-secondary ms-2">{{ note.created_at|date:"Y-m-d H:i" }}</small>
+        <br><span>{{ note.content }}</span>
+      </div>
+      {% empty %}
+      <div class="list-group-item text-body-secondary">No notes.</div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="card-footer">
+    <form method="post">
+      {% csrf_token %}
+      <div class="input-group">
+        <input type="text" name="note_content" class="form-control" placeholder="Add a note..." required>
+        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-plus-lg me-1"></i>Add Note</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <div class="card card-outline card-secondary mt-3">
   <div class="card-header">
     <h3 class="card-title"><i class="bi bi-clock-history me-2"></i>Activity</h3>

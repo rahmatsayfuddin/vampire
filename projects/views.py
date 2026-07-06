@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, HttpResponseNotFound
 from django.conf import settings
 import threading, os
-from .models import Project, SlaProfile, ScanReport, ScanFinding
+from .models import Project, SlaProfile, ScanReport, ScanFinding, ProjectNote
 from .forms import ProjectForm, SlaProfileForm
 from .services import ProjectService
 from .parsers import PARSERS
@@ -65,14 +65,23 @@ def project_delete(request, pk):
 def project_detail(request, pk):
     project = ProjectService.get_project_for_user(pk, request.user)
 
+    if request.method == 'POST' and request.POST.get('note_content', '').strip():
+        ProjectNote.objects.create(
+            project=project, user=request.user,
+            content=request.POST['note_content'].strip()
+        )
+        return redirect('project_detail', pk=project.pk)
+
     reports = project.reports.all().order_by('-created_at')
     content_type = ContentType.objects.get_for_model(Project)
     audit_logs = AuditLog.objects.filter(content_type=content_type, object_id=project.pk)[:10]
     scan_reports = project.scan_reports.all().order_by('-uploaded_at')
+    notes = project.notes.all()[:20]
     return render(request, 'projects/project_detail.html', {
             'project': project,
             'reports': reports,
             'scan_reports': scan_reports,
+            'notes': notes,
             'audit_logs': audit_logs,
         })
 

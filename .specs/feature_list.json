@@ -1487,7 +1487,7 @@
       "area": "projects",
       "title": "Project Notes (Logbook) \u2014 markdown notes per project with timestamp",
       "user_visible_behavior": "Users can add plain text notes to a project. Notes appear in chronological order on the project detail page. Each note shows author and timestamp.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Open project detail \u2014 verify Notes section exists.",
         "Type a note and submit.",
@@ -1495,7 +1495,12 @@
         "Add a second note \u2014 verify chronological ordering.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "ProjectNote model: project FK, user FK, content TextField, created_at",
+        "project_detail: Notes card with list-group entries + input-group form",
+        "Form POST handled in project_detail view, notes[:20] in context",
+        "22 tests pass"
+      ],
       "notes": "Lightweight model: ProjectNote(project FK, user FK, content TextField, created_at). Added to project_detail timeline or as separate card. No edit/delete for v1."
     }
   ]

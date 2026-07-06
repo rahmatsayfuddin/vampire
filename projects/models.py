@@ -87,3 +87,16 @@ class ScanFinding(models.Model):
 
     def __str__(self):
         return f'[{self.severity}] {self.title}'
+
+
+class ProjectNote(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='notes')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f'{self.user}: {self.content[:60]}'
