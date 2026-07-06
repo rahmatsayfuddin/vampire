@@ -56,6 +56,11 @@ class Project(models.Model):
 class ScanReport(models.Model):
     TOOL_CHOICES = [
         ('burp', 'Burp Suite'),
+        ('zap', 'OWASP ZAP'),
+        ('nessus', 'Nessus'),
+        ('acunetix', 'Acunetix'),
+        ('nmap', 'Nmap'),
+        ('openvas', 'OpenVAS CSV'),
         ('csv', 'Generic CSV'),
     ]
     STATUS_CHOICES = [
