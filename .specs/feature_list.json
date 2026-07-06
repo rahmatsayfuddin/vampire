@@ -1462,6 +1462,41 @@
       ],
       "evidence": [],
       "notes": "Chart.js stacked bar chart. Data: severity counts per ScanReport grouped by source_tool. Shows last 3 scans per tool. If multiple tools, show chart per tool or tool selector dropdown. Reuse Chart.js pattern from dashboard."
+    },
+    {
+      "id": "feat-017",
+      "priority": 61,
+      "area": "projects",
+      "title": "Project Dashboard \u2014 mini-dashboard per project: scan trends, SLA, SPI, findings summary",
+      "user_visible_behavior": "A mini-dashboard at the top of project detail page shows scan trend chart, SLA compliance pie, SPI indicator, and finding severity breakdown for that project.",
+      "status": "not_started",
+      "verification": [
+        "Open project detail \u2014 verify mini-dashboard section below project info.",
+        "Verify scan trend chart (severity bars across scan uploads) renders.",
+        "Verify SPI indicator shows on track/delayed.",
+        "Verify finding severity pie chart (like global dashboard) but scoped to this project.",
+        "Verify non-admin users see only assigned project data.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Reuse Chart.js pattern from global dashboard (severity doughnut, SPI). Add stacked bar chart for scan trend. Add SLA compliance ring. Data scoped to current project only. Located in project_detail.html above scanning reports."
+    },
+    {
+      "id": "feat-018",
+      "priority": 62,
+      "area": "projects",
+      "title": "Project Notes (Logbook) \u2014 markdown notes per project with timestamp",
+      "user_visible_behavior": "Users can add plain text notes to a project. Notes appear in chronological order on the project detail page. Each note shows author and timestamp.",
+      "status": "not_started",
+      "verification": [
+        "Open project detail \u2014 verify Notes section exists.",
+        "Type a note and submit.",
+        "Verify note appears with author name and timestamp.",
+        "Add a second note \u2014 verify chronological ordering.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Lightweight model: ProjectNote(project FK, user FK, content TextField, created_at). Added to project_detail timeline or as separate card. No edit/delete for v1."
     }
   ]
 }
