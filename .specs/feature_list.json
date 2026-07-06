@@ -1409,6 +1409,25 @@
         "Extensible pattern \u2014 add Nessus/Acunetix parsers via PARSERS[\"nessus\"] = parse_nessus"
       ],
       "notes": "Part of feat-012. Separated for clarity. Burp parser: lxml parse <issues> \u2192 <issue> \u2192 name/severity/path/description/remediation. CSV parser: csv.DictReader with expected columns. Extensible: add Nessus/Acunetix parsers later."
+    },
+    {
+      "id": "feat-014",
+      "priority": 58,
+      "area": "projects",
+      "title": "Extended Scan Parsers \u2014 ZAP, Nessus, Acunetix, Nmap, OpenVAS",
+      "user_visible_behavior": "Uploaded scan reports from ZAP, Nessus, Acunetix, Nmap, and OpenVAS are automatically parsed into structured findings.",
+      "status": "not_started",
+      "verification": [
+        "Upload a ZAP XML report \u2014 verify findings parsed correctly (title, severity, URL).",
+        "Upload a Nessus .nessus file \u2014 verify findings parsed correctly.",
+        "Upload an Acunetix XML report \u2014 verify findings parsed correctly.",
+        "Upload an Nmap XML \u2014 verify findings parsed correctly.",
+        "Upload an OpenVAS CSV \u2014 verify findings parsed correctly.",
+        "Upload an invalid file \u2014 verify status shows Error.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Follows DefectDojo sample-scan-files format patterns. ZAP: <alertitem> with <alert>, <riskcode> (0-3), <uri>, <desc>, <solution>. Nessus: .nessus XML with <ReportItem pluginName= severity=>. Acunetix: <ReportItem> with <Name>, <Severity>, <Description>, <Recommendation>, <Affects>. Nmap: <port><service name=><state state=><script>. Extends projects/parsers.py. PARSERS dict pattern stays same."
     }
   ]
 }
