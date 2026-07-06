@@ -1428,6 +1428,40 @@
       ],
       "evidence": [],
       "notes": "Follows DefectDojo sample-scan-files format patterns. ZAP: <alertitem> with <alert>, <riskcode> (0-3), <uri>, <desc>, <solution>. Nessus: .nessus XML with <ReportItem pluginName= severity=>. Acunetix: <ReportItem> with <Name>, <Severity>, <Description>, <Recommendation>, <Affects>. Nmap: <port><service name=><state state=><script>. Extends projects/parsers.py. PARSERS dict pattern stays same."
+    },
+    {
+      "id": "feat-015",
+      "priority": 59,
+      "area": "projects",
+      "title": "Scan comparison \u2014 solved/recurring/new flagging antar scan (same tool)",
+      "user_visible_behavior": "When viewing scan results from the same tool, findings are flagged as New, Solved, or Recurring based on comparison with the previous scan.",
+      "status": "not_started",
+      "verification": [
+        "Upload two Burp scans to the same project (different findings).",
+        "View the second scan \u2014 verify New (green) badge on new findings.",
+        "Verify Solved (green strikethrough) badge on findings not in current scan.",
+        "Verify Recurring badge on findings present in both scans.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Matching logic: hash(title + affected_lower) between scans of same source_tool. UI: colored badges + strikethrough for solved findings. No model changes needed \u2014 comparison done in view via set operations."
+    },
+    {
+      "id": "feat-016",
+      "priority": 60,
+      "area": "projects",
+      "title": "Scan trend chart \u2014 severity counts over last 3 scans (same tool)",
+      "user_visible_behavior": "A stacked bar chart on project detail shows severity distribution across the last 3 scans of the same tool, allowing users to visualize remediation progress.",
+      "status": "not_started",
+      "verification": [
+        "Upload at least 2 scans of the same tool to a project.",
+        "Navigate to project detail \u2014 verify trend chart appears below Scanning Reports.",
+        "Verify bars show severity breakdown (Critical/High/Medium/Low) per scan.",
+        "Upload a third scan \u2014 verify chart updates to show all 3.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [],
+      "notes": "Chart.js stacked bar chart. Data: severity counts per ScanReport grouped by source_tool. Shows last 3 scans per tool. If multiple tools, show chart per tool or tool selector dropdown. Reuse Chart.js pattern from dashboard."
     }
   ]
 }
