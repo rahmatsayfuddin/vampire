@@ -7,6 +7,10 @@ urlpatterns = [
     path('create/from_product/<int:product_id>/', views.project_create, name='project_create_from_product'),
     path('update/<int:pk>/', views.project_update, name='project_update'),
     path('delete/<int:pk>/', views.project_delete, name='project_delete'),
+    path('<int:pk>/upload-scan/', views.upload_scan, name='upload_scan'),
+    path('<int:pk>/scan/<int:sf_id>/promote/', views.promote_scan_finding, name='promote_scan_finding'),
+    path('<int:pk>/scan/<int:sf_id>/fp/', views.tag_scan_fp, name='tag_scan_fp'),
+    path('scan/<int:report_id>/download/', views.download_scan, name='download_scan'),
     path('<int:pk>/', views.project_detail, name='project_detail'),
 
     path('sla/', views.sla_profile_list, name='sla_profile_list'),

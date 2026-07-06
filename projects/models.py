@@ -1,5 +1,6 @@
 from django.db import models
 from organizations.models import Organization
+from django.conf import settings
 
 
 class SlaProfile(models.Model):
@@ -50,3 +51,39 @@ class Project(models.Model):
 
     def __str__(self):
         return self.project_name
+
+
+class ScanReport(models.Model):
+    TOOL_CHOICES = [
+        ('burp', 'Burp Suite'),
+        ('csv', 'Generic CSV'),
+    ]
+    STATUS_CHOICES = [
+        ('parsing', 'Parsing'),
+        ('done', 'Done'),
+        ('error', 'Error'),
+    ]
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='scan_reports')
+    file = models.FileField(upload_to='scans/')
+    source_tool = models.CharField(max_length=20, choices=TOOL_CHOICES)
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='parsing')
+
+    def __str__(self):
+        return f'{self.source_tool} — {self.file.name}'
+
+
+class ScanFinding(models.Model):
+    report = models.ForeignKey(ScanReport, on_delete=models.CASCADE, related_name='findings')
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    severity = models.CharField(max_length=20)
+    affected = models.CharField(max_length=255, blank=True)
+    recommendation = models.TextField(blank=True)
+    promoted_to = models.ForeignKey('findings.Finding', null=True, blank=True, on_delete=models.SET_NULL)
+    is_false_positive = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f'[{self.severity}] {self.title}'

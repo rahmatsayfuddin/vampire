@@ -1367,7 +1367,7 @@
       "area": "projects",
       "title": "Scan Report Upload \u2014 upload Burp/CSV, async parse, show findings",
       "user_visible_behavior": "Users can upload scan reports (Burp XML, CSV) to a project. Results appear in the Scanning Reports section after async parsing. Each parsed finding has Add to Finding and Tag False Positive actions.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Navigate to project detail page.",
         "Click Upload Scan \u2192 select Burp XML file \u2192 submit.",
@@ -1379,7 +1379,14 @@
         "Verify original upload file can be downloaded.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "ScanReport model: project FK, file (scans/), source_tool, uploaded_by, uploaded_at, status",
+        "ScanFinding model: report FK, title, description, severity, affected, recommendation, promoted_to Finding, is_false_positive",
+        "Async parsing via threading.Thread (same pattern as ReportGenerationService)",
+        "project_detail: scans section shows uploads table with tool/file/uploaded_at/status/findings count",
+        "Expanded findings per upload with Add to Finding + Tag FP buttons",
+        "Upload modal: source tool dropdown (Burp/CSV) + file input"
+      ],
       "notes": "Follows same async pattern as ReportGenerationService. Models: ScanReport (project FK, file, source_tool, uploaded_by, upload_at, status) + ScanFinding (report FK, title, desc, severity, affected_url, recommendation, promoted_to FK Finding, is_false_positive). Parsers: Burp XML via lxml, Generic CSV. Views: upload, download, promote-to-finding, tag-fp. URLs under projects/. Fills the existing placeholder Scanning Reports section on project_detail.html."
     },
     {
@@ -1388,14 +1395,19 @@
       "area": "projects",
       "title": "Scan Report parsers \u2014 Burp XML + Generic CSV",
       "user_visible_behavior": "Uploaded scan reports are automatically parsed into structured findings regardless of which tool exported them.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Upload a Burp Suite XML export \u2014 verify parsing creates findings with correct title, severity, URL.",
         "Upload a generic CSV (columns: title, severity, url, description, recommendation) \u2014 verify findings are created.",
         "Upload an invalid file \u2014 verify status shows 'Error'.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "projects/parsers.py: PARSERS dict with parse_burp + parse_csv",
+        "parse_burp: lxml parse <issues>\u2192<issue> \u2192 name/severity/path/issueBackground/remediationBackground",
+        "parse_csv: csv.DictReader with title/severity/url/description/recommendation (case-insensitive headers)",
+        "Extensible pattern \u2014 add Nessus/Acunetix parsers via PARSERS[\"nessus\"] = parse_nessus"
+      ],
       "notes": "Part of feat-012. Separated for clarity. Burp parser: lxml parse <issues> \u2192 <issue> \u2192 name/severity/path/description/remediation. CSV parser: csv.DictReader with expected columns. Extensible: add Nessus/Acunetix parsers later."
     }
   ]

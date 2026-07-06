@@ -90,17 +90,112 @@
 </div>
 
 <div class="card card-outline card-secondary mt-3">
-  <div class="card-header">
+  <div class="card-header d-flex justify-content-between align-items-center">
     <h3 class="card-title"><i class="bi bi-search me-2"></i>Scanning Reports</h3>
+    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#scanUploadModal">
+      <i class="bi bi-upload me-1"></i>Upload Scan
+    </button>
   </div>
-  <div class="card-body">
-    <ul class="list-group">
-      {% for scan in scans %}
-      <li class="list-group-item">{{ scan.scan_tool }} — {{ scan.report_file.name }}</li>
-      {% empty %}
-      <li class="list-group-item">No scans uploaded.</li>
-      {% endfor %}
-    </ul>
+  <div class="card-body p-0">
+    <table class="table table-striped mb-0">
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>File</th>
+          <th>Uploaded</th>
+          <th>Status</th>
+          <th>Findings</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sr in scan_reports %}
+        <tr>
+          <td><span class="badge bg-info text-dark">{{ sr.get_source_tool_display }}</span></td>
+          <td>{{ sr.file.name|cut:"scans/" }}</td>
+          <td>{{ sr.uploaded_at|date:"Y-m-d H:i" }}</td>
+          <td>
+            {% if sr.status == 'parsing' %}<span class="badge bg-warning text-dark">Parsing...</span>
+            {% elif sr.status == 'done' %}<span class="badge bg-success">Done</span>
+            {% else %}<span class="badge bg-danger">Error</span>
+            {% endif %}
+          </td>
+          <td>{{ sr.findings.count }}</td>
+          <td>
+            <a href="{% url 'download_scan' sr.pk %}" class="btn btn-sm btn-secondary"><i class="bi bi-download"></i></a>
+          </td>
+        </tr>
+        {% if sr.status == 'done' and sr.findings.exists %}
+        <tr>
+          <td colspan="6" class="p-0">
+            <table class="table table-sm table-borderless mb-0 ms-3" style="width: auto;">
+              <tbody>
+                {% for sf in sr.findings.all %}
+                <tr class="{% if sf.is_false_positive %}text-decoration-line-through text-body-secondary{% endif %}">
+                  <td class="text-nowrap">{{ forloop.counter }}</td>
+                  <td>
+                    {% if sf.severity == 'Critical' or sf.severity == 'High' %}<span class="badge bg-danger">{{ sf.severity }}</span>
+                    {% elif sf.severity == 'Medium' %}<span class="badge bg-warning text-dark">{{ sf.severity }}</span>
+                    {% elif sf.severity == 'Low' %}<span class="badge bg-info text-dark">{{ sf.severity }}</span>
+                    {% else %}<span class="badge bg-success">{{ sf.severity }}</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ sf.title }}</td>
+                  <td><small class="text-body-secondary">{{ sf.affected|truncatechars:40 }}</small></td>
+                  <td>
+                    {% if sf.is_false_positive %}
+                    <span class="badge bg-secondary">FP</span>
+                    {% elif sf.promoted_to %}
+                    <a href="{% url 'finding_detail' sf.promoted_to.pk %}" class="btn btn-sm btn-outline-success"><i class="bi bi-check-circle"></i> Added</a>
+                    {% else %}
+                    <a href="{% url 'promote_scan_finding' project.pk sf.pk %}" class="btn btn-sm btn-success"><i class="bi bi-plus-circle me-1"></i>Add</a>
+                    <a href="{% url 'tag_scan_fp' project.pk sf.pk %}" class="btn btn-sm btn-outline-danger ms-1"><i class="bi bi-x-circle"></i></a>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </td>
+        </tr>
+        {% endif %}
+        {% empty %}
+        <tr><td colspan="6" class="text-center">No scans uploaded.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal fade" id="scanUploadModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-upload me-2"></i>Upload Scan Report</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form action="{% url 'upload_scan' project.pk %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Source Tool</label>
+            <select name="source_tool" class="form-select">
+              <option value="burp">Burp Suite</option>
+              <option value="csv">Generic CSV</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">File</label>
+            <input type="file" name="file" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="bi bi-upload me-1"></i>Upload</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
