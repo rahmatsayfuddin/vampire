@@ -1,6 +1,6 @@
 {
   "project": "vampire",
-  "last_updated": "2026-07-03",
+  "last_updated": "2026-07-07",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -1427,48 +1427,66 @@
         "./init.sh + 22 tests pass."
       ],
       "evidence": [
-        "ZAP: parse_zap() \u2014 <alertitem> with <alert>, <riskcode>(0-3), <uri>, <desc>, <solution>",
-        "Nessus: parse_nessus() \u2014 <ReportItem pluginName= severity=(0-4)>, <solution>, <plugin_output>",
-        "Acunetix: parse_acunetix() \u2014 <ReportItem> with <Name>, <Severity>, <Affects>, <Description>, <Recommendation>",
-        "Nmap: parse_nmap() \u2014 <port> with <service name= product=>, <state state=open>",
-        "OpenVAS: parse_openvas_csv() \u2014 CSV with name/severity/host/description/solution, float severity\u2192High/Medium/Low",
-        "All 5 parsers tested with sample data \u2014 findings parsed correctly"
+        "All 7 parsers verified with DefectDojo sample-scan-files real data. PARSERS dict: burp/zap/nessus/acunetix/nmap/openvas/csv.",
+        "Burp: 13/17 findings, filters 'Information' severity, affected = host_name/path (from <host ip=>) parsed via lxml",
+        "ZAP: 42/67 findings, filters riskcode=0 (Info), affected = full URI, parsed via lxml",
+        "Nessus: 30/288 findings, filters severity=0, auto-detect XML v2 + 2 CSV formats (SC vuln list + summary), host:port(svc) format, description = <description> + Evidence + <plugin_output>",
+        "Acunetix: 18/19 findings, filters 'informational', parsed via lxml",
+        "Nmap: 3 findings, affected = hostname(IP):port/protocol, per-host extraction via lxml",
+        "OpenVAS: CSV with name/severity/host/description/solution, float severity -> High/Medium/Low",
+        "Generic CSV: case-insensitive column headers via csv.DictReader",
+        "Manual Parse flow: upload stores file with status 'pending', user clicks Parse button (parse_scan view) which starts _run_parse in thread",
+        "Error handling: parse_nessus() detection + execution separated to prevent silent exception swallowing (fixed lxml not installed in Docker via requirements.txt + libxml2-dev/libxslt1-dev)",
+        "Scan detail page: dedicated scan_detail view + template with findings table, comparison badges, promote/FP actions, solved findings card",
+        "22 tests pass, init.sh clean"
       ],
-      "notes": "Follows DefectDojo sample-scan-files format patterns. ZAP: <alertitem> with <alert>, <riskcode> (0-3), <uri>, <desc>, <solution>. Nessus: .nessus XML with <ReportItem pluginName= severity=>. Acunetix: <ReportItem> with <Name>, <Severity>, <Description>, <Recommendation>, <Affects>. Nmap: <port><service name=><state state=><script>. Extends projects/parsers.py. PARSERS dict pattern stays same."
+      "notes": "All 7 parsers reworked with real DefectDojo sample files. Key improvements: severity filtering (no Info noise), host/IP extraction in affected field, multi-format auto-detection (Nessus XML+CSV). Scan upload now manual-parse flow (pending -> Parse button -> parsing -> done). Findings displayed on dedicated scan_detail page, not inline on project_detail."
     },
     {
       "id": "feat-015",
       "priority": 59,
       "area": "projects",
-      "title": "Scan comparison \u2014 solved/recurring/new flagging antar scan (same tool)",
-      "user_visible_behavior": "When viewing scan results from the same tool, findings are flagged as New, Solved, or Recurring based on comparison with the previous scan.",
-      "status": "not_started",
+      "title": "Scan comparison — 2-scan pair comparison with New/Recurring/Solved columns",
+      "user_visible_behavior": "Compare tab on project detail lets users select two scans of the same tool and see findings split into New, Recurring, and Solved columns with Add/FP actions.",
+      "status": "passing",
       "verification": [
         "Upload two Burp scans to the same project (different findings).",
-        "View the second scan \u2014 verify New (green) badge on new findings.",
-        "Verify Solved (green strikethrough) badge on findings not in current scan.",
-        "Verify Recurring badge on findings present in both scans.",
+        "Navigate to project detail → Compare tab.",
+        "Select scan A and B, click Compare → verify New/Recurring/Solved columns.",
+        "Verify Add/FP buttons work on findings.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
-      "notes": "Matching logic: hash(title + affected_lower) between scans of same source_tool. UI: colored badges + strikethrough for solved findings. No model changes needed \u2014 comparison done in view via set operations."
+      "evidence": [
+        "AJAX endpoint: compare_scans view at /projects/:id/scans/compare/?a=:id&b=:id returns JSON with new/recurring/solved arrays",
+        "Matching logic: _scan_comparison() using md5(title+affected.lower()) between consecutive same-tool scans",
+        "UI: Compare tab with dual dropdown (tool-filtered), Compare button, 3-column result (New/Solved/Recurring) with severity badges + Add/FP actions",
+        "E2E: Compare endpoint correctly returns 1 new, 1 recurring, 1 solved for test data"
+      ],
+      "notes": "Part of tabbed Scanning Reports card (Scans | Trend | Compare). Compare uses AJAX fetch to avoid page reload. Add/FP buttons included in each column."
     },
     {
       "id": "feat-016",
       "priority": 60,
       "area": "projects",
-      "title": "Scan trend chart \u2014 severity counts over last 3 scans (same tool)",
-      "user_visible_behavior": "A stacked bar chart on project detail shows severity distribution across the last 3 scans of the same tool, allowing users to visualize remediation progress.",
-      "status": "not_started",
+      "title": "Scan trend chart — stacked bar with tool filter + scan checkboxes",
+      "user_visible_behavior": "Trend tab on project detail shows a stacked bar chart of severity distribution across scans, filterable by tool and individual scan checkboxes with Select All/Deselect.",
+      "status": "passing",
       "verification": [
-        "Upload at least 2 scans of the same tool to a project.",
-        "Navigate to project detail \u2014 verify trend chart appears below Scanning Reports.",
-        "Verify bars show severity breakdown (Critical/High/Medium/Low) per scan.",
-        "Upload a third scan \u2014 verify chart updates to show all 3.",
+        "Upload at least 2 scans to a project.",
+        "Navigate to project detail → Trend tab.",
+        "Verify chart shows severity breakdown per scan.",
+        "Toggle scan checkboxes — verify chart updates.",
+        "Switch tool dropdown — verify checkboxes and chart update.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
-      "notes": "Chart.js stacked bar chart. Data: severity counts per ScanReport grouped by source_tool. Shows last 3 scans per tool. If multiple tools, show chart per tool or tool selector dropdown. Reuse Chart.js pattern from dashboard."
+      "evidence": [
+        "projects/views.py: project_detail precomputes trend_data per tool (last 5 scans, severity counts) + scan_list_data JSON",
+        "Template: Trend tab with tool dropdown, scan checkboxes (Select All / Deselect All), Chart.js stacked bar",
+        "JS: buildTrendTab() populates checkboxes, renderTrendChart() rebuilds on checkbox change, selectAllTrend() for bulk toggle",
+        "Chart.js stacked bar with severity colors: Critical=#212529, High=#dc3545, Medium=#ffc107, Low=#0d6efd",
+        "E2E: trend data JSON + scan checkboxes + chart all render correctly"
+      ],
+      "notes": "Part of tabbed Scanning Reports card (Scans | Trend | Compare). Filter checkboxes let users select which scans to include in trend. Max 5 scans shown per tool."
     },
     {
       "id": "feat-017",
@@ -1476,7 +1494,7 @@
       "area": "projects",
       "title": "Project Dashboard \u2014 mini-dashboard per project: scan trends, SLA, SPI, findings summary",
       "user_visible_behavior": "A mini-dashboard at the top of project detail page shows scan trend chart, SLA compliance pie, SPI indicator, and finding severity breakdown for that project.",
-      "status": "not_started",
+      "status": "passing",
       "verification": [
         "Open project detail \u2014 verify mini-dashboard section below project info.",
         "Verify scan trend chart (severity bars across scan uploads) renders.",
@@ -1485,7 +1503,13 @@
         "Verify non-admin users see only assigned project data.",
         "./init.sh + 22 tests pass."
       ],
-      "evidence": [],
+      "evidence": [
+        "projects/views.py: project_detail view computes finding_count, severity_counts, late_count, sla_compliance, spi, spi_status per project",
+        "projects/templates/projects/project_detail.html: mini-dashboard with 4 stat boxes (findings, late, SLA%, SPI) + severity doughnut chart + SLA/SPI doughnut chart",
+        "Scan trend chart from feat-016 already included below mini-dashboard",
+        "Quick test confirms stat boxes, severity chart, and SLA chart all render correctly",
+        "22 tests pass"
+      ],
       "notes": "Reuse Chart.js pattern from global dashboard (severity doughnut, SPI). Add stacked bar chart for scan trend. Add SLA compliance ring. Data scoped to current project only. Located in project_detail.html above scanning reports."
     },
     {

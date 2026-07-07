@@ -1,0 +1,107 @@
+{% extends "base_adminlte.html" %}
+{% block title %}Scan Detail — {{ report.file.name|cut:"scans/" }}{% endblock %}
+{% block content %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'project_list' %}">Projects</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'project_detail' project.pk %}">{{ project.project_name }}</a></li>
+    <li class="breadcrumb-item active">Scan Detail</li>
+  </ol>
+</nav>
+
+<div class="card card-outline card-info mb-3">
+  <div class="card-header">
+    <h3 class="card-title">{{ report.get_source_tool_display }} — {{ report.file.name|cut:"scans/" }}</h3>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-3"><strong>Uploaded:</strong> {{ report.uploaded_at|date:"Y-m-d H:i" }}</div>
+      <div class="col-md-3"><strong>Status:</strong>
+        {% if report.status == 'pending' %}<span class="badge bg-secondary">Pending</span>
+        {% elif report.status == 'parsing' %}<span class="badge bg-warning text-dark">Parsing...</span>
+        {% elif report.status == 'done' %}<span class="badge bg-success">Done</span>
+        {% else %}<span class="badge bg-danger">Error</span>
+        {% endif %}
+      </div>
+      <div class="col-md-3"><strong>Findings:</strong> {{ findings|length }}</div>
+      <div class="col-md-3">
+        {% if report.status == 'pending' and perms.projects.change_project %}
+        <a href="{% url 'parse_scan' project.pk report.pk %}" class="btn btn-sm btn-primary"><i class="bi bi-play-fill me-1"></i>Parse</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card card-outline card-danger">
+  <div class="card-header">
+    <h3 class="card-title"><i class="bi bi-bug me-2"></i>Findings ({{ findings|length }})</h3>
+  </div>
+  <div class="card-body p-0">
+    <table class="table table-striped table-hover mb-0">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Severity</th>
+          <th>Title</th>
+          <th>Affected</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sf in findings %}
+        <tr class="{% if sf.is_false_positive %}text-decoration-line-through text-body-secondary{% endif %}">
+          <td>{{ forloop.counter }}</td>
+          <td>
+            {% if sf.severity == 'Critical' or sf.severity == 'High' %}<span class="badge bg-danger">{{ sf.severity }}</span>
+            {% elif sf.severity == 'Medium' %}<span class="badge bg-warning text-dark">{{ sf.severity }}</span>
+            {% elif sf.severity == 'Low' %}<span class="badge bg-info text-dark">{{ sf.severity }}</span>
+            {% else %}<span class="badge bg-success">{{ sf.severity }}</span>
+            {% endif %}
+            {% if sf.comparison_flag == 'new' %}<span class="badge bg-success ms-1">New</span>{% endif %}
+            {% if sf.comparison_flag == 'recurring' %}<span class="badge bg-primary ms-1">Recurring</span>{% endif %}
+          </td>
+          <td>{{ sf.title }}</td>
+          <td><small class="text-body-secondary" title="{{ sf.affected }}">{{ sf.affected|truncatechars:60 }}</small></td>
+          <td>
+            {% if sf.is_false_positive %}
+            <span class="badge bg-secondary">FP</span>
+            {% elif sf.promoted_to %}
+            <a href="{% url 'finding_detail' sf.promoted_to.pk %}" class="btn btn-sm btn-outline-success"><i class="bi bi-check-circle me-1"></i>Added</a>
+            {% else %}
+            <a href="{% url 'promote_scan_finding' project.pk sf.pk %}" class="btn btn-sm btn-success"><i class="bi bi-plus-circle me-1"></i>Add</a>
+            <a href="{% url 'tag_scan_fp' project.pk sf.pk %}" class="btn btn-sm btn-outline-danger ms-1"><i class="bi bi-x-circle"></i></a>
+            {% endif %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5" class="text-center">
+          {% if report.status == 'pending' %}Click Parse to extract findings.{% elif report.status == 'error' %}Parsing failed.{% elif report.status == 'parsing' %}Parsing in progress...{% else %}No findings found.{% endif %}
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% if solved_findings %}
+<div class="card card-outline card-success mt-3">
+  <div class="card-header">
+    <h3 class="card-title"><i class="bi bi-check-circle me-2"></i>Solved ({{ solved_findings|length }})</h3>
+  </div>
+  <div class="card-body">
+    <p class="text-body-secondary mb-2">Findings from the previous scan no longer present in this scan:</p>
+    {% for pf in solved_findings %}
+    <span class="badge bg-secondary me-2">{{ pf.severity }}</span>
+    <span class="text-body-secondary">{{ pf.title }}</span>
+    <small class="text-decoration-line-through text-body-secondary ms-1">{{ pf.affected|truncatechars:40 }}</small>
+    <br>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<a href="{% url 'project_detail' project.pk %}" class="btn btn-secondary mt-3"><i class="bi bi-arrow-left me-1"></i>Back to Project</a>
+
+{% endblock %}

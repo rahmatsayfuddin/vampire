@@ -5,4 +5,5 @@ whitenoise
 Pillow
 markdown
 bleach
+lxml
 

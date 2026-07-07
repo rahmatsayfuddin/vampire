@@ -64,6 +64,7 @@ class ScanReport(models.Model):
         ('csv', 'Generic CSV'),
     ]
     STATUS_CHOICES = [
+        ('pending', 'Pending'),
         ('parsing', 'Parsing'),
         ('done', 'Done'),
         ('error', 'Error'),
@@ -74,7 +75,7 @@ class ScanReport(models.Model):
     source_tool = models.CharField(max_length=20, choices=TOOL_CHOICES)
     uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='parsing')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
 
     def __str__(self):
         return f'{self.source_tool} — {self.file.name}'

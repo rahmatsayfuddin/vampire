@@ -84,3 +84,6 @@ staticfiles/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Test data (sample scan files for parser verification)
+testdata/

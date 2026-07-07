@@ -42,6 +42,89 @@
   </div>
 </div>
 
+<div class="row mt-3">
+  <div class="col-lg-3 col-6 mb-3">
+    <div class="small-box text-bg-primary">
+      <div class="inner">
+        <h3>{{ finding_count }}</h3>
+        <p>Findings</p>
+      </div>
+      <i class="bi bi-bug-fill small-box-icon"></i>
+    </div>
+  </div>
+  <div class="col-lg-3 col-6 mb-3">
+    <div class="small-box text-bg-{% if late_count > 0 %}danger{% else %}success{% endif %}">
+      <div class="inner">
+        <h3>{{ late_count }}</h3>
+        <p>Late Findings</p>
+      </div>
+      <i class="bi bi-exclamation-triangle-fill small-box-icon"></i>
+    </div>
+  </div>
+  <div class="col-lg-3 col-6 mb-3">
+    <div class="small-box text-bg-{% if sla_compliance >= 80 %}success{% elif sla_compliance >= 50 %}warning{% else %}danger{% endif %}">
+      <div class="inner">
+        <h3>{{ sla_compliance }}%</h3>
+        <p>SLA Compliance</p>
+      </div>
+      <i class="bi bi-hourglass-split small-box-icon"></i>
+    </div>
+  </div>
+  <div class="col-lg-3 col-6 mb-3">
+    <div class="small-box text-bg-{% if spi_status == 'on_track' %}success{% elif spi_status == 'delayed' %}danger{% else %}secondary{% endif %}">
+      <div class="inner">
+        <h3>{% if spi %}{{ spi|floatformat:2 }}{% else %}—{% endif %}</h3>
+        <p>SPI {% if spi_status == 'on_track' %}<i class="bi bi-check-circle"></i>{% elif spi_status == 'delayed' %}<i class="bi bi-x-circle"></i>{% endif %}</p>
+      </div>
+      <i class="bi bi-speedometer2 small-box-icon"></i>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card card-outline card-primary">
+      <div class="card-header"><h3 class="card-title">Findings by Severity</h3></div>
+      <div class="card-body">
+        <canvas id="projSeverityChart" style="height: 200px;"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card card-outline card-info">
+      <div class="card-header"><h3 class="card-title">SLA / SPI</h3></div>
+      <div class="card-body">
+        <canvas id="projSlaSpiChart" style="height: 200px;"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var sevLabels = {{ severity_labels|safe }};
+  var sevData = {{ severity_data|safe }};
+  var sevColors = {'Critical': '#212529', 'High': '#dc3545', 'Medium': '#ffc107', 'Low': '#0d6efd', 'Info': '#198754'};
+  new Chart(document.getElementById('projSeverityChart'), {
+    type: 'doughnut',
+    data: {
+      labels: sevLabels,
+      datasets: [{ data: sevData, backgroundColor: sevLabels.map(function(l) { return sevColors[l] || '#6c757d'; }) }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+  });
+  var onTime = {{ finding_count }} - {{ late_count }};
+  new Chart(document.getElementById('projSlaSpiChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['On Time (' + onTime + ')', 'Late ({{ late_count }})'],
+      datasets: [{ data: [onTime, {{ late_count }}], backgroundColor: ['#28a745', '#dc3545'] }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+  });
+});
+</script>
+
 <div class="card card-outline card-primary mt-3">
   <div class="card-header d-flex justify-content-between align-items-center">
     <h3 class="card-title"><i class="bi bi-people me-2"></i>Assignments (Project Team)</h3>
@@ -96,74 +179,102 @@
       <i class="bi bi-upload me-1"></i>Upload Scan
     </button>
   </div>
-  <div class="card-body p-0">
-    <table class="table table-striped mb-0">
-      <thead>
-        <tr>
-          <th>Tool</th>
-          <th>File</th>
-          <th>Uploaded</th>
-          <th>Status</th>
-          <th>Findings</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for sr in scan_reports %}
-        <tr>
-          <td><span class="badge bg-info text-dark">{{ sr.get_source_tool_display }}</span></td>
-          <td>{{ sr.file.name|cut:"scans/" }}</td>
-          <td>{{ sr.uploaded_at|date:"Y-m-d H:i" }}</td>
-          <td>
-            {% if sr.status == 'parsing' %}<span class="badge bg-warning text-dark">Parsing...</span>
-            {% elif sr.status == 'done' %}<span class="badge bg-success">Done</span>
-            {% else %}<span class="badge bg-danger">Error</span>
-            {% endif %}
-          </td>
-          <td>{{ sr.findings.count }}</td>
-          <td>
-            <a href="{% url 'download_scan' sr.pk %}" class="btn btn-sm btn-secondary"><i class="bi bi-download"></i></a>
-          </td>
-        </tr>
-        {% if sr.status == 'done' and sr.findings.exists %}
-        <tr>
-          <td colspan="6" class="p-0">
-            <table class="table table-sm table-borderless mb-0 ms-3" style="width: auto;">
-              <tbody>
-                {% for sf in sr.findings.all %}
-                <tr class="{% if sf.is_false_positive %}text-decoration-line-through text-body-secondary{% endif %}">
-                  <td class="text-nowrap">{{ forloop.counter }}</td>
-                  <td>
-                    {% if sf.severity == 'Critical' or sf.severity == 'High' %}<span class="badge bg-danger">{{ sf.severity }}</span>
-                    {% elif sf.severity == 'Medium' %}<span class="badge bg-warning text-dark">{{ sf.severity }}</span>
-                    {% elif sf.severity == 'Low' %}<span class="badge bg-info text-dark">{{ sf.severity }}</span>
-                    {% else %}<span class="badge bg-success">{{ sf.severity }}</span>
-                    {% endif %}
-                  </td>
-                  <td>{{ sf.title }}</td>
-                  <td><small class="text-body-secondary">{{ sf.affected|truncatechars:40 }}</small></td>
-                  <td>
-                    {% if sf.is_false_positive %}
-                    <span class="badge bg-secondary">FP</span>
-                    {% elif sf.promoted_to %}
-                    <a href="{% url 'finding_detail' sf.promoted_to.pk %}" class="btn btn-sm btn-outline-success"><i class="bi bi-check-circle"></i> Added</a>
-                    {% else %}
-                    <a href="{% url 'promote_scan_finding' project.pk sf.pk %}" class="btn btn-sm btn-success"><i class="bi bi-plus-circle me-1"></i>Add</a>
-                    <a href="{% url 'tag_scan_fp' project.pk sf.pk %}" class="btn btn-sm btn-outline-danger ms-1"><i class="bi bi-x-circle"></i></a>
-                    {% endif %}
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </td>
-        </tr>
-        {% endif %}
-        {% empty %}
-        <tr><td colspan="6" class="text-center">No scans uploaded.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div class="card-header p-0 border-bottom">
+    <ul class="nav nav-tabs" role="tablist">
+      <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-scans" type="button">Scans</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-trend" type="button">Trend</button></li>
+      <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-compare" type="button">Compare</button></li>
+    </ul>
+  </div>
+  <div class="card-body tab-content p-0">
+    <!-- Tab 1: Scans -->
+    <div class="tab-pane fade show active" id="tab-scans">
+      <table class="table table-striped mb-0">
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>File</th>
+            <th>Uploaded</th>
+            <th>Status</th>
+            <th>Findings</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for sr in scan_reports %}
+          <tr>
+            <td><span class="badge bg-info text-dark">{{ sr.get_source_tool_display }}</span></td>
+            <td>{{ sr.file.name|cut:"scans/" }}</td>
+            <td>{{ sr.uploaded_at|date:"Y-m-d H:i" }}</td>
+            <td>
+              {% if sr.status == 'pending' %}<span class="badge bg-secondary">Pending</span>
+              {% elif sr.status == 'parsing' %}<span class="badge bg-warning text-dark">Parsing...</span>
+              {% elif sr.status == 'done' %}<span class="badge bg-success">Done</span>
+              {% else %}<span class="badge bg-danger">Error</span>
+              {% endif %}
+              {% if sr.status == 'pending' and perms.projects.change_project %}
+              <a href="{% url 'parse_scan' project.pk sr.pk %}" class="btn btn-sm btn-outline-primary ms-1"><i class="bi bi-play-fill me-1"></i>Parse</a>
+              {% endif %}
+            </td>
+            <td>{{ sr.findings.count }}</td>
+            <td>
+              {% if sr.status == 'done' %}
+              <a href="{% url 'scan_detail' sr.pk %}" class="btn btn-sm btn-outline-info" title="View Findings"><i class="bi bi-eye"></i></a>
+              {% endif %}
+              <a href="{% url 'download_scan' sr.pk %}" class="btn btn-sm btn-secondary" title="Download"><i class="bi bi-download"></i></a>
+              {% if perms.projects.change_project %}
+              <a href="{% url 'delete_scan' sr.pk %}" class="btn btn-sm btn-outline-danger" title="Delete" onclick="return confirm('Delete this scan?')"><i class="bi bi-trash"></i></a>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="text-center">No scans uploaded.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Tab 2: Trend -->
+    <div class="tab-pane fade" id="tab-trend">
+      <div class="p-3">
+        <div class="row mb-2">
+          <div class="col-auto">
+            <label class="form-label mb-0">Tool</label>
+            <select id="trend-tool" class="form-select form-select-sm" style="width:auto;display:inline-block;">
+            </select>
+          </div>
+          <div class="col-auto d-flex align-items-end gap-1">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectAllTrend(true)">Select All</button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectAllTrend(false)">Deselect All</button>
+          </div>
+        </div>
+        <div id="trend-checkboxes" class="mb-2"></div>
+        <canvas id="trendChart" style="height:280px;"></canvas>
+      </div>
+    </div>
+
+    <!-- Tab 3: Compare -->
+    <div class="tab-pane fade" id="tab-compare">
+      <div class="p-3">
+        <div class="row mb-3">
+          <div class="col-auto">
+            <label class="form-label">Scan A</label>
+            <select id="compare-a" class="form-select form-select-sm"></select>
+          </div>
+          <div class="col-auto d-flex align-items-end">
+            <span class="fs-5 text-body-secondary mx-2">vs</span>
+          </div>
+          <div class="col-auto">
+            <label class="form-label">Scan B</label>
+            <select id="compare-b" class="form-select form-select-sm"></select>
+          </div>
+          <div class="col-auto d-flex align-items-end">
+            <button type="button" class="btn btn-sm btn-primary" onclick="runCompare()">Compare</button>
+          </div>
+        </div>
+        <div id="compare-results"></div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -182,6 +293,11 @@
             <label class="form-label">Source Tool</label>
             <select name="source_tool" class="form-select">
               <option value="burp">Burp Suite</option>
+              <option value="zap">OWASP ZAP</option>
+              <option value="nessus">Nessus</option>
+              <option value="acunetix">Acunetix</option>
+              <option value="nmap">Nmap</option>
+              <option value="openvas">OpenVAS CSV</option>
               <option value="csv">Generic CSV</option>
             </select>
           </div>
@@ -354,4 +470,102 @@
 <div class="mt-3">
   <a href="{% url 'project_list' %}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Project List</a>
 </div>
+
+<script>
+var scanData = {{ scan_list_data|safe }};
+var trendJson = {{ trend_data|safe }};
+var projectPk = {{ project.pk }};
+var trendChart = null;
+
+function buildTrendTab(tool) {
+  var scans = scanData.filter(function(s) { return s.tool === tool && s.status === 'done' && s.findings > 0; });
+  var container = document.getElementById('trend-checkboxes');
+  container.innerHTML = scans.map(function(s, i) {
+    return '<div class="form-check form-check-inline mb-1"><input class="form-check-input trend-cb" type="checkbox" value="' + i + '" checked id="tr-cb-' + i + '"><label class="form-check-label small" for="tr-cb-' + i + '">' + s.file + ' (' + s.date + ')</label></div>';
+  }).join('');
+  window._trendScans = scans;
+  renderTrendChart();
+}
+
+function renderTrendChart() {
+  var cbs = document.querySelectorAll('.trend-cb:checked');
+  var labels = Array.from(cbs).map(function(cb) { return window._trendScans[parseInt(cb.value)].file; });
+  var tool = document.getElementById('trend-tool').value;
+  var raw = trendJson[tool];
+  if (!raw) return;
+
+  if (trendChart) trendChart.destroy();
+  trendChart = new ApexCharts(document.querySelector('#trendChart'), {
+    chart: { type: 'bar', height: 280, toolbar: { show: false } },
+    plotOptions: { bar: { horizontal: false, columnWidth: '55%', borderRadius: 2 } },
+    dataLabels: { enabled: false },
+    stroke: { show: true, width: 1, colors: ['#fff'] },
+    xaxis: { categories: labels },
+    yaxis: { tickAmount: 3, labels: { formatter: function(v) { return Math.round(v); } } },
+    legend: { position: 'bottom' },
+    colors: ['#212529', '#dc3545', '#ffc107', '#0d6efd'],
+    series: raw.datasets.map(function(ds) {
+      return { name: ds.label, data: Array.from(cbs).map(function(cb) { return ds.data[parseInt(cb.value)]; }) };
+    })
+  });
+  trendChart.render();
+}
+function selectAllTrend(val) {
+  document.querySelectorAll('.trend-cb').forEach(function(cb) { cb.checked = val; });
+  renderTrendChart();
+}
+
+function buildCompareDropdowns() {
+  var a = document.getElementById('compare-a');
+  var b = document.getElementById('compare-b');
+  var opts = scanData.filter(function(s) { return s.status === 'done' && s.findings > 0; });
+  var html = opts.map(function(s) { return '<option value="' + s.id + '">' + s.tool_display + ' — ' + s.file + ' (' + s.date + ')</option>'; }).join('');
+  a.innerHTML = html;
+  b.innerHTML = html;
+  if (opts.length >= 2) { a.selectedIndex = opts.length - 2; b.selectedIndex = opts.length - 1; }
+  a.addEventListener('change', function() {
+    var sel = a.options[a.selectedIndex];
+    if (!sel) return;
+    var atool = sel.text.split(' — ')[0];
+    Array.from(b.options).forEach(function(o) { o.style.display = o.text.startsWith(atool) ? '' : 'none'; });
+  });
+  a.dispatchEvent(new Event('change'));
+}
+
+function runCompare() {
+  var aId = document.getElementById('compare-a').value;
+  var bId = document.getElementById('compare-b').value;
+  if (aId === bId) { alert('Pilih dua scan yang berbeda.'); return; }
+  var div = document.getElementById('compare-results');
+  div.innerHTML = '<div class=\"text-center py-3\"><div class=\"spinner-border text-primary\"></div></div>';
+  fetch('/projects/' + projectPk + '/scans/compare/?a=' + aId + '&b=' + bId)
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      function col(items, color, title) {
+        var rows = items.map(function(f) {
+          var act = '';
+          if (f.promoted) act = '<a href=\"/findings/' + f.promoted + '/\" class=\"btn btn-sm btn-outline-success\"><i class=\"bi bi-check-circle me-1\"></i>Added</a>';
+          else if (f.is_fp) act = '<span class=\"badge bg-secondary\">FP</span>';
+          else act = '<a href=\"/projects/' + projectPk + '/scan/' + f.pk + '/promote/\" class=\"btn btn-sm btn-success\"><i class=\"bi bi-plus-circle me-1\"></i>Add</a> <a href=\"/projects/' + projectPk + '/scan/' + f.pk + '/fp/\" class=\"btn btn-sm btn-outline-danger ms-1\"><i class=\"bi bi-x-circle\"></i></a>';
+          var sevBadge = f.severity === 'Critical' || f.severity === 'High' ? 'bg-danger' : f.severity === 'Medium' ? 'bg-warning text-dark' : 'bg-info text-dark';
+          return '<tr><td><span class=\"badge ' + sevBadge + '\">' + f.severity + '</span></td><td>' + f.title + '</td><td><small class=\"text-body-secondary\">' + (f.affected||'').substring(0,50) + '</small></td><td>' + act + '</td></tr>';
+        }).join('');
+        return '<div class=\"col-md-4\"><h6 class=\"text-' + color + '\">' + title + ' (' + items.length + ')</h6><table class=\"table table-sm table-striped\"><tbody>' + (rows || '<tr><td class=\"text-body-secondary\">None</td></tr>') + '</tbody></table></div>';
+      }
+      div.innerHTML = '<div class=\"row\">' + col(data.new, 'success', 'New') + col(data.recurring, 'primary', 'Recurring') + col(data.solved, 'secondary', 'Solved') + '</div>';
+      data.solved.forEach(function(f) { div.querySelector('.col-md-4:last-child tbody').innerHTML += '<tr><td><span class=\"badge bg-secondary me-1\">' + f.severity + '</span></td><td class=\"text-decoration-line-through text-body-secondary\">' + f.title + '</td><td></td><td></td></tr>'; });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var tools = Object.keys(trendJson);
+  var sel = document.getElementById('trend-tool');
+  tools.forEach(function(t) { var display = scanData.find(function(s) { return s.tool === t; }); sel.innerHTML += '<option value=\"' + t + '\">' + (display ? display.tool_display : t) + '</option>'; });
+  if (tools.length) buildTrendTab(tools[0]);
+  sel.addEventListener('change', function() { buildTrendTab(this.value); });
+  document.querySelectorAll('.trend-cb').length === 0 && document.querySelector('#tab-trend').addEventListener('shown.bs.tab', function() { if (!document.querySelectorAll('.trend-cb').length) buildTrendTab(sel.value); });
+  document.querySelector('#tab-compare').addEventListener('shown.bs.tab', function() { if (!document.getElementById('compare-a').options.length) buildCompareDropdowns(); });
+  buildCompareDropdowns();
+});
+</script>
 {% endblock %}
