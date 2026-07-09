@@ -1457,12 +1457,13 @@
         "./init.sh + 22 tests pass."
       ],
       "evidence": [
-        "AJAX endpoint: compare_scans view at /projects/:id/scans/compare/?a=:id&b=:id returns JSON with new/recurring/solved arrays",
-        "Matching logic: _scan_comparison() using md5(title+affected.lower()) between consecutive same-tool scans",
-        "UI: Compare tab with dual dropdown (tool-filtered), Compare button, 3-column result (New/Solved/Recurring) with severity badges + Add/FP actions",
-        "E2E: Compare endpoint correctly returns 1 new, 1 recurring, 1 solved for test data"
+        "AJAX endpoint: compare_scans view at /projects/:id/scans/compare/?a=:id&b=:id returns JSON {new, recurring, solved}",
+        "Matching logic: _compare_pair() uses md5(title+affected.lower()) for direct pair comparison (not consecutive), scan B dropdown auto-filtered to same tool",
+        "3-column result: New (green, add/FP buttons) / Recurring (blue, add/FP buttons) / Solved (grey, strikethrough, no actions)",
+        "promoted_to_id passed correctly as Finding PK (not bool), dropdowns include all done scans including 0-finding ones",
+        "E2E verified: 1 new, 1 recurring, 1 solved for test pair"
       ],
-      "notes": "Part of tabbed Scanning Reports card (Scans | Trend | Compare). Compare uses AJAX fetch to avoid page reload. Add/FP buttons included in each column."
+      "notes": "Part of tabbed Scanning Reports card (Scans | Trend | Compare). Direct pair comparison via _compare_pair(), not consecutive chain. AJAX fetch avoids page reload."
     },
     {
       "id": "feat-016",
@@ -1480,13 +1481,13 @@
         "./init.sh + 22 tests pass."
       ],
       "evidence": [
-        "projects/views.py: project_detail precomputes trend_data per tool (last 5 scans, severity counts) + scan_list_data JSON",
-        "Template: Trend tab with tool dropdown, scan checkboxes (Select All / Deselect All), Chart.js stacked bar",
-        "JS: buildTrendTab() populates checkboxes, renderTrendChart() rebuilds on checkbox change, selectAllTrend() for bulk toggle",
-        "Chart.js stacked bar with severity colors: Critical=#212529, High=#dc3545, Medium=#ffc107, Low=#0d6efd",
-        "E2E: trend data JSON + scan checkboxes + chart all render correctly"
+        "projects/views.py: project_detail precomputes trend_data per tool — dataset.data is dict {scan_id: count} for exact ID matching, not indexOf date lookup",
+        "Template: Trend tab with simple HTML table (Tool | Scan | Critical | High | Medium | Low | Total), no filters, no charts",
+        "JS: buildTrendTable() renders all done scans with severity counts via scanData + trendJson, includes 0-finding scans",
+        "Scan ID-based matching avoids duplicate-row bug when scans share the same date",
+        "E2E: all done scans appear in table with correct per-scan severity breakdown"
       ],
-      "notes": "Part of tabbed Scanning Reports card (Scans | Trend | Compare). Filter checkboxes let users select which scans to include in trend. Max 5 scans shown per tool."
+      "notes": "Part of tabbed Scanning Reports card (Scans | Trend | Compare). Simple severity count table per scan — no filter, no chart. Matches by scan ID to handle same-date scans correctly."
     },
     {
       "id": "feat-017",

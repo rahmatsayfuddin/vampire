@@ -147,11 +147,11 @@ def project_detail(request, pk):
         sev_order = ['Critical', 'High', 'Medium', 'Low']
         if trend_scans:
             trend_data[tool] = {
-                'labels': [s.uploaded_at.strftime('%m/%d') for s in trend_scans],
+                'scans': [{'id': s.pk, 'date': s.uploaded_at.strftime('%m/%d')} for s in trend_scans],
                 'datasets': [
-                    {'label': sev, 'data': [
-                        s.findings.filter(severity=sev).count() for s in trend_scans
-                    ], 'backgroundColor': {'Critical': '#212529', 'High': '#dc3545', 'Medium': '#ffc107', 'Low': '#0d6efd'}[sev]}
+                    {'label': sev, 'data': dict(
+                        (s.pk, s.findings.filter(severity=sev).count()) for s in trend_scans
+                    ), 'backgroundColor': {'Critical': '#212529', 'High': '#dc3545', 'Medium': '#ffc107', 'Low': '#0d6efd'}[sev]}
                     for sev in sev_order
                 ]
             }
@@ -318,28 +318,33 @@ def compare_scans(request, pk):
     if report_a.source_tool != report_b.source_tool:
         return HttpResponseNotFound('Scans must be from the same tool')
 
-    all_scans = list(ScanReport.objects.filter(
-        project=project, source_tool=report_a.source_tool
-    ).order_by('-uploaded_at'))
-    comparison_flags, solved_map = _scan_comparison(all_scans)
-
-    new_items = []
-    recurring_items = []
-    solved_items = solved_map.get(report_b.pk, [])
-
-    for sf in report_b.findings.all():
-        flag = comparison_flags.get(sf.pk)
-        d = {'pk': sf.pk, 'title': sf.title, 'severity': sf.severity, 'affected': sf.affected, 'is_fp': sf.is_false_positive, 'promoted': bool(sf.promoted_to)}
-        if flag == 'new':
-            new_items.append(d)
-        elif flag == 'recurring':
-            recurring_items.append(d)
-
+    new_items, recurring_items, solved_items = _compare_pair(report_a, report_b)
     return JsonResponse({
         'new': new_items,
         'recurring': recurring_items,
         'solved': solved_items,
     })
+
+
+def _compare_pair(report_a, report_b):
+    a_map = {}
+    for sf in report_a.findings.all():
+        h = hashlib.md5((sf.title + sf.affected.lower()).encode()).hexdigest()
+        a_map[h] = {'title': sf.title, 'severity': sf.severity, 'affected': sf.affected}
+
+    b_map = {}
+    for sf in report_b.findings.all():
+        h = hashlib.md5((sf.title + sf.affected.lower()).encode()).hexdigest()
+        b_map[h] = {'pk': sf.pk, 'title': sf.title, 'severity': sf.severity,
+                    'affected': sf.affected, 'is_fp': sf.is_false_positive,
+                    'promoted': sf.promoted_to_id}
+
+    a_set, b_set = set(a_map), set(b_map)
+    return (
+        [b_map[h] for h in (b_set - a_set)],
+        [b_map[h] for h in (a_set & b_set)],
+        [a_map[h] for h in (a_set - b_set)],
+    )
 
 
 @login_required

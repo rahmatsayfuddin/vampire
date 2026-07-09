@@ -237,19 +237,12 @@ document.addEventListener('DOMContentLoaded', function () {
     <!-- Tab 2: Trend -->
     <div class="tab-pane fade" id="tab-trend">
       <div class="p-3">
-        <div class="row mb-2">
-          <div class="col-auto">
-            <label class="form-label mb-0">Tool</label>
-            <select id="trend-tool" class="form-select form-select-sm" style="width:auto;display:inline-block;">
-            </select>
-          </div>
-          <div class="col-auto d-flex align-items-end gap-1">
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectAllTrend(true)">Select All</button>
-            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="selectAllTrend(false)">Deselect All</button>
-          </div>
+        <div id="trend-table" class="table-responsive">
+          <table class="table table-sm table-bordered mb-0">
+            <thead><tr><th>Tool</th><th>Scan</th><th>Critical</th><th>High</th><th>Medium</th><th>Low</th><th>Total</th></tr></thead>
+            <tbody></tbody>
+          </table>
         </div>
-        <div id="trend-checkboxes" class="mb-2"></div>
-        <canvas id="trendChart" style="height:280px;"></canvas>
       </div>
     </div>
 
@@ -475,50 +468,30 @@ document.addEventListener('DOMContentLoaded', function () {
 var scanData = {{ scan_list_data|safe }};
 var trendJson = {{ trend_data|safe }};
 var projectPk = {{ project.pk }};
-var trendChart = null;
-
-function buildTrendTab(tool) {
-  var scans = scanData.filter(function(s) { return s.tool === tool && s.status === 'done' && s.findings > 0; });
-  var container = document.getElementById('trend-checkboxes');
-  container.innerHTML = scans.map(function(s, i) {
-    return '<div class="form-check form-check-inline mb-1"><input class="form-check-input trend-cb" type="checkbox" value="' + i + '" checked id="tr-cb-' + i + '"><label class="form-check-label small" for="tr-cb-' + i + '">' + s.file + ' (' + s.date + ')</label></div>';
-  }).join('');
-  window._trendScans = scans;
-  renderTrendChart();
-}
-
-function renderTrendChart() {
-  var cbs = document.querySelectorAll('.trend-cb:checked');
-  var labels = Array.from(cbs).map(function(cb) { return window._trendScans[parseInt(cb.value)].file; });
-  var tool = document.getElementById('trend-tool').value;
-  var raw = trendJson[tool];
-  if (!raw) return;
-
-  if (trendChart) trendChart.destroy();
-  trendChart = new ApexCharts(document.querySelector('#trendChart'), {
-    chart: { type: 'bar', height: 280, toolbar: { show: false } },
-    plotOptions: { bar: { horizontal: false, columnWidth: '55%', borderRadius: 2 } },
-    dataLabels: { enabled: false },
-    stroke: { show: true, width: 1, colors: ['#fff'] },
-    xaxis: { categories: labels },
-    yaxis: { tickAmount: 3, labels: { formatter: function(v) { return Math.round(v); } } },
-    legend: { position: 'bottom' },
-    colors: ['#212529', '#dc3545', '#ffc107', '#0d6efd'],
-    series: raw.datasets.map(function(ds) {
-      return { name: ds.label, data: Array.from(cbs).map(function(cb) { return ds.data[parseInt(cb.value)]; }) };
-    })
+function buildTrendTable() {
+  var sevOrder = ['Critical', 'High', 'Medium', 'Low'];
+  var tbody = document.querySelector('#trend-table tbody');
+  var rows = [];
+  scanData.forEach(function(s) {
+    if (s.status !== 'done') return;
+    var json = trendJson[s.tool];
+    if (!json || !json.datasets) return;
+    var counts = {};
+    json.datasets.forEach(function(ds) { counts[ds.label] = ds.data[s.id] || 0; });
+    var total = sevOrder.reduce(function(sum, sev) { return sum + (counts[sev] || 0); }, 0);
+    rows.push('<tr><td><span class=\"badge bg-info text-dark\">' + s.tool_display + '</span></td><td><small>' + s.file + ' (' + s.date + ')</small></td>' +
+      '<td class=\"text-center\">' + (counts.Critical || 0) + '</td>' +
+      '<td class=\"text-center\">' + (counts.High || 0) + '</td>' +
+      '<td class=\"text-center\">' + (counts.Medium || 0) + '</td>' +
+      '<td class=\"text-center\">' + (counts.Low || 0) + '</td>' +
+      '<td class=\"text-center\">' + total + '</td></tr>');
   });
-  trendChart.render();
+  tbody.innerHTML = rows.join('') || '<tr><td colspan=\"7\" class=\"text-center text-body-secondary\">No parsed scans with findings.</td></tr>';
 }
-function selectAllTrend(val) {
-  document.querySelectorAll('.trend-cb').forEach(function(cb) { cb.checked = val; });
-  renderTrendChart();
-}
-
 function buildCompareDropdowns() {
   var a = document.getElementById('compare-a');
   var b = document.getElementById('compare-b');
-  var opts = scanData.filter(function(s) { return s.status === 'done' && s.findings > 0; });
+  var opts = scanData.filter(function(s) { return s.status === 'done'; });
   var html = opts.map(function(s) { return '<option value="' + s.id + '">' + s.tool_display + ' — ' + s.file + ' (' + s.date + ')</option>'; }).join('');
   a.innerHTML = html;
   b.innerHTML = html;
@@ -541,29 +514,26 @@ function runCompare() {
   fetch('/projects/' + projectPk + '/scans/compare/?a=' + aId + '&b=' + bId)
     .then(function(r) { return r.json(); })
     .then(function(data) {
-      function col(items, color, title) {
+      function col(items, color, title, showActions) {
         var rows = items.map(function(f) {
-          var act = '';
-          if (f.promoted) act = '<a href=\"/findings/' + f.promoted + '/\" class=\"btn btn-sm btn-outline-success\"><i class=\"bi bi-check-circle me-1\"></i>Added</a>';
-          else if (f.is_fp) act = '<span class=\"badge bg-secondary\">FP</span>';
-          else act = '<a href=\"/projects/' + projectPk + '/scan/' + f.pk + '/promote/\" class=\"btn btn-sm btn-success\"><i class=\"bi bi-plus-circle me-1\"></i>Add</a> <a href=\"/projects/' + projectPk + '/scan/' + f.pk + '/fp/\" class=\"btn btn-sm btn-outline-danger ms-1\"><i class=\"bi bi-x-circle\"></i></a>';
           var sevBadge = f.severity === 'Critical' || f.severity === 'High' ? 'bg-danger' : f.severity === 'Medium' ? 'bg-warning text-dark' : 'bg-info text-dark';
-          return '<tr><td><span class=\"badge ' + sevBadge + '\">' + f.severity + '</span></td><td>' + f.title + '</td><td><small class=\"text-body-secondary\">' + (f.affected||'').substring(0,50) + '</small></td><td>' + act + '</td></tr>';
+          var act = '';
+          if (showActions) {
+            if (f.promoted) act = '<a href=\"/findings/' + f.promoted + '/\" class=\"btn btn-sm btn-outline-success\"><i class=\"bi bi-check-circle me-1\"></i>Added</a>';
+            else if (f.is_fp) act = '<span class=\"badge bg-secondary\">FP</span>';
+            else act = '<a href=\"/projects/' + projectPk + '/scan/' + f.pk + '/promote/\" class=\"btn btn-sm btn-success\"><i class=\"bi bi-plus-circle me-1\"></i>Add</a> <a href=\"/projects/' + projectPk + '/scan/' + f.pk + '/fp/\" class=\"btn btn-sm btn-outline-danger ms-1\"><i class=\"bi bi-x-circle\"></i></a>';
+          }
+          var rowStyle = showActions ? '' : ' class=\"text-decoration-line-through text-body-secondary\"';
+          return '<tr' + rowStyle + '><td><span class=\"badge ' + sevBadge + '\">' + f.severity + '</span></td><td>' + f.title + '</td><td><small class=\"text-body-secondary\">' + (f.affected||'').substring(0,40) + '</small></td><td>' + act + '</td></tr>';
         }).join('');
-        return '<div class=\"col-md-4\"><h6 class=\"text-' + color + '\">' + title + ' (' + items.length + ')</h6><table class=\"table table-sm table-striped\"><tbody>' + (rows || '<tr><td class=\"text-body-secondary\">None</td></tr>') + '</tbody></table></div>';
+        return '<div class=\"col-md-4\"><h6 class=\"text-' + color + '\">' + title + ' (' + items.length + ')</h6><table class=\"table table-sm table-striped\"><tbody>' + (rows || '<tr><td class=\"text-body-secondary\">—</td></tr>') + '</tbody></table></div>';
       }
-      div.innerHTML = '<div class=\"row\">' + col(data.new, 'success', 'New') + col(data.recurring, 'primary', 'Recurring') + col(data.solved, 'secondary', 'Solved') + '</div>';
-      data.solved.forEach(function(f) { div.querySelector('.col-md-4:last-child tbody').innerHTML += '<tr><td><span class=\"badge bg-secondary me-1\">' + f.severity + '</span></td><td class=\"text-decoration-line-through text-body-secondary\">' + f.title + '</td><td></td><td></td></tr>'; });
+      div.innerHTML = '<div class=\"row\">' + col(data.new, 'success', 'New', true) + col(data.recurring, 'primary', 'Recurring', true) + col(data.solved, 'secondary', 'Solved', false) + '</div>';
     });
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  var tools = Object.keys(trendJson);
-  var sel = document.getElementById('trend-tool');
-  tools.forEach(function(t) { var display = scanData.find(function(s) { return s.tool === t; }); sel.innerHTML += '<option value=\"' + t + '\">' + (display ? display.tool_display : t) + '</option>'; });
-  if (tools.length) buildTrendTab(tools[0]);
-  sel.addEventListener('change', function() { buildTrendTab(this.value); });
-  document.querySelectorAll('.trend-cb').length === 0 && document.querySelector('#tab-trend').addEventListener('shown.bs.tab', function() { if (!document.querySelectorAll('.trend-cb').length) buildTrendTab(sel.value); });
+  buildTrendTable();
   document.querySelector('#tab-compare').addEventListener('shown.bs.tab', function() { if (!document.getElementById('compare-a').options.length) buildCompareDropdowns(); });
   buildCompareDropdowns();
 });
