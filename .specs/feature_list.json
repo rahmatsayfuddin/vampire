@@ -1,6 +1,6 @@
 {
   "project": "vampire",
-  "last_updated": "2026-07-07",
+  "last_updated": "2026-07-10",
   "rules": {
     "single_active_feature": true,
     "passing_requires_evidence": true,
@@ -1534,6 +1534,53 @@
         "22 tests pass"
       ],
       "notes": "Lightweight model: ProjectNote(project FK, user FK, content TextField, created_at). Added to project_detail timeline or as separate card. No edit/delete for v1."
+    },
+    {
+      "id": "feat-019",
+      "priority": 63,
+      "area": "projects",
+      "title": "Revamp Project List — AdminLTE v4 style table + summary cards + search/filter",
+      "user_visible_behavior": "Project list page shows summary cards (In Progress/On Track/Delayed/Completed), searchable table with status badges, SPI, due date, findings count, and action buttons.",
+      "status": "passing",
+      "verification": [
+        "Open /projects/ — verify 4 summary cards render with correct counts.",
+        "Verify table columns: Project, Status, SPI, Due, Findings, Actions.",
+        "Type in search box — verify table filters by project name.",
+        "Select status from dropdown — verify table filters.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [
+        "projects/views.py: project_list view computes summary counts (in_progress/on_track/delayed/completed) + prefetches findings + builds project_data list",
+        "projects/templates/projects/project_list.html: full AdminLTE v4 rewrite — 4 summary cards, toolbar with search input + status dropdown, table with 6 columns",
+        "Table columns: Project (name+org), Status (badge), SPI (colored value), Due (date), Findings (badge), Actions (btn-group View/Edit/Delete)",
+        "Client-side JS: filterProjects() filters by name substring + status value",
+        "22 tests pass, init.sh clean"
+      ],
+      "notes": "Adapt AdminLTE v4 pages/projects.html layout. Table columns: Project (name + org), Status (badge), SPI (colored value), Due (date), Findings (count badge), Actions (View/Edit/Delete). Summary cards: In Progress, On Track (SPI>=1), Delayed (SPI<1), Completed. Client-side JS search + status filter. Removed team column (user preference)."
+    },
+    {
+      "id": "chore-001",
+      "priority": 64,
+      "area": "docs",
+      "title": "Reorganize README — split into docs/ multi-file documentation",
+      "user_visible_behavior": "Compact README with quick start + tech stack + links. Full docs under docs/ folder: setup, architecture, features, usage, configuration, development.",
+      "status": "passing",
+      "verification": [
+        "docs/ directory exists with 6 files: setup.md, architecture.md, features.md, usage.md, configuration.md, development.md",
+        "README.md is compact (~30 lines) with quick start + links to all docs",
+        "All content from original 396-line README preserved across the 6 files",
+        "Links between docs working (relative paths)"
+      ],
+      "evidence": [
+        "docs/setup.md: prerequisites, local dev, Docker, baseline checks, dependencies",
+        "docs/architecture.md: project structure tree, FBV+services pattern, 13 core models, app descriptions",
+        "docs/features.md: feature overview by category (Dashboard, Projects, Findings, VKB, Scan Reports, Audit, Reports) + SPI/SLA metrics",
+        "docs/usage.md: 12-step guide — organization → SLA → project → assignment → scan → finding wizard → VKB → report template → generate → audit → search",
+        "docs/configuration.md: env vars table, DB_HOST logic, security headers, logging",
+        "docs/development.md: commands, code conventions, feature workflow, startup workflow",
+        "README.md: 37 lines — intro, quick start, tech stack table, doc links, license"
+      ],
+      "notes": "Split current 396-line README into 6 focused docs under docs/. Main README kept minimal: intro + quick start + tech stack + doc links."
     }
   ]
 }

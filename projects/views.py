@@ -16,8 +16,29 @@ from django.contrib.auth.decorators import login_required, permission_required
 
 @login_required
 def project_list(request):
-    projects = ProjectService.get_queryset_for_user(request.user)
-    return render(request, 'projects/project_list.html', {'projects': projects})
+    projects = ProjectService.get_queryset_for_user(request.user).select_related('organization').prefetch_related('finding_set')
+    total = projects.count()
+    in_progress = sum(1 for p in projects if p.status == 'In Progress')
+    completed = sum(1 for p in projects if p.status == 'Completed')
+    on_track = sum(1 for p in projects if ProjectMetricsService.spi(p) is not None and ProjectMetricsService.spi(p) >= 1)
+    delayed = sum(1 for p in projects if ProjectMetricsService.spi(p) is not None and ProjectMetricsService.spi(p) < 1)
+    project_data = [{
+        'pk': p.pk,
+        'name': p.project_name,
+        'org': p.organization.name,
+        'status': p.status,
+        'spi': p.spi(),
+        'findings': p.finding_set.count(),
+        'end_date': p.end_date,
+    } for p in projects]
+    return render(request, 'projects/project_list.html', {
+        'projects': project_data,
+        'total': total,
+        'in_progress': in_progress,
+        'on_track': on_track,
+        'delayed': delayed,
+        'completed': completed,
+    })
 
 @login_required
 @permission_required('projects.add_project', raise_exception=True)

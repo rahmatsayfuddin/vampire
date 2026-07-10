@@ -1,45 +1,116 @@
 {% extends "base_adminlte.html" %}
 {% block title %}Projects{% endblock %}
 {% block content %}
+
 <div class="d-flex justify-content-between align-items-center mb-3">
-  <h1 class="h3">Projects</h1>
-  <a href="{% url 'project_create' %}" class="btn btn-primary">Create New Project</a>
+  <h1 class="mb-0 fs-3">Projects</h1>
+  <a href="{% url 'project_create' %}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>New Project</a>
 </div>
 
-<div class="row">
-  {% for project in projects %}
-  <div class="col-md-6">
-    <div class="card card-outline card-primary mb-3">
-      <div class="card-header">
-        <h3 class="card-title">{{ project.project_name }} — {{ project.organization.name }}</h3>
-      </div>
-      <div class="card-body">
-        <p>Status: {{ project.status }}</p>
-        {% if project.status == 'Completed' %}
-        {% if project.spi >= 1 %}
-        <p><strong>SPI:</strong> {{ project.spi }} 🟢 – On time or faster</p>
-        {% else %}
-        <p><strong>SPI:</strong> {{ project.spi }} 🔴 – Delayed</p>
-        {% endif %}
-        {% else %}
-        {% if project.spi >= 1 %}
-        <p><strong>SPI (est.):</strong> {{ project.spi }} 🟢 – Estimated, project not yet completed</p>
-        {% else %}
-        <p><strong>SPI (est.):</strong> {{ project.spi }} 🔴 – Estimated, project not yet completed</p>
-        {% endif %}
-        {% endif %}
-      </div>
-      <div class="card-footer">
-        <a href="{% url 'project_detail' project.pk %}" class="btn btn-sm btn-info">View</a>
-        <a href="{% url 'project_update' project.pk %}" class="btn btn-sm btn-warning">Edit</a>
-        <a href="{% url 'project_delete' project.pk %}" class="btn btn-sm btn-danger">Delete</a>
-      </div>
+<div class="row g-3 mb-3">
+  <div class="col-md-3 col-6">
+    <div class="card h-100">
+      <div class="card-body"><p class="text-secondary small mb-1">In Progress</p><h3 class="mb-0 fw-bold text-primary">{{ in_progress }}</h3></div>
     </div>
   </div>
-  {% empty %}
-  <div class="col-12">
-    <div class="alert alert-secondary">No projects found.</div>
+  <div class="col-md-3 col-6">
+    <div class="card h-100">
+      <div class="card-body"><p class="text-secondary small mb-1">On Track</p><h3 class="mb-0 fw-bold text-success">{{ on_track }}</h3></div>
+    </div>
   </div>
-  {% endfor %}
+  <div class="col-md-3 col-6">
+    <div class="card h-100">
+      <div class="card-body"><p class="text-secondary small mb-1">Delayed</p><h3 class="mb-0 fw-bold text-danger">{{ delayed }}</h3></div>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="card h-100">
+      <div class="card-body"><p class="text-secondary small mb-1">Completed</p><h3 class="mb-0 fw-bold text-secondary">{{ completed }}</h3></div>
+    </div>
+  </div>
 </div>
+
+<div class="card">
+  <div class="card-header d-flex flex-wrap gap-2 align-items-center">
+    <h3 class="card-title mb-0 me-auto">All projects</h3>
+    <div class="input-group input-group-sm" style="width:16rem;">
+      <span class="input-group-text"><i class="bi bi-search"></i></span>
+      <input type="search" id="project-search" class="form-control" placeholder="Search projects..." aria-label="Search projects" oninput="filterProjects()">
+    </div>
+    <select id="project-status-filter" class="form-select form-select-sm" style="width:10rem;" onchange="filterProjects()">
+      <option value="">All statuses</option>
+      <option value="In Progress">In Progress</option>
+      <option value="Planned">Planned</option>
+      <option value="Completed">Completed</option>
+      <option value="On Hold">On Hold</option>
+    </select>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0" id="project-table">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>Status</th>
+            <th>SPI</th>
+            <th>Due</th>
+            <th>Findings</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in projects %}
+          <tr data-name="{{ p.name|lower }}{{ p.org|lower }}" data-status="{{ p.status }}">
+            <td>
+              <a href="{% url 'project_detail' p.pk %}" class="fw-semibold text-decoration-none">{{ p.name }}</a>
+              <div class="small text-secondary">{{ p.org }}</div>
+            </td>
+            <td>
+              {% if p.status == 'In Progress' %}<span class="badge text-bg-primary">{{ p.status }}</span>
+              {% elif p.status == 'Completed' %}<span class="badge text-bg-success">{{ p.status }}</span>
+              {% elif p.status == 'On Hold' %}<span class="badge text-bg-warning">{{ p.status }}</span>
+              {% else %}<span class="badge text-bg-secondary">{{ p.status }}</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if p.spi %}
+              <span class="fw-semibold {% if p.spi >= 1 %}text-success{% else %}text-danger{% endif %}">{{ p.spi|floatformat:2 }}</span>
+              {% else %}—{% endif %}
+            </td>
+            <td class="text-nowrap">{{ p.end_date|date:"M d, Y" }}</td>
+            <td>
+              {% if p.findings %}
+              <span class="badge text-bg-dark">{{ p.findings }}</span>
+              {% else %}—{% endif %}
+            </td>
+            <td class="text-end">
+              <div class="btn-group btn-group-sm">
+                <a href="{% url 'project_detail' p.pk %}" class="btn btn-outline-secondary" title="View"><i class="bi bi-eye"></i></a>
+                <a href="{% url 'project_update' p.pk %}" class="btn btn-outline-secondary" title="Edit"><i class="bi bi-pencil"></i></a>
+                <a href="{% url 'project_delete' p.pk %}" class="btn btn-outline-secondary" title="Delete"><i class="bi bi-trash"></i></a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="text-center py-3 text-secondary">No projects found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+function filterProjects() {
+  var q = document.getElementById('project-search').value.toLowerCase();
+  var status = document.getElementById('project-status-filter').value;
+  document.querySelectorAll('#project-table tbody tr').forEach(function(tr) {
+    var name = tr.getAttribute('data-name') || '';
+    var st = tr.getAttribute('data-status') || '';
+    var matchName = !q || name.indexOf(q) >= 0;
+    var matchStatus = !status || st === status;
+    tr.style.display = matchName && matchStatus ? '' : 'none';
+  });
+}
+</script>
 {% endblock %}
