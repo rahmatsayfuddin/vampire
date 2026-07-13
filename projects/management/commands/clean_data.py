@@ -1,46 +1,32 @@
 from django.core.management.base import BaseCommand
-from products.models import Product
-from projects.models import Project
-from findings.models import Finding
+from organizations.models import Organization
+from projects.models import Project, ScanReport, ScanFinding, ProjectNote, SlaProfile
+from findings.models import Finding, FindingComment, RiskAcceptance
 from assignments.models import Assignment
 from vkb.models import VulnerabilityKnowledgeBase
-from reports.models import ReportHistory
+from reports.models import ReportHistory, ReportTemplate
 from stakeholders.models import Stakeholder
+from audit.models import AuditLog
+
 
 class Command(BaseCommand):
-    help = 'Clean all data except Users and Groups for E2E testing'
+    help = 'Clean all application data except Users and Groups'
 
     def handle(self, *args, **options):
         self.stdout.write('Cleaning data...')
-
-        # Delete in order of dependencies (though CASCADE should handle most)
-        
-        # Reports
         ReportHistory.objects.all().delete()
-        self.stdout.write('Deleted Reports')
-
-        # Findings
+        ReportTemplate.objects.all().delete()
+        AuditLog.objects.all().delete()
+        FindingComment.objects.all().delete()
+        RiskAcceptance.objects.all().delete()
         Finding.objects.all().delete()
-        self.stdout.write('Deleted Findings')
-
-        # Assignments
+        ScanFinding.objects.all().delete()
+        ScanReport.objects.all().delete()
+        ProjectNote.objects.all().delete()
         Assignment.objects.all().delete()
-        self.stdout.write('Deleted Assignments')
-
-        # Projects
-        Project.objects.all().delete()
-        self.stdout.write('Deleted Projects')
-
-        # Products
-        Product.objects.all().delete()
-        self.stdout.write('Deleted Products')
-
-        # VKB
-        VulnerabilityKnowledgeBase.objects.all().delete()
-        self.stdout.write('Deleted VKB')
-
-        # Stakeholders
         Stakeholder.objects.all().delete()
-        self.stdout.write('Deleted Stakeholders')
-
-        self.stdout.write(self.style.SUCCESS('Successfully cleaned all application data (Users preserved)'))
+        Project.objects.all().delete()
+        SlaProfile.objects.all().delete()
+        VulnerabilityKnowledgeBase.objects.all().delete()
+        Organization.objects.all().delete()
+        self.stdout.write(self.style.SUCCESS('All application data cleaned (Users & Groups preserved)'))

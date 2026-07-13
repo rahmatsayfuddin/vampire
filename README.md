@@ -16,6 +16,11 @@ Application: `http://127.0.0.1:8001/`
 
 > Port 8001 is used because macOS Docker Desktop occupies port 8000.
 
+## Demo
+
+[https://vampire.rahmatsay.xyz](https://vampire.rahmatsay.xyz)
+**Login:** `admin` / `admin123`
+
 ## Tech Stack
 
 | Component | Technology |

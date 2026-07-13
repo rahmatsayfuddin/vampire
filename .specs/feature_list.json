@@ -1581,6 +1581,31 @@
         "README.md: 37 lines — intro, quick start, tech stack table, doc links, license"
       ],
       "notes": "Split current 396-line README into 6 focused docs under docs/. Main README kept minimal: intro + quick start + tech stack + doc links."
+    },
+    {
+      "id": "chore-002",
+      "priority": 65,
+      "area": "devops",
+      "title": "Demo data script — seed_demo management command for realistic scenarios",
+      "user_visible_behavior": "Running `python manage.py seed_demo` populates the database with 2 orgs, 6 projects (various states), 24 findings (mix of severities/statuses + 5 late + 3 risk-accepted), 3 scan reports, 4 users, 8 VKB entries, and more.",
+      "status": "passing",
+      "verification": [
+        "Run `python manage.py seed_demo` — verify all data created without errors.",
+        "Check dashboard shows 24 findings, 6 projects.",
+        "Verify 5 findings marked late, 3 risk-accepted.",
+        "Verify 2 orgs, 4 users, 3 scan reports, 8 VKB entries, 4 stakeholders.",
+        "./init.sh + 22 tests pass."
+      ],
+      "evidence": [
+        "projects/management/commands/seed_demo.py: idempotent (calls clean_data first), creates complete demo dataset",
+        "Fixed projects/management/commands/clean_data.py: replaced broken products.models import with organizations.models",
+        "Scenarios: 2 orgs (Acme + GlobalTech), 2 SLA profiles, 6 projects across all 4 statuses, 24 findings with mixed severity/status/SLA",
+        "3 scan reports for Acme Web Portal (2 Nessus scans for comparison + 1 Burp), 10+ parsed ScanFindings each",
+        "4 users: admin/admin123, pentester/demo1234, viewer/demo1234, lead/demo1234",
+        "8 VKB entries across OWASP categories, 4 stakeholders, 5 project notes",
+        "22 tests pass, init.sh clean"
+      ],
+      "notes": "Idempotent — runs clean_data first then creates fresh demo data. Created scenarios for: In Progress on-track, In Progress delayed/overdue, Completed on-time, On Hold, Planned. Late findings created by pushing created_at 365 days back. Risk acceptances created with accept_until +90 days."
     }
   ]
 }
